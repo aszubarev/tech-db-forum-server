@@ -1,0 +1,31 @@
+version: "3"
+services:
+
+  postgres:
+    restart: always
+    image: postgres:latest
+    networks:
+      - backend
+    ports:
+      - "5454:5432"
+    environment:
+      - POSTGRES_USER=my_user
+      - POSTGRES_PASSWORD=my_pass
+      - POSTGRES_DB=my_db
+
+  loader:
+    build:
+      context: ../lib/loaders/postgres
+
+    volumes:
+      - ../src/database:/tmp/database
+
+    environment:
+      - PGPASSWORD=my_pass
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+networks:
+  backend:

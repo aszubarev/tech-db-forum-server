@@ -1,45 +1,46 @@
 @startuml
 
-post: post_id [INT]
-post: thread_id [INT]
-post: forum_id [INT]
-post: user_id [INT]
-post: parent_id [INT]
-post: message [TEXT]
-post: created [DATETIME]
-post: is_edited [BOOLEAN]
-post ---> forum
-post ---> user : author
-post ---> thread
-post -> post: parent
+posts: post_id [INT]
+posts: thread_id [INT]
+posts: forum_id [INT]
+posts: user_id [INT]
+posts: parent_id [INT]
+posts: message [TEXT]
+posts: created [DATETIME]
+posts: is_edited [BOOLEAN]
+posts ---> forums
+posts ---> users : author
+posts ---> threads
+posts -> posts: parent
 
 vote: vote_id [INT]
 vote: thread_id [INT]
 vote: user_id [INT]
-vote: value [INT]
-vote ---> user
-vote ---> thread
+vote: vote_value [INT]
+vote ---> users
+vote ---> threads
 
-user: user_id [INT]
-user: nickname [TEXT]
-user: about [TEXT]
-user: email [TEXT]
-user: fullname [TEXT]
+users: user_id [INT]
+users: nickname [CITEXT]
+users: email [CITEXT]
+users: about [TEXT]
+users: fullname [TEXT]
 
-forum: forum_id [INT]
-forum: slug [TEXT]
-forum: user_id [text]
-forum: threads [INT]
-forum: title [text]
-forum -> user: responsible
+forums: forum_id [INT]
+forums: slug [CITEXT]
+forums: user_id [INT]
+forums: title [text]
+forums -> users: responsible
 
-thread: thread_id [INT]
-thread: slug [TEXT]
-thread: forum_id [DATETIME]
-thread: created [DATETIME]
-thread: message [TEXT]
-thread: title [TEXT]
-thread -> forum
+threads: thread_id [INT]
+threads: slug [CITEXT]
+threads: forum_id [INT]
+threads: user_id [INT]
+threads: created [DATETIME]
+threads: message [TEXT]
+threads: title [TEXT]
+threads -> forums
+threads --> users : author
 
 
 @enduml
