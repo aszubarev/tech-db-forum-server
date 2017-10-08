@@ -1,0 +1,9 @@
+CREATE TABLE users2
+(
+    user_id SERIAL,
+
+    fullname TEXT NOT NULL,
+    about TEXT NOT NULL,
+
+    PRIMARY KEY(user_id)
+);
