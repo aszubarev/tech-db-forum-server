@@ -28,17 +28,19 @@ users: fullname [TEXT]
 
 forums: forum_id [INT]
 forums: slug [CITEXT]
-forums: user_id [text]
+forums: user_id [INT]
 forums: title [text]
 forums -> users: responsible
 
 threads: thread_id [INT]
 threads: slug [CITEXT]
-threads: forum_id [DATETIME]
+threads: forum_id [INT]
+threads: user_id [INT]
 threads: created [DATETIME]
 threads: message [TEXT]
 threads: title [TEXT]
 threads -> forums
+threads --> users : author
 
 
 @enduml
