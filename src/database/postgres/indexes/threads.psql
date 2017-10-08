@@ -1,0 +1,9 @@
+CREATE INDEX threads_slug_idx
+  ON threads (slug);
+
+CREATE INDEX threads_forums_idx
+  ON threads (forum_id);
+
+CREATE INDEX threads_users_idx
+  ON threads (user_id);
+

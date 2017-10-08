@@ -32,3 +32,11 @@ psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/constraint
 psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/constraints/threads.psql;
 echo "[COMPLETE] create constraints from *.psql files"
 
+echo "[TRY] create indexes from *.psql files"
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/indexes/users.psql;
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/indexes/vote.psql;
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/indexes/forums.psql;
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/indexes/threads.psql;
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/indexes/posts.psql;
+echo "[COMPLETE] create indexes from *.psql files"
+
