@@ -14,8 +14,8 @@ posts ---> threads
 posts -> posts: parent
 
 vote: vote_id [INT]
-vote: thread_id [INT]
 vote: user_id [INT]
+vote: thread_id [INT]
 vote: vote_value [INT]
 vote ---> users
 vote ---> threads
@@ -41,6 +41,5 @@ threads: message [TEXT]
 threads: title [TEXT]
 threads -> forums
 threads --> users : author
-
 
 @enduml
