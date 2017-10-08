@@ -29,7 +29,6 @@ users: fullname [TEXT]
 forums: forum_id [INT]
 forums: slug [CITEXT]
 forums: user_id [text]
-forums: threads [INT]
 forums: title [text]
 forums -> users: responsible
 
