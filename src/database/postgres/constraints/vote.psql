@@ -1,0 +1,7 @@
+ALTER TABLE vote
+    ADD CONSTRAINT vote_fk_users
+    FOREIGN KEY(user_id) REFERENCES users(user_id);
+
+ALTER TABLE vote
+    ADD CONSTRAINT vote_fk_threads
+    FOREIGN KEY(thread_id) REFERENCES threads(thread_id);

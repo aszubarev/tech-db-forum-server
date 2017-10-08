@@ -27,5 +27,8 @@ echo "[COMPLETE] create tables from *.psql files"
 
 echo "[TRY] create constraints from *.psql files"
 psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/constraints/posts.psql;
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/constraints/vote.psql;
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/constraints/forums.psql;
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/constraints/threads.psql;
 echo "[COMPLETE] create constraints from *.psql files"
 
