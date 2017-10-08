@@ -21,20 +21,20 @@ vote ---> users
 vote ---> threads
 
 users: user_id [INT]
-users: nickname [TEXT]
+users: nickname [CITEXT]
+users: email [CITEXT]
 users: about [TEXT]
-users: email [TEXT]
 users: fullname [TEXT]
 
 forums: forum_id [INT]
-forums: slug [TEXT]
+forums: slug [CITEXT]
 forums: user_id [text]
 forums: threads [INT]
 forums: title [text]
 forums -> users: responsible
 
 threads: thread_id [INT]
-threads: slug [TEXT]
+threads: slug [CITEXT]
 threads: forum_id [DATETIME]
 threads: created [DATETIME]
 threads: message [TEXT]
