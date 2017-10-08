@@ -17,9 +17,15 @@ echo "[TRY] CREATE EXTENSION citext"
 psql -h postgres -p 5432 -U my_user -d my_db -c "CREATE EXTENSION citext;" > /dev/null;
 echo "[COMPLETE] CREATE EXTENSION citext"
 
-echo "[TRY] connect to another container and fill database from *.psql files"
+echo "[TRY] create tables from *.psql files"
 psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/tables/users.psql;
 psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/tables/vote.psql;
 psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/tables/forums.psql;
 psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/tables/threads.psql;
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/tables/posts.psql;
+echo "[COMPLETE] create tables from *.psql files"
+
+echo "[TRY] create constraints from *.psql files"
+psql -h postgres -p 5432 -U my_user -d my_db < /tmp/database/postgres/constraints/posts.psql;
+echo "[COMPLETE] create constraints from *.psql files"
 
