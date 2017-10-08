@@ -24,8 +24,8 @@ services:
       - PGPASSWORD=my_pass
     networks:
       - backend
-    links:
-     - postgres
+    depends_on:
+      - postgres
 
 networks:
   backend:
