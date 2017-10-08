@@ -1,0 +1,5 @@
+CREATE INDEX forums_slug_idx
+  ON forums (slug);
+
+CREATE INDEX forums_users_idx
+  ON forums (user_id);

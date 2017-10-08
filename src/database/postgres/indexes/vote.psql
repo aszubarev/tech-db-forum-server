@@ -1,0 +1,8 @@
+CREATE INDEX vote_users_idx
+  ON vote (user_id);
+
+CREATE INDEX vote_threads_idx
+  ON vote (thread_id);
+
+
+
