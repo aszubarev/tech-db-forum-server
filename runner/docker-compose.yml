@@ -19,11 +19,13 @@ services:
 
     volumes:
       - ../src/database:/tmp/database
-    depends_on:
-      - "postgres"
+
+    environment:
+      - PGPASSWORD=my_pass
     networks:
       - backend
-
+    links:
+     - postgres
 
 networks:
   backend:
