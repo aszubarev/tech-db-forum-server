@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_thread_by_id(p_user_id INT)
+CREATE OR REPLACE FUNCTION get_thread_by_user_id(p_user_id INT)
   RETURNS TABLE(thread_id INT,
                 slug CITEXT,
                 forum_id INT,

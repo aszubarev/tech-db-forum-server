@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION get_forum_by_id(p_forum_id INT)
   RETURNS TABLE(forum_id INT,
-                p_slug CITEXT,
-                p_user_id INT,
-                p_title TEXT)
+                slug CITEXT,
+                user_id INT,
+                title TEXT)
 AS
 $BODY$
   BEGIN
