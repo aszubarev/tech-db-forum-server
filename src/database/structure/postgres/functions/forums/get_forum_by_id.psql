@@ -11,4 +11,4 @@ $BODY$
     WHERE f.forum_id = p_forum_id;
   END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE;
+LANGUAGE plpgsql VOLATILE;

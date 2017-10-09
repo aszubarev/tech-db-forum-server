@@ -11,4 +11,4 @@ $BODY$
     WHERE f.user_id = p_user_id;
   END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE;
+LANGUAGE plpgsql VOLATILE;
