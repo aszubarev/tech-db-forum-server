@@ -5,8 +5,8 @@ CREATE OR REPLACE FUNCTION add_forum(
 RETURNS void AS
 $BODY$
   BEGIN
-    INSERT INTO users (p_slug, p_user_id, p_title)
-      VALUES (slug, user_id, title);
+    INSERT INTO forums (slug, user_id, title)
+      VALUES (p_slug, p_user_id, p_title);
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;

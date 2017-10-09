@@ -6,8 +6,8 @@ CREATE OR REPLACE FUNCTION add_user(
 RETURNS void AS
 $BODY$
   BEGIN
-    INSERT INTO users (p_nickname, p_email, p_about, p_fullname)
-      VALUES (nickname, email, about, fullname);
+    INSERT INTO users (nickname, email, about, fullname)
+      VALUES (p_nickname, p_email, p_about, p_fullname);
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
