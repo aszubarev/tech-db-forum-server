@@ -1,0 +1,12 @@
+CREATE OR REPLACE FUNCTION add_forum(
+  p_slug CITEXT,
+  p_user_id INT,
+  p_title TEXT)
+RETURNS void AS
+$BODY$
+  BEGIN
+    INSERT INTO users (p_slug, p_user_id, p_title)
+      VALUES (slug, user_id, title);
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
