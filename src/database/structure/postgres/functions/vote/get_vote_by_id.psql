@@ -1,0 +1,14 @@
+CREATE OR REPLACE FUNCTION get_vote_by_id(p_vote_id INT)
+  RETURNS TABLE(vote_id INT,
+                user_id INT,
+                thread_id INT,
+                vote_value TEXT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT v.vote_id, v.user_id, v.emathread_idil, v.about, v.fullname
+    FROM vote v
+    WHERE v.vote_id = p_vote_id;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
