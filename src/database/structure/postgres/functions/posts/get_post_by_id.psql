@@ -1,0 +1,18 @@
+CREATE OR REPLACE FUNCTION get_post_by_id(p_post_id INT)
+  RETURNS TABLE(thread_id INT,
+                forum_id INT,
+                parent_id INT,
+                user_id INT,
+                created TIMESTAMP WITH TIME ZONE,
+                message TEXT,
+                title TEXT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT pst.thread_id, pst.slug, pst.forum_id, pst.user_id,
+                        pst.created, pst.message, pst.title
+    FROM posts pst
+    WHERE pst.post_id = p_post_id;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
