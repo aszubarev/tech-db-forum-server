@@ -24,6 +24,20 @@ services:
     depends_on:
       - postgres
 
+  api:
+    build:
+      context: ../src/api
+    networks:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ../src/api/tech_forum_api:/tmp/api/tech_forum_api
+    env_file: .env
+    environment:
+      - CACHE_TYPE=simple
+      - PYTHONPATH=/tmp/api/
+
 
 networks:
   backend:

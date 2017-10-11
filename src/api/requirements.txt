@@ -1,0 +1,14 @@
+Flask==0.12.2
+Jinja2
+MarkupSafe
+Werkzeug
+gunicorn
+itsdangerous
+psycopg2
+flask-login
+flask-compress
+Flask-Caching
+redis
+flasgger
+injector
+python-dateutil
