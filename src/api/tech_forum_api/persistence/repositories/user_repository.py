@@ -23,8 +23,9 @@ class UserRepository(Repository[UserDTO]):
     def get_all(self) -> List[UserDTO]:
         raise NotImplementedError
 
-    def add(self, entity: UserDTO) -> None:
-        self._context.callproc('add_user', [entity.nickname, entity.email, entity.about, entity.fullname])
+    def add(self, entity: UserDTO) -> Optional[UserDTO]:
+        data = self._context.callproc('add_user', [entity.nickname, entity.email, entity.about, entity.fullname])
+        return create_one(UserDTO, data)
 
     def update(self, entity: UserDTO) -> None:
         self._context.callproc('update_user_by_nickname', [entity.nickname, entity.email,
