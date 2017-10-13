@@ -32,5 +32,5 @@ class UserDTO(Entity):
         return self._about
 
     @property
-    def about(self) -> str:
+    def fullname(self) -> str:
         return self._fullname
