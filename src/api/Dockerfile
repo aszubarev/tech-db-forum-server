@@ -14,7 +14,16 @@ RUN python setup.py install
 
 RUN rm -rf /prereqs
 
+COPY . /api
+WORKDIR /api
+RUN python setup.py install
+RUN rm -rf /api
+
 RUN pip freeze | grep apiutils
 RUN pip freeze | grep sqlutils
+RUN pip freeze | grep tech
 
-CMD pip freeze | grep apiutils
+COPY ./main.py /usr/local/tech_forum_api/main.py
+WORKDIR /usr/local/tech_forum_api
+
+CMD echo "HELLO NEW"
