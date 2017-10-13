@@ -1,0 +1,15 @@
+CREATE OR REPLACE FUNCTION add_thread(
+  p_slug CITEXT,
+  p_forum_id CITEXT,
+  p_user_id TEXT,
+  p_created TIMESTAMP WITH TIME ZONE,
+  p_message TEXT,
+  p_title TEXT)
+RETURNS void AS
+$BODY$
+  BEGIN
+    INSERT INTO threads (slug, forum_id, user_id, created, message, title)
+      VALUES (p_slug, p_forum_id, p_user_id, p_created, p_message, p_title);
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

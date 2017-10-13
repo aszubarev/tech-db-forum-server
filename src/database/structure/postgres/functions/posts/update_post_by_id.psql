@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION update_post(
+    p_post_id INT,
+    p_message TEXT,
+    p_title TEXT)
+RETURNS void AS
+$BODY$
+  BEGIN
+    UPDATE posts
+      SET message = p_message, title = p_title, is_edited = TRUE
+      WHERE post_id = p_post_id;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

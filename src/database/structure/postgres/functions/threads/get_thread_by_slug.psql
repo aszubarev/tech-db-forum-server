@@ -1,0 +1,18 @@
+CREATE OR REPLACE FUNCTION get_thread_by_slug(p_slug CITEXT)
+  RETURNS TABLE(thread_id INT,
+                slug CITEXT,
+                forum_id INT,
+                user_id INT,
+                created TIMESTAMP WITH TIME ZONE,
+                message TEXT,
+                title TEXT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT th.thread_id, th.slug, th.forum_id, th.user_id,
+                        th.created, th.message, th.title
+    FROM threads th
+    WHERE th.slug = p_slug;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

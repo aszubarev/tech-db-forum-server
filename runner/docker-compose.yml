@@ -8,24 +8,36 @@ services:
       - backend
     ports:
       - "5454:5432"
-    environment:
-      - POSTGRES_USER=my_user
-      - POSTGRES_PASSWORD=my_pass
-      - POSTGRES_DB=my_db
 
   loader:
     build:
-      context: ../lib/loaders/postgres
+      context: ../lib/loader/
 
     volumes:
       - ../src/database:/tmp/database
 
-    environment:
-      - PGPASSWORD=my_pass
+    env_file: .env
+
     networks:
       - backend
+
     depends_on:
       - postgres
+
+  api:
+    build:
+      context: ../src/api
+    networks:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ../src/api/tech_forum_api:/tmp/api/tech_forum_api
+    env_file: .env
+    environment:
+      - CACHE_TYPE=simple
+      - PYTHONPATH=/tmp/api/
+
 
 networks:
   backend:

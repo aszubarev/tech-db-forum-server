@@ -1,0 +1,12 @@
+CREATE OR REPLACE FUNCTION add_vote(
+  p_user_id INT,
+  p_thread_id INT,
+  p_vote_value INT)
+RETURNS void AS
+$BODY$
+  BEGIN
+    INSERT INTO vote (user_id, thread_id, vote_value)
+      VALUES (p_user_id, p_thread_id, p_vote_value);
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
