@@ -1,4 +1,6 @@
 Flask==0.12.2
+flask_caching
+flask_compress
 Jinja2
 MarkupSafe
 Werkzeug

@@ -26,4 +26,14 @@ RUN pip freeze | grep tech
 COPY ./main.py /usr/local/tech_forum_api/main.py
 WORKDIR /usr/local/tech_forum_api
 
-CMD echo "HELLO NEW"
+ENV CACHE_TYPE simple
+ENV DB_NAME forum_server
+ENV DB_USER forum_server
+ENV DB_PASS forum_server
+ENV DB_SERVICE postgres
+ENV DB_PORT 5432
+ENV SERVER_NAME forum_server
+ENV DB_HOST postgres
+ENV WEB_PORT 80
+
+CMD /usr/local/bin/gunicorn -w 1 -b :$WEB_PORT main:app
