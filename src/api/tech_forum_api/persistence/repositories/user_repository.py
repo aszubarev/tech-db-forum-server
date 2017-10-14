@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, List
 
 from injector import inject
@@ -32,8 +33,37 @@ class UserRepository(Repository[UserDTO]):
         return create_one(UserDTO, data)
 
     def update(self, entity: UserDTO) -> Optional[UserDTO]:
+
+        logging.info(f"nickname = {entity.nickname}; email = {entity.email}; fullname = {entity.fullname}")
+
         params = [p for p in [entity.nickname, entity.email, entity.about, entity.fullname] if p is not None]
-        data = self._context.callproc('update_user_by_nickname', params)
+        data = None
+        logging.info(f"len params = {len(params)}")
+
+        if entity.email is not None and entity.about is not None and entity.fullname is not None:
+            data = self._context.callproc('update_user', params)
+
+        elif entity.email is not None and entity.about is None and entity.fullname is None:
+            data = self._context.callproc('update_user_by_email', params)
+
+        elif entity.email is None and entity.about is not None and entity.fullname is None:
+            data = self._context.callproc('update_user_by_about', params)
+
+        elif entity.email is None and entity.about is None and entity.fullname is not None:
+            data = self._context.callproc('update_user_by_fullname', params)
+
+        elif entity.email is None and entity.about is not None and entity.fullname is not None:
+            data = self._context.callproc('update_user_by_about_fullname', params)
+
+        elif entity.email is not None and entity.about is None and entity.fullname is not None:
+            data = self._context.callproc('update_user_by_email_fullname', params)
+
+        elif entity.email is not None and entity.about is not None and entity.fullname is None:
+            data = self._context.callproc('update_user_by_email_about', params)
+
+        elif entity.email is None and entity.about is None and entity.fullname is None:
+            data = self._context.callproc('update_user_by_empty_data', params)
+
         return create_one(UserDTO, data)
 
     def delete(self, uid: int) -> None:

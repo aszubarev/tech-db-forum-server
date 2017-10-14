@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION update_user_by_nickname_by_empty_data(
+CREATE OR REPLACE FUNCTION update_user_by_empty_data(
   p_nickname CITEXT)
 
 RETURNS TABLE(user_id INT,

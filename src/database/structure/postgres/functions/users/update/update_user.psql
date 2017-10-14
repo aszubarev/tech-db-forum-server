@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION update_user_by_nickname(
+CREATE OR REPLACE FUNCTION update_user(
   p_nickname CITEXT,
   p_email CITEXT,
   p_about TEXT,
