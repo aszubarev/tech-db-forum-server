@@ -16,7 +16,7 @@ $BODY$
         UPDATE users
         SET email = p_email, about = p_about, fullname = p_fullname
         WHERE users.nickname = p_nickname
-        RETURNING *;
+        RETURNING users.user_id, users.nickname, users.email, users.about, users.fullname;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;

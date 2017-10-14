@@ -15,7 +15,7 @@ $BODY$
     RETURN QUERY
         INSERT INTO users (nickname, email, about, fullname)
         VALUES (p_nickname, p_email, p_about, p_fullname)
-        RETURNING *;
+        RETURNING users.user_id, users.nickname, users.email, users.about, users.fullname;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
