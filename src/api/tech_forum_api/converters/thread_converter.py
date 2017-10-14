@@ -11,7 +11,7 @@ class ThreadConverter(Converter[Thread, ThreadDTO]):
         return Thread(uid=entity.uid).fill(
             slug=entity.slug,
             forum=Forum(entity.forum_id),
-            user=User(entity.user_id),
+            author=User(entity.user_id),
             created=entity.created,
             message=entity.message,
             title=entity.title
