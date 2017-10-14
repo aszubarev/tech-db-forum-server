@@ -63,12 +63,11 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
         def _create_thread(slug: str):
             try:
 
+                # TODO it's bad idea use this open code here. Move to another blueprint
                 data = {'forum': slug}
                 serialized_data = request.json
                 serialized_data.update(data)
                 entity = self._thread_serializer.load(serialized_data)
-
-                # return self._return_error(f"Can't create thread by slag = {slug}", 201)
 
                 model = self._thread_service.add(entity)
                 if model is None:

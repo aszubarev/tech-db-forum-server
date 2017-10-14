@@ -11,7 +11,7 @@ logging.exception("HERE HELLO APP.PY")
 
 
 app = Flask(__name__)
-app.config['APPLICATION_ROOT'] = '/'
+app.config['APPLICATION_ROOT'] = '/api'
 
 application = Application()
 application.register(app)
