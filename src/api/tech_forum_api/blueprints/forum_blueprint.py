@@ -46,6 +46,10 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
                 return self._add(data)
 
             except UniqueViolationError:
-                return self._return_error("UniqueViolationError", 409)
+                forum = self.__service.get_by_slug(request.json['slug'])
+                return self._return_one_with_status(forum, 409)
+
+            except NoDataFoundError:
+                return self._return_error(f"Can't find user with nickname {request.json['user']}", 404)
 
         return blueprint

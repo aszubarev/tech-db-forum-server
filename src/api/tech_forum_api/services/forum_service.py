@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, List
 
 from injector import inject, singleton
@@ -24,6 +25,10 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
 
     def get_by_id(self, uid: int) -> Optional[Forum]:
         return super().get_by_id(uid)
+
+    def get_by_slug(self, slug: str) -> Optional[Forum]:
+        dto = self.__repo.get_by_slug(slug)
+        return self._convert(dto)
 
     def _convert(self, entity: ForumDTO) -> Optional[Forum]:
         if not entity:

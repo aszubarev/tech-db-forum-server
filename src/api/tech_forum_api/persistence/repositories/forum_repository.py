@@ -16,6 +16,10 @@ class ForumRepository(Repository[ForumDTO]):
         data = self._context.callproc('get_forum_by_id', [uid])
         return create_one(ForumDTO, data)
 
+    def get_by_slug(self, slug: str) -> Optional[ForumDTO]:
+        data = self._context.callproc('get_forum_by_slug', [slug])
+        return create_one(ForumDTO, data)
+
     def get_all(self) -> List[ForumDTO]:
         raise NotImplementedError
 
