@@ -27,11 +27,6 @@ class ForumRepository(Repository[ForumDTO]):
         data = self._context.callproc('add_forum', [entity.slug, entity.user_id, entity.title])
         return create_one(ForumDTO, data)
 
-    # def update(self, entity: ForumDTO) -> Optional[ForumDTO]:
-    #     data = self._context.callproc('update_forum_by_nickname', [entity.nickname, entity.email,
-    #                                                               entity.about, entity.fullname])
-    #     return create_one(ForumDTO, data)
-
     def update(self, entity: ForumDTO):
         raise NotImplementedError
 

@@ -5,11 +5,22 @@ CREATE OR REPLACE FUNCTION add_thread(
   p_created TIMESTAMP WITH TIME ZONE,
   p_message TEXT,
   p_title TEXT)
-RETURNS void AS
+
+RETURNS TABLE(thread_id INT,
+              slug CITEXT,
+              forum_id INT,
+              user_id INT,
+              created TIMESTAMP WITH TIME ZONE,
+              message TEXT,
+              title TEXT)
+AS
 $BODY$
   BEGIN
-    INSERT INTO threads (slug, forum_id, user_id, created, message, title)
-      VALUES (p_slug, p_forum_id, p_user_id, p_created, p_message, p_title);
+    RETURN QUERY
+        INSERT INTO threads (slug, forum_id, user_id, created, message, title)
+        VALUES (p_slug, p_forum_id, p_user_id, p_created, p_message, p_title)
+        RETURNING threads.thread_id, threads.slug, threads.forum_id, threads.user_id,
+                  threads.created, threads.message, threads.titlle;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
