@@ -37,9 +37,10 @@ class Service(Generic[T, E, R]):
         self._clear_cache()
         return self._convert(dto)
 
-    def update(self, entity: E) -> None:
-        self._repo.update(entity)
+    def update(self, entity: E) -> E:
+        dto = self._repo.update(entity)
         self._clear_cache()
+        return self._convert(dto)
 
     def delete(self, uid: Any) -> None:
         self._repo.delete(uid)

@@ -4,7 +4,7 @@ from typing import List, Any, TypeVar, Generic, Dict, Optional
 
 from flask import abort, json, request, url_for, Blueprint, Response
 
-from sqlutils import Model, Service, EmptyExpandSet
+from sqlutils import Model, Service
 from sqlutils import ForeignKeyViolationError, NoDataFoundError, UniqueViolationError
 
 from .serializer import Serializer
@@ -116,16 +116,16 @@ class BaseBlueprint(Generic[S]):
         response = self._serializer.dump(model)
         return Response(response=json.dumps(response), status=201, mimetype='application/json')
 
-    def _update(self):
-        entity = self._parse()
+    def _update(self, data: Dict[str, Any]):
+        entity = self._parse(data)
         model = self._update_entity(entity)
-        response = self._serializer.dump(model, EmptyExpandSet())
+        response = self._serializer.dump(model)
         return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
     def _delete(self, uid: Any) -> Response:
         model: Model = None
         try:
-            model = self._service.get_by_id(uid, EmptyExpandSet())
+            model = self._service.get_by_id(uid)
         except BaseException:
             logging.exception("Can't get {0} model".format(self._name))
             abort(400)
@@ -138,7 +138,7 @@ class BaseBlueprint(Generic[S]):
 
     def _return_error(self, msg: str, status):
         response = self._error_serializer.dump(Error(msg))
-        return Response(response=response, status=status, mimetype='application/json')
+        return Response(response=json.dumps(response), status=status, mimetype='application/json')
 
     @abstractmethod
     def _create_blueprint(self) -> Blueprint:
@@ -156,38 +156,37 @@ class BaseBlueprint(Generic[S]):
         return entity
 
     def _add_entity(self, entity: Any) -> Any:
-        model = None
+
         try:
             model = self._service.add(entity)
             if model is None:
-                logging.debug(f"Can't add {self._name} entity")
-                abort(404)
-        except UniqueViolationError:
-            # logging.debug(f"Can't add {self._name} entity")
-            raise UniqueViolationError(f"Can't add {self._name} entity")
-            # abort(409)
-        except ForeignKeyViolationError:
-            logging.debug(f"Can't add {self._name} entity")
-            abort(409)
-        except NoDataFoundError:
-            logging.debug("Can't update {0} entity".format(self._name))
-            abort(404)
+                raise NoDataFoundError("Can't add {0} entity".format(self._name))
 
-        return model
+            return model
+
+        except NoDataFoundError as exp:
+            raise NoDataFoundError("Can't add {0} entity".format(self._name)) from exp
+
+        except UniqueViolationError as exp:
+            raise UniqueViolationError(f"Can't add {self._name} entity") from exp
+
+        except ForeignKeyViolationError as exp:
+            raise ForeignKeyViolationError(f"Can't add {self._name} entity") from exp
 
     def _update_entity(self, entity: Any) -> Any:
         try:
-            self._service.update(entity)
-        except NoDataFoundError:
-            logging.debug("Can't update {0} entity".format(self._name))
-            abort(404)
-        except UniqueViolationError:
-            logging.debug("Can't update {0} entity".format(self._name))
-            abort(409)
+            model = self._service.update(entity)
+            if model is None:
+                raise NoDataFoundError("Can't add {0} entity".format(self._name))
 
-        model = self._service.get_by_id(entity.uid, EmptyExpandSet())
-        if model is None:
-            abort(404)
+            return model
 
-        return model
+        except NoDataFoundError as exp:
+            raise NoDataFoundError("Can't update {0} entity".format(self._name)) from exp
+
+        except UniqueViolationError as exp:
+            raise UniqueViolationError(f"Can't update {self._name} entity") from exp
+
+        except ForeignKeyViolationError as exp:
+            raise ForeignKeyViolationError(f"Can't update {self._name} entity") from exp
 

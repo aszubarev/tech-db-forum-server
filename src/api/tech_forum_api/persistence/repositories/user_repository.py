@@ -31,9 +31,10 @@ class UserRepository(Repository[UserDTO]):
         data = self._context.callproc('add_user', [entity.nickname, entity.email, entity.about, entity.fullname])
         return create_one(UserDTO, data)
 
-    def update(self, entity: UserDTO) -> None:
-        self._context.callproc('update_user_by_nickname', [entity.nickname, entity.email,
-                                                           entity.about, entity.fullname])
+    def update(self, entity: UserDTO) -> Optional[UserDTO]:
+        data = self._context.callproc('update_user_by_nickname', [entity.nickname, entity.email,
+                                                                  entity.about, entity.fullname])
+        return create_one(UserDTO, data)
 
     def delete(self, uid: int) -> None:
         raise NotImplementedError

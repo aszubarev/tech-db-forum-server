@@ -25,6 +25,10 @@ class UserService(Service[User, UserDTO, UserRepository]):
     def get_by_id(self, uid: int) -> Optional[User]:
         return super().get_by_id(uid)
 
+    def get_by_nickname(self, nickname: str) -> Optional[User]:
+        data = self.__repo.get_by_nickname(nickname)
+        return self._convert(data)
+
     def get_by_nickname_or_email(self, nickname: str, email: str) -> List[User]:
         data = self.__repo.get_by_nickname_or_email(nickname, email)
         return self._convert_many(data)

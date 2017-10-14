@@ -3,12 +3,20 @@ CREATE OR REPLACE FUNCTION update_user_by_nickname(
   p_email CITEXT,
   p_about TEXT,
   p_fullname TEXT)
-RETURNS void AS
+
+RETURNS TABLE(user_id INT,
+              nickname CITEXT,
+              email CITEXT,
+              about TEXT,
+              fullname TEXT)
+AS
 $BODY$
   BEGIN
-    UPDATE features
-      SET email = p_email, about = p_about, ullname = p_fullname
-      WHERE nickname = p_nickname;
+    RETURN QUERY
+        UPDATE users
+        SET email = p_email, about = p_about, fullname = p_fullname
+        WHERE users.nickname = p_nickname
+        RETURNING *;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
