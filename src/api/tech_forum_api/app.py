@@ -1,25 +1,22 @@
 import logging
 import os
 
-from flask import Flask, Response
-from flask_compress import Compress
+from flask import Flask, Response, url_for
 from werkzeug.wsgi import DispatcherMiddleware
 
 from tech_forum_api.application import Application
-from tech_forum_api.cache import cache
+
+logging.basicConfig(level=logging.INFO)
+logging.exception("HERE HELLO APP.PY")
 
 
 app = Flask(__name__)
-app.config['APPLICATION_ROOT'] = '/api/v1/tech_forum_api'
-Compress(app)
-app.config['CACHE_TYPE'] = os.environ['CACHE_TYPE']
-app.config['CACHE_KEY_PREFIX'] = '/api/v1/tech_forum_api'
-app.config['CACHE_REDIS_HOST'] = 'redis'
-app.config['CACHE_REDIS_PORT'] = '6379'
-cache.init_app(app)
+app.config['APPLICATION_ROOT'] = '/'
 
 application = Application()
 application.register(app)
+
+logging.info("[APP.PY] registered blueprints")
 
 
 @app.errorhandler(400)
@@ -52,7 +49,10 @@ def simple(env, resp):
     return [b'']
 
 
-app.wsgi_app = DispatcherMiddleware(simple, {'/api/v1/tech_forum_api': app.wsgi_app})
+# app.wsgi_app = DispatcherMiddleware(simple, {'/': app.wsgi_app})
+# logging.info("[APP.PY] add DispatcherMiddleware")
+
 
 if __name__ == '__main__':
+    logging.info("try start")
     app.run()

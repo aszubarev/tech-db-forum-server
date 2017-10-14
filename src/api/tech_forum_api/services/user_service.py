@@ -22,7 +22,6 @@ class UserService(Service[User, UserDTO, UserRepository]):
     def __repo(self) -> UserRepository:
         return self._repo
 
-    @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[User]:
         return super().get_by_id(uid)
 
@@ -34,5 +33,6 @@ class UserService(Service[User, UserDTO, UserRepository]):
 
     @staticmethod
     def _clear_cache() -> None:
-        cache.delete_memoized(UserService.get_by_id)
+        # cache.delete_memoized(UserService.get_by_id)
+        pass
         #TODO dont remember update cache
