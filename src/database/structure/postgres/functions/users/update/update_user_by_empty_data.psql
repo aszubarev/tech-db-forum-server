@@ -1,0 +1,18 @@
+CREATE OR REPLACE FUNCTION update_user_by_empty_data(
+  p_nickname CITEXT)
+
+RETURNS TABLE(user_id INT,
+              nickname CITEXT,
+              email CITEXT,
+              about TEXT,
+              fullname TEXT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY
+        SELECT users.user_id, users.nickname, users.email, users.about, users.fullname
+        FROM users
+        WHERE users.nickname = p_nickname;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

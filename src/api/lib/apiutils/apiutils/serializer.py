@@ -10,12 +10,10 @@ E = TypeVar("E", bound="Entity")
 
 class Serializer(Generic[T, E]):
 
-    @staticmethod
     @abstractmethod
-    def dump(model: T) -> Dict[str, Any]:
+    def dump(self, model: T) -> Dict[str, Any]:
         raise NotImplementedError
 
-    @staticmethod
     @abstractmethod
-    def load(data: Dict[str, Any]) -> E:
+    def load(self, data: Dict[str, Any]) -> E:
         raise NotImplementedError
