@@ -9,7 +9,7 @@ $BODY$
   BEGIN
     RETURN QUERY SELECT u.user_id, u.nickname, u.email, u.about, u.fullname
     FROM users u
-    WHERE u.nickname = p_nickname or u.emial = p_email;
+    WHERE u.nickname = p_nickname or u.email = p_email;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;

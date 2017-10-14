@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from injector import inject
-from sqlutils import DataContext, Repository, create_one
+from sqlutils import DataContext, Repository, create_one, create_many
 
 from tech_forum_api.persistence.dto.user_dto import UserDTO
 
@@ -19,6 +19,10 @@ class UserRepository(Repository[UserDTO]):
     def get_by_nickname(self, nickname: str) -> Optional[UserDTO]:
         data = self._context.callproc('get_user_by_nickname', [nickname])
         return create_one(UserDTO, data)
+
+    def get_by_nickname_or_email(self, nickname: str, email: str) -> List[UserDTO]:
+        data = self._context.callproc('get_users_by_nickname_or_email', [nickname, email])
+        return create_many(UserDTO, data)
 
     def get_all(self) -> List[UserDTO]:
         raise NotImplementedError

@@ -1,12 +1,13 @@
 import logging
 
-from flask import Blueprint, abort, request, Response
+from flask import Blueprint, abort, request, Response, json
 from injector import inject, singleton
 
 from apiutils import BaseBlueprint
 
 from tech_forum_api.serializers.user_serializer import UserSerializer
 from tech_forum_api.services.user_service import UserService
+from sqlutils import ForeignKeyViolationError, NoDataFoundError, UniqueViolationError
 logging.basicConfig(level=logging.INFO)
 
 
@@ -35,8 +36,15 @@ class UserBlueprint(BaseBlueprint[UserService]):
 
         @blueprint.route('/<nickname>/create', methods=['POST'])
         def _add(nickname: str):
-            data = {'nickname': nickname}
-            return self._add(data)
+            try:
+                data = {'nickname': nickname}
+                return self._add(data)
+            #TODO move to get function
+            except NoDataFoundError:
+                return self._return_error(f"Can't find user with nickname {nickname}", 404)
+            except UniqueViolationError:
+                data = self._service.get_by_nickname_or_email(nickname=nickname, email=request.json['email'])
+                return self._return_many_with_status(data, 409)
 
         @blueprint.route('/', methods=['PUT'])
         def _update():

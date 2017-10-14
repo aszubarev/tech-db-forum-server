@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from injector import inject, singleton
 from sqlutils import Service
@@ -24,6 +24,10 @@ class UserService(Service[User, UserDTO, UserRepository]):
 
     def get_by_id(self, uid: int) -> Optional[User]:
         return super().get_by_id(uid)
+
+    def get_by_nickname_or_email(self, nickname: str, email: str) -> List[User]:
+        data = self.__repo.get_by_nickname_or_email(nickname, email)
+        return self._convert_many(data)
 
     def _convert(self, entity: UserDTO) -> Optional[User]:
         if not entity:

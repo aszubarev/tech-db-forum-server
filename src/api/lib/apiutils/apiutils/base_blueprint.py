@@ -1,6 +1,6 @@
 from abc import abstractmethod
 import logging
-from typing import List, Any, TypeVar, Generic, Dict
+from typing import List, Any, TypeVar, Generic, Dict, Optional
 
 from flask import abort, json, request, url_for, Blueprint, Response
 
@@ -11,6 +11,30 @@ from .serializer import Serializer
 
 T = TypeVar("T", bound="Model")
 S = TypeVar("S", bound="Service")
+
+class Error(object):
+
+    def __init__(self, msg: str) -> None:
+        self._msg: str = msg
+
+    @property
+    def msg(self) -> str:
+        return self._msg
+
+
+class ErrorSerializer(object):
+
+    @staticmethod
+    def dump(model: Error) -> Optional[Dict[str, Any]]:
+
+        if not model:
+            return None
+
+        data = {
+            'message': model.msg
+        }
+
+        return data
 
 
 def return_one(model: Model, serializer: Serializer) -> Response:
@@ -30,11 +54,19 @@ def return_many(models: List[T], serializer: Serializer) -> Response:
                     status=200, mimetype='application/json')
 
 
+def return_many_with_status(models: List[T], serializer: Serializer, status: int) -> Response:
+    response = []
+    for model in models:
+        response.append(serializer.dump(model))
+    return Response(response=json.dumps(response), status=status, mimetype='application/json')
+
+
 class BaseBlueprint(Generic[S]):
 
     def __init__(self, service: S) -> None:
         self._blueprint = None
         self._service = service
+        self._error_serializer = ErrorSerializer
 
     @property
     @abstractmethod
@@ -57,6 +89,9 @@ class BaseBlueprint(Generic[S]):
 
     def _return_many(self, models: List[Model]) -> Response:
         return return_many(models, self._serializer)
+
+    def _return_many_with_status(self, models: List[Model], status) -> Response:
+        return return_many_with_status(models, self._serializer, status)
 
     def _get_by_id(self, uid: Any):
         model = None
@@ -101,6 +136,10 @@ class BaseBlueprint(Generic[S]):
         self._service.delete(model.uid)
         return Response(response='', status=204, mimetype='application/json')
 
+    def _return_error(self, msg: str, status):
+        response = self._error_serializer.dump(Error(msg))
+        return Response(response=response, status=status, mimetype='application/json')
+
     @abstractmethod
     def _create_blueprint(self) -> Blueprint:
         raise NotImplementedError
@@ -124,8 +163,9 @@ class BaseBlueprint(Generic[S]):
                 logging.debug(f"Can't add {self._name} entity")
                 abort(404)
         except UniqueViolationError:
-            logging.debug(f"Can't add {self._name} entity")
-            abort(409)
+            # logging.debug(f"Can't add {self._name} entity")
+            raise UniqueViolationError(f"Can't add {self._name} entity")
+            # abort(409)
         except ForeignKeyViolationError:
             logging.debug(f"Can't add {self._name} entity")
             abort(409)
@@ -150,3 +190,4 @@ class BaseBlueprint(Generic[S]):
             abort(404)
 
         return model
+
