@@ -33,14 +33,8 @@ class UserBlueprint(BaseBlueprint[UserService]):
             logging.exception(uid)
             return self._get_by_id(int(uid))
 
-        @blueprint.route('/', methods=['GET'])
-        def test_connection():
-            logging.info("[test_connection] success")
-            return Response(status=200, mimetype='application/json')
-
         @blueprint.route('/<nickname>/create', methods=['POST'])
         def _add(nickname: str):
-            logging.exception(nickname)
             data = {'nickname': nickname}
             return self._add(data)
 

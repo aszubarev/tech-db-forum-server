@@ -5,7 +5,7 @@ class UserDTO(Entity):
 
     @property
     def _key_field(self) -> str:
-        return 'actor_id'
+        return 'user_id'
 
     def __init__(self, uid: int = None,
                  nickname: str = None,

@@ -4,12 +4,18 @@ CREATE OR REPLACE FUNCTION add_user(
   p_about TEXT,
   p_fullname TEXT)
 
-RETURNS void
+RETURNS TABLE(user_id INT,
+              nickname CITEXT,
+              email CITEXT,
+              about TEXT,
+              fullname TEXT)
 AS
 $BODY$
   BEGIN
-    INSERT INTO users (nickname, email, about, fullname)
-      VALUES (p_nickname, p_email, p_about, p_fullname);
+    RETURN QUERY
+        INSERT INTO users (nickname, email, about, fullname)
+        VALUES (p_nickname, p_email, p_about, p_fullname)
+        RETURNING *;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
