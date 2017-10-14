@@ -7,8 +7,6 @@ from werkzeug.wsgi import DispatcherMiddleware
 from tech_forum_api.application import Application
 
 logging.basicConfig(level=logging.INFO)
-logging.exception("HERE HELLO APP.PY")
-
 
 app = Flask(__name__)
 app.config['APPLICATION_ROOT'] = '/api'
@@ -16,7 +14,7 @@ app.config['APPLICATION_ROOT'] = '/api'
 application = Application()
 application.register(app)
 
-logging.info("[APP.PY] registered blueprints")
+logging.info("[app.py] registered blueprints")
 
 
 @app.errorhandler(400)
@@ -49,8 +47,8 @@ def simple(env, resp):
     return [b'']
 
 
-# app.wsgi_app = DispatcherMiddleware(simple, {'/': app.wsgi_app})
-# logging.info("[APP.PY] add DispatcherMiddleware")
+app.wsgi_app = DispatcherMiddleware(simple, {'/api': app.wsgi_app})
+logging.info("[app.py] add DispatcherMiddleware")
 
 
 if __name__ == '__main__':
