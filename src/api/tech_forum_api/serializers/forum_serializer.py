@@ -1,7 +1,6 @@
 from typing import Dict, Any, Optional
 
 from injector import inject, singleton
-import logging
 
 from apiutils import Serializer
 
