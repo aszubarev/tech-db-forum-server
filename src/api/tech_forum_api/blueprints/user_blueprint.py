@@ -35,7 +35,7 @@ class UserBlueprint(BaseBlueprint[UserService]):
 
         @blueprint.route('/<uid>', methods=['GET'])
         def _get_by_id(uid: str):
-            logging.exception(uid)
+            logging.info(uid)
             return self._get_by_id(int(uid))
 
         @blueprint.route('/<nickname>/create', methods=['POST'])
@@ -76,9 +76,5 @@ class UserBlueprint(BaseBlueprint[UserService]):
             except UniqueViolationError:
                 logging.info(f"Can't update user with nickname {nickname}; Bad request body")
                 return self._return_error(f"Can't update user with nickname {nickname};  Bad request body", 409)
-
-        @blueprint.route('/<uid>', methods=['DELETE'])
-        def _delete(uid: str):
-            return self._delete(uid)
 
         return blueprint

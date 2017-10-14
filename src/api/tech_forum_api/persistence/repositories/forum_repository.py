@@ -28,7 +28,7 @@ class ForumRepository(Repository[ForumDTO]):
     #                                                               entity.about, entity.fullname])
     #     return create_one(ForumDTO, data)
 
-    def update(self, entity: T):
+    def update(self, entity: ForumDTO):
         raise NotImplementedError
 
     def delete(self, uid: int) -> None:
