@@ -2,7 +2,7 @@ import logging
 from typing import Optional, List
 
 from injector import inject, singleton
-from sqlutils import Service
+from sqlutils import Service, NoDataFoundError
 
 from tech_forum_api.cache import cache
 from tech_forum_api.converters.forum_converter import ForumConverter
@@ -28,7 +28,11 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
 
     def get_by_slug(self, slug: str) -> Optional[Forum]:
         dto = self.__repo.get_by_slug(slug)
-        return self._convert(dto)
+        model = self._convert(dto)
+        if not model:
+            raise NoDataFoundError(f"Can't find forum by slug = {slug}")
+
+        return model
 
     def _convert(self, entity: ForumDTO) -> Optional[Forum]:
         if not entity:

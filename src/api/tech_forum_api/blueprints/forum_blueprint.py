@@ -52,4 +52,12 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
             except NoDataFoundError:
                 return self._return_error(f"Can't find user with nickname {request.json['user']}", 404)
 
+        @blueprint.route('/<slug>/details', methods=['GET'])
+        def _forum_details(slug: str):
+            try:
+                model = self._service.get_by_slug(slug)
+                return self._return_one_with_status(model, 200)
+            except NoDataFoundError:
+                return self._return_error(f"Can't find forum details by slag = {slug}", 404)
+
         return blueprint
