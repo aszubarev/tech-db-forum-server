@@ -33,9 +33,9 @@ class UserSerializer(Serializer):
         return data
 
     def load(self, data: Dict[str, Any]) -> UserDTO:
-        user_id = None if data.get('id') is None or data.get('id') == 'null' else int(data['id'])
-        nickname = data['nickname']
-        email = data['email']
-        about = data['about']
-        fullname = data['fullname']
+        user_id = None if data.get('id') is None else int(data['id'])
+        nickname = None if data.get('nickname') is None else data['nickname']
+        email = None if data.get('email') is None else data['email']
+        about = None if data.get('about') is None or data.get('about') == 'null'else data['about']
+        fullname = None if data.get('fullname') is None else data['fullname']
         return UserDTO(user_id, nickname, email, about, fullname)

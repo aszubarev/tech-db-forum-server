@@ -32,8 +32,8 @@ class UserRepository(Repository[UserDTO]):
         return create_one(UserDTO, data)
 
     def update(self, entity: UserDTO) -> Optional[UserDTO]:
-        data = self._context.callproc('update_user_by_nickname', [entity.nickname, entity.email,
-                                                                  entity.about, entity.fullname])
+        params = [p for p in [entity.nickname, entity.email, entity.about, entity.fullname] if p is not None]
+        data = self._context.callproc('update_user_by_nickname', params)
         return create_one(UserDTO, data)
 
     def delete(self, uid: int) -> None:

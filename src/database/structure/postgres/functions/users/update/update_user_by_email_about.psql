@@ -1,0 +1,21 @@
+CREATE OR REPLACE FUNCTION update_user_by_email_about(
+  p_nickname CITEXT,
+  p_email CITEXT,
+  p_about TEXT)
+
+RETURNS TABLE(user_id INT,
+              nickname CITEXT,
+              email CITEXT,
+              about TEXT,
+              fullname TEXT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY
+        UPDATE users
+        SET email = p_email, about = p_about
+        WHERE users.nickname = p_nickname
+        RETURNING users.user_id, users.nickname, users.email, users.about, users.fullname;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

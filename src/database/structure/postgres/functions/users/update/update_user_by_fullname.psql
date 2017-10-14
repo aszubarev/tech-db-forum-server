@@ -1,0 +1,20 @@
+CREATE OR REPLACE FUNCTION update_user_by_fullname(
+  p_nickname CITEXT,
+  p_fullname TEXT)
+
+RETURNS TABLE(user_id INT,
+              nickname CITEXT,
+              email CITEXT,
+              about TEXT,
+              fullname TEXT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY
+        UPDATE users
+        SET fullname = p_fullname
+        WHERE users.nickname = p_nickname
+        RETURNING users.user_id, users.nickname, users.email, users.about, users.fullname;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
