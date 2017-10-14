@@ -41,16 +41,15 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
     def _create_blueprint(self) -> Blueprint:
         blueprint = Blueprint(self._name, __name__)
 
-        @blueprint.route('/<uid>', methods=['GET'])
+        @blueprint.route('forum/<uid>', methods=['GET'])
         def _get_by_id(uid: str):
             logging.exception(uid)
             return self._get_by_id(int(uid))
 
-        @blueprint.route('/create', methods=['POST'])
+        @blueprint.route('forum/create', methods=['POST'])
         def _add():
             try:
-                data = {}
-                return self._add(data)
+                return self._add({})
 
             except UniqueViolationError:
                 forum = self.__service.get_by_slug(request.json['slug'])
@@ -59,31 +58,8 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
             except NoDataFoundError:
                 return self._return_error(f"Can't find user with nickname {request.json['user']}", 404)
 
-        @blueprint.route('/<slug>/create', methods=['POST'])
-        def _create_thread(slug: str):
-            try:
-
-                # TODO it's bad idea use this open code here. Move to another blueprint
-                data = {'forum': slug}
-                serialized_data = request.json
-                serialized_data.update(data)
-                entity = self._thread_serializer.load(serialized_data)
-
-                model = self._thread_service.add(entity)
-                if model is None:
-                    return self._return_error(f"Can't create thread by slag = {slug}", 404)
-                response = self._thread_serializer.dump(model)
-                return Response(response=json.dumps(response),
-                                status=201, mimetype='application/json')
-
-            except NoDataFoundError:
-                return self._return_error(f"Can't create thread by slag = {slug}", 404)
-
-            except UniqueViolationError:
-                return self._return_error(f"Can't create thread by slag = {slug}", 409)
-
-        @blueprint.route('/<slug>/details', methods=['GET'])
-        def _forum_details(slug: str):
+        @blueprint.route('forum/<slug>/details', methods=['GET'])
+        def _details(slug: str):
             try:
                 model = self._service.get_by_slug(slug)
                 return self._return_one_with_status(model, 200)
