@@ -37,6 +37,7 @@ services:
     environment:
       - CACHE_TYPE=simple
       - PYTHONPATH=/tmp/api/
+    command: bash -c "cd /tmp/api/tech_forum_api && /usr/local/bin/gunicorn -w 1 -b :80 app:app"
 
 
 networks:

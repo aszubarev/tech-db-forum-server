@@ -1,6 +1,6 @@
 from abc import abstractmethod
 import logging
-from typing import List, Any, TypeVar, Generic
+from typing import List, Any, TypeVar, Generic, Dict
 
 from flask import abort, json, request, url_for, Blueprint, Response
 
@@ -75,18 +75,17 @@ class BaseBlueprint(Generic[S]):
             logging.exception("Can't get all {0} models".format(self._name))
             abort(500)
 
-    def _add(self):
-        entity = self._parse()
-        uid = self._add_entity(entity)
-        return Response(response='', status=201, mimetype='application/json',
-                        headers={'Location': url_for('._get_by_id', uid=uid)})
+    def _add(self, data: Dict[str, Any]):
+        entity = self._parse(data)
+        model = self._add_entity(entity)
+        response = self._serializer.dump(model)
+        return Response(response=json.dumps(response), status=201, mimetype='application/json')
 
     def _update(self):
         entity = self._parse()
         model = self._update_entity(entity)
         response = self._serializer.dump(model, EmptyExpandSet())
-        return Response(response=json.dumps(response),
-                        status=200, mimetype='application/json')
+        return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
     def _delete(self, uid: Any) -> Response:
         model: Model = None
@@ -106,26 +105,35 @@ class BaseBlueprint(Generic[S]):
     def _create_blueprint(self) -> Blueprint:
         raise NotImplementedError
 
-    def _parse(self):
+    def _parse(self, data: Dict[str, Any]):
         entity = None
         try:
-            entity = self._serializer.load(request.json)
+            serialized_data = request.json
+            serialized_data.update(data)
+            entity = self._serializer.load(serialized_data)
         except BaseException:
             logging.exception(f"Can't parse {self._name} entity")
             abort(400)
         return entity
 
     def _add_entity(self, entity: Any) -> Any:
-        uid = None
+        model = None
         try:
-            uid = self._service.add(entity)
+            model = self._service.add(entity)
+            if model is None:
+                logging.debug(f"Can't add {self._name} entity")
+                abort(404)
         except UniqueViolationError:
             logging.debug(f"Can't add {self._name} entity")
             abort(409)
         except ForeignKeyViolationError:
             logging.debug(f"Can't add {self._name} entity")
             abort(409)
-        return uid
+        except NoDataFoundError:
+            logging.debug("Can't update {0} entity".format(self._name))
+            abort(404)
+
+        return model
 
     def _update_entity(self, entity: Any) -> Any:
         try:

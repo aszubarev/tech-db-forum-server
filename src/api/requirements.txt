@@ -1,5 +1,6 @@
 Flask==0.12.2
-install flask_caching
+flask_caching
+flask_compress
 Jinja2
 MarkupSafe
 Werkzeug
