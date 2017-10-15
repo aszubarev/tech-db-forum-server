@@ -51,10 +51,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
         def _get_threads_by_forum(slug: str):
             try:
                 models = self.__service.get_for_forum(slug)
-                return self._return_many(models,
-                                         status=200,
-                                         sort_key=lambda thread: thread.created,
-                                         sort_reverse=True)
+                return self._return_many(models, status=200)
 
             except NoDataFoundError:
                 return self._return_error(f"Can't get threads by forum slag = {slug}", 404)

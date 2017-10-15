@@ -13,6 +13,7 @@ $BODY$
                         th.created, th.message, th.title
     FROM threads th
     WHERE th.forum_id = p_forum_id;
+
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;

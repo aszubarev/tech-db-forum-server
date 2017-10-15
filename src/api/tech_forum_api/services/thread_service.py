@@ -1,6 +1,8 @@
 import logging
 from typing import Optional, List
 
+import dateutil.parser
+from flask import request
 from injector import inject, singleton
 from sqlutils import Service, NoDataFoundError
 
@@ -33,9 +35,16 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         if forum is None:
             raise NoDataFoundError(f"Can't find forum by slug = {slug}")
 
-        logging.info(f"[ThreadService.get_by_forum_slug] forum.uid = {forum.uid}")
-        data = self._repo.get_for_forum(forum.uid)
-        logging.info(f"[ThreadService.get_by_forum_slug] data = {data}")
+        desc = request.args.get('desc')
+        limit = request.args.get('limit')
+        since = request.args.get('since')
+
+        logging.info(f"[ThreadService.get_for_forum] desc = {desc}, limit - {limit}; since = {since}")
+        if since is not None:
+            since = dateutil.parser.parse(since)
+            logging.info(f"[ThreadService.get_for_forum] since parsed = {since}")
+
+        data = self._repo.get_for_forum(forum.uid, desc=desc, limit=limit, since=since)
         return self._convert_many(data)
 
     def _convert(self, entity: ThreadDTO) -> Optional[Thread]:
