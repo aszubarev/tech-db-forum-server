@@ -17,6 +17,10 @@ class ThreadRepository(Repository[ThreadDTO]):
         data = self._context.callproc('get_thread_by_id', [uid])
         return create_one(ThreadDTO, data)
 
+    def get_by_slug(self, slug: str) -> Optional[ThreadDTO]:
+        data = self._context.callproc('get_thread_by_slug', [slug])
+        return create_one(ThreadDTO, data)
+
     def get_for_forum(self, forum_id: int, **kwargs) -> List[ThreadDTO]:
 
         data = None

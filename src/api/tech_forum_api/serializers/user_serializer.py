@@ -33,6 +33,9 @@ class UserSerializer(Serializer):
 
         return data
 
+    def prepare_load_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        return {}
+
     def load(self, data: Dict[str, Any]) -> UserDTO:
         user_id = None if data.get('id') is None or data.get('id') == 'null' else int(data['id'])
         nickname = None if data.get('nickname') is None or data.get('nickname') == 'null' else data['nickname']

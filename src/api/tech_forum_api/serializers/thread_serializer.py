@@ -53,6 +53,9 @@ class ThreadSerializer(Serializer):
 
         return data
 
+    def prepare_load_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        return {}
+
     def load(self, data: Dict[str, Any]) -> ThreadDTO:
 
         logging.info(f"[ThreadSerializer.load] Try load entity")
@@ -74,6 +77,8 @@ class ThreadSerializer(Serializer):
         created = None if data.get('created') is None or data.get('created') == 'null' else dateutil.parser.parse(data['created'])
         message = None if data.get('message') is None or data.get('message') == 'null' else data['message']
         title = None if data.get('title') is None or data.get('title') == 'null' else data['title']
+
+        logging.info(f"[ThreadSerializer.load] Complete load entity")
 
         return ThreadDTO(uid=thread_id, slug=slug, forum_id=forum_id, user_id=user_id,
                          created=created, message=message, title=title)

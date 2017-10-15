@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Dict, Generic, TypeVar
+from typing import Any, Dict, Generic, TypeVar, List
 
 # noinspection PyUnresolvedReferences
 from sqlutils import Entity, Model, AbstractExpandSet
@@ -12,6 +12,10 @@ class Serializer(Generic[T, E]):
 
     @abstractmethod
     def dump(self, model: T) -> Dict[str, Any]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def prepare_load_data(self, managed_data: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError
 
     @abstractmethod
