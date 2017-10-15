@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_forum_by_user_id(p_user_id INT)
+CREATE OR REPLACE FUNCTION get_forums_for_user(p_user_id INT)
   RETURNS TABLE(forum_id INT,
                 slug CITEXT,
                 user_id INT,

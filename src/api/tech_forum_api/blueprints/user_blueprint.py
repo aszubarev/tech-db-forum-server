@@ -41,12 +41,11 @@ class UserBlueprint(BaseBlueprint[UserService]):
         @blueprint.route('/<nickname>/create', methods=['POST'])
         def _add(nickname: str):
             try:
-                data = {'nickname': nickname}
-                return self._add(data)
+                return self._add({'nickname': nickname})
 
             except UniqueViolationError:
                 data = self.__service.get_by_nickname_or_email(nickname=nickname, email=request.json['email'])
-                return self._return_many_with_status(data, 409)
+                return self._return_many(data, status=409)
 
         @blueprint.route('/<nickname>/profile', methods=['GET'])
         def profile(nickname: str):

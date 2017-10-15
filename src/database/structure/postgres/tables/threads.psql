@@ -4,7 +4,7 @@ CREATE TABLE threads
     slug CITEXT DEFAULT NULL UNIQUE,
     forum_id int NOT NULL,
     user_id int NOT NULL,
-    created TIMESTAMP WITH TIME ZONE NOT NULL,
+    created TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     message TEXT NOT NULL,
     title TEXT NOT NULL
 );

@@ -30,7 +30,7 @@ services:
     networks:
       - backend
     ports:
-      - "80:80"
+      - "5000:80"
     volumes:
       - ../src/api/tech_forum_api:/tmp/api/tech_forum_api
     env_file: .env

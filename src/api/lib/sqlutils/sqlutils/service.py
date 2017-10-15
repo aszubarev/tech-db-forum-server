@@ -32,12 +32,12 @@ class Service(Generic[T, E, R]):
             models.append(self._convert(entity))
         return models
 
-    def add(self, entity: E) -> E:
+    def add(self, entity: E) -> T:
         dto = self._repo.add(entity)
         self._clear_cache()
         return self._convert(dto)
 
-    def update(self, entity: E) -> E:
+    def update(self, entity: E) -> T:
         dto = self._repo.update(entity)
         self._clear_cache()
         return self._convert(dto)

@@ -37,28 +37,38 @@ class ErrorSerializer(object):
         return data
 
 
-def return_one(model: Model, serializer: Serializer) -> Response:
+def return_one(model: Model, serializer: Serializer, **kwargs) -> Response:
     if model is None:
         abort(404)
 
     response = serializer.dump(model)
+
+    status = kwargs.get('status')
+    if status is None:
+        status = 200
+
     return Response(response=json.dumps(response),
-                    status=200, mimetype='application/json')
+                    status=status, mimetype='application/json')
 
 
-def return_many(models: List[T], serializer: Serializer) -> Response:
+def return_many(models: List[T], serializer: Serializer, **kwargs) -> Response:
     response = []
     for model in models:
         response.append(serializer.dump(model))
+
+    sort_key = kwargs.get('sort_key')
+    sort_reverse = kwargs.get('sort_reverse')
+    if sort_key is not None and sort_reverse is not None:
+        sorted(models, key=sort_key, reverse=sort_reverse)
+    elif sort_key is not None and sort_reverse is None:
+        sorted(models, key=sort_key)
+
+    status = kwargs.get('status')
+    if status is None:
+        status = 200
+
     return Response(response=json.dumps(response),
-                    status=200, mimetype='application/json')
-
-
-def return_many_with_status(models: List[T], serializer: Serializer, status: int) -> Response:
-    response = []
-    for model in models:
-        response.append(serializer.dump(model))
-    return Response(response=json.dumps(response), status=status, mimetype='application/json')
+                    status=status, mimetype='application/json')
 
 
 class BaseBlueprint(Generic[S]):
@@ -84,14 +94,11 @@ class BaseBlueprint(Generic[S]):
             self._blueprint = self._create_blueprint()
         return self._blueprint
 
-    def _return_one(self, model: Model) -> Response:
-        return return_one(model, self._serializer)
+    def _return_one(self, model: Model, **kwargs) -> Response:
+        return return_one(model, self._serializer, **kwargs)
 
-    def _return_many(self, models: List[Model]) -> Response:
-        return return_many(models, self._serializer)
-
-    def _return_many_with_status(self, models: List[Model], status) -> Response:
-        return return_many_with_status(models, self._serializer, status)
+    def _return_many(self, models: List[Model], **kwargs) -> Response:
+        return return_many(models, self._serializer, **kwargs)
 
     def _get_by_id(self, uid: Any):
         model = None
@@ -150,6 +157,8 @@ class BaseBlueprint(Generic[S]):
             serialized_data = request.json
             serialized_data.update(data)
             entity = self._serializer.load(serialized_data)
+        except NoDataFoundError as exp:
+            raise NoDataFoundError(f"Can't parse {self._name} entity") from exp
         except BaseException:
             logging.exception(f"Can't parse {self._name} entity")
             abort(400)

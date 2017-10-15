@@ -1,0 +1,36 @@
+-- [desc, limit]
+
+CREATE OR REPLACE FUNCTION get_threads_for_forum_sort_limit(p_forum_id INT,
+                                                            p_desc_flag BOOLEAN,
+                                                            p_limit int)
+  RETURNS TABLE(thread_id INT,
+                slug CITEXT,
+                forum_id INT,
+                user_id INT,
+                created TIMESTAMP WITH TIME ZONE,
+                message TEXT,
+                title TEXT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY
+        SELECT th.thread_id, th.slug, th.forum_id, th.user_id,
+                        th.created, th.message, th.title
+        FROM threads th
+        WHERE th.forum_id = p_forum_id
+        ORDER BY
+                 CASE p_desc_flag
+                    WHEN false THEN th.created
+                    ELSE NULL
+                 END ASC,
+
+                 CASE p_desc_flag
+                    WHEN true THEN th.created
+                    ELSE NULL
+                 END DESC
+        LIMIT p_limit;
+
+
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

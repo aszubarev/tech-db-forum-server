@@ -16,17 +16,16 @@ class ForumRepository(Repository[ForumDTO]):
         data = self._context.callproc('get_forum_by_id', [uid])
         return create_one(ForumDTO, data)
 
+    def get_by_slug(self, slug: str) -> Optional[ForumDTO]:
+        data = self._context.callproc('get_forum_by_slug', [slug])
+        return create_one(ForumDTO, data)
+
     def get_all(self) -> List[ForumDTO]:
         raise NotImplementedError
 
     def add(self, entity: ForumDTO) -> Optional[ForumDTO]:
         data = self._context.callproc('add_forum', [entity.slug, entity.user_id, entity.title])
         return create_one(ForumDTO, data)
-
-    # def update(self, entity: ForumDTO) -> Optional[ForumDTO]:
-    #     data = self._context.callproc('update_forum_by_nickname', [entity.nickname, entity.email,
-    #                                                               entity.about, entity.fullname])
-    #     return create_one(ForumDTO, data)
 
     def update(self, entity: ForumDTO):
         raise NotImplementedError
