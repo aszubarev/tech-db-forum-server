@@ -15,7 +15,7 @@ class Serializer(Generic[T, E]):
         raise NotImplementedError
 
     @abstractmethod
-    def prepare_load_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def prepare_load_data(self, managed_data: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError
 
     @abstractmethod

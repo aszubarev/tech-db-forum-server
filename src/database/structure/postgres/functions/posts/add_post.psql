@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION add_posts(
   p_parent_id INT,
   p_message TEXT,
   p_created TIMESTAMP WITH TIME ZONE,
-  p_is_edited DEFAULT FALSE)
+  p_is_edited BOOLEAN)
 
 RETURNS TABLE(post_id INT,
               thread_id INT,
@@ -13,7 +13,7 @@ RETURNS TABLE(post_id INT,
               user_id INT,
               parent_id INT,
               message TEXT,
-              message TIMESTAMP WITH TIME ZONE,
+              created TIMESTAMP WITH TIME ZONE,
               is_edited BOOLEAN)
 AS
 $BODY$
@@ -21,12 +21,12 @@ $BODY$
     RETURN QUERY
         INSERT INTO posts (thread_id, forum_id, user_id, parent_id,
                            message, created, is_edited)
-                       
+
         VALUES (p_thread_id, p_forum_id, p_user_id, p_parent_id,
                 p_message, p_created, p_is_edited)
-              
+
         RETURNING posts.post_id, posts.thread_id, posts.forum_id, posts.user_id,
-                  posts.parent_id, posts.message, posts.message, posts.is_edited;
+                  posts.parent_id, posts.message, posts.created, posts.is_edited;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;

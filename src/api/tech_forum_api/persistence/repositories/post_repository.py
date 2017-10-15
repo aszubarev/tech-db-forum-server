@@ -14,23 +14,17 @@ class PostRepository(Repository[PostDTO]):
         self._context = context
 
     def get_by_id(self, uid: int) -> Optional[PostDTO]:
-        data = self._context.callproc('get_thread_by_id', [uid])
+        data = self._context.callproc('get_post_by_id', [uid])
         return create_one(PostDTO, data)
 
     def get_all(self) -> List[PostDTO]:
         raise NotImplementedError
 
-    def add(self, entities: List[PostDTO]) -> List[PostDTO]:
-        if not entities:
-            return []
+    def add(self, entity: PostDTO) -> Optional[PostDTO]:
+        data = self._context.callproc('add_post', [entity.thread_id, entity.forum_id, entity.user_id,
+                                                   entity.parent_id, entity.message, entity.created, entity.is_edited])
 
-        data_list = []
-        for entity in entities:
-            data = self._context.callproc('add_post', [entity.thread_id, entity.forum_id, entity.user_id,
-                                                       entity.parent_id, entity.message, entity.created])
-            data_list.append(data)
-
-        return create_many(PostDTO, data_list)
+        return create_one(PostDTO, data)
 
     def update(self, entity: PostDTO):
         raise NotImplementedError

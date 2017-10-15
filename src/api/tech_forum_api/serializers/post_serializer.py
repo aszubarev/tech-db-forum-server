@@ -53,10 +53,10 @@ class PostSerializer(Serializer):
 
         return data
 
-    def prepare_load_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def prepare_load_data(self, managed_data: Dict[str, Any]) -> Dict[str, Any]:
         logging.info(f"[PostSerializer.prepare_load_data] Try load entity")
 
-        thread_slug_or_id = data.get('thread')
+        thread_slug_or_id = managed_data.get('thread_slug_or_id')
 
         if thread_slug_or_id is None:
             logging.error(f"[PostSerializer.load] Bad request")

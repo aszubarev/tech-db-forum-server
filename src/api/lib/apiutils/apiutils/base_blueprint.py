@@ -117,14 +117,19 @@ class BaseBlueprint(Generic[S]):
             logging.exception("Can't get all {0} models".format(self._name))
             abort(500)
 
-    def _add(self, data: Dict[str, Any]):
-        entity = self._parse(data)
+    def _add(self, manage_data: Dict[str, Any] = None):
+        entity = self._parse(manage_data)
         model = self._add_entity(entity)
         response = self._serializer.dump(model)
         return Response(response=json.dumps(response), status=201, mimetype='application/json')
 
-    def _update(self, data: Dict[str, Any]):
-        entity = self._parse(data)
+    def _add_many(self, manage_data: Dict[str, Any]):
+        entities = self._parse_many(manage_data)
+        models = self._add_many_entity(entities)
+        return self._return_many(models, status=201)
+
+    def _update(self, manage_data: Dict[str, Any]):
+        entity = self._parse(manage_data)
         model = self._update_entity(entity)
         response = self._serializer.dump(model)
         return Response(response=json.dumps(response), status=200, mimetype='application/json')
@@ -151,18 +156,38 @@ class BaseBlueprint(Generic[S]):
     def _create_blueprint(self) -> Blueprint:
         raise NotImplementedError
 
-    def _parse(self, data: Dict[str, Any]):
+    def _parse(self, manage_data: Dict[str, Any] = None):
+
         entity = None
         try:
-            serialized_data = request.json
-            serialized_data.update(data)
-            entity = self._serializer.load(serialized_data)
+            if manage_data is None:
+                manage_data = {}
+            load_data = request.json
+            load_data.update(manage_data)
+            entity = self._serializer.load(load_data)
         except NoDataFoundError as exp:
             raise NoDataFoundError(f"Can't parse {self._name} entity") from exp
         except BaseException:
             logging.exception(f"Can't parse {self._name} entity")
             abort(400)
         return entity
+
+    def _parse_many(self, manage_data: Dict[str, Any]):
+        entities = []
+        try:
+            prepared_load_data = self._serializer.prepare_load_data(manage_data)
+            load_data_list = request.json
+            for load_data in load_data_list:
+                load_data.update(prepared_load_data)
+                entity = self._serializer.load(load_data)
+                entities.append(entity)
+
+        except NoDataFoundError as exp:
+            raise NoDataFoundError(f"Can't parse {self._name} entity") from exp
+        except BaseException:
+            logging.exception(f"Can't parse {self._name} entity")
+            abort(400)
+        return entities
 
     def _add_entity(self, entity: Any) -> Any:
 
@@ -198,4 +223,10 @@ class BaseBlueprint(Generic[S]):
 
         except ForeignKeyViolationError as exp:
             raise ForeignKeyViolationError(f"Can't update {self._name} entity") from exp
+
+    def _add_many_entity(self, entities: List[Any]) -> List[Any]:
+        models = []
+        for entity in entities:
+            models.append(self._add_entity(entity))
+        return models
 

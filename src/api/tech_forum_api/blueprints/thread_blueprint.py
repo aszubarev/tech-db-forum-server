@@ -7,7 +7,6 @@ from apiutils import BaseBlueprint
 
 from tech_forum_api.serializers.thread_serializer import ThreadSerializer
 from sqlutils import NoDataFoundError, UniqueViolationError
-from tech_forum_api.services.forum_service import ForumService
 from tech_forum_api.services.thread_service import ThreadService
 
 logging.basicConfig(level=logging.INFO)
