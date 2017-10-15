@@ -6,6 +6,5 @@ CREATE TABLE posts
     user_id int NOT NULL,
     parent_id int NOT NULL,
     created TIMESTAMP WITH TIME ZONE NOT NULL,
-    is_edited BOOLEAN NOT NULL,
-    title TEXT NOT NULL
+    is_edited BOOLEAN DEFAULT FALSE NOT NULL
 );
