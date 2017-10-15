@@ -39,10 +39,8 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         limit = request.args.get('limit')
         since = request.args.get('since')
 
-        logging.info(f"[ThreadService.get_for_forum] desc = {desc}, limit - {limit}; since = {since}")
         if since is not None:
             since = dateutil.parser.parse(since)
-            logging.info(f"[ThreadService.get_for_forum] since parsed = {since}")
 
         data = self._repo.get_for_forum(forum.uid, desc=desc, limit=limit, since=since)
         return self._convert_many(data)
