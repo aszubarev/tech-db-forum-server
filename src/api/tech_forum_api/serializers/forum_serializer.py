@@ -34,6 +34,9 @@ class ForumSerializer(Serializer):
 
         return data
 
+    def prepare_load_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        return {}
+
     def load(self, data: Dict[str, Any]) -> ForumDTO:
 
         user = self._userService.get_by_nickname(data.get('user'))

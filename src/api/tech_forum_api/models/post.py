@@ -13,7 +13,7 @@ class Post(Model):
 
         self._thread: Thread = None
         self._forum: Forum = None
-        self._user: User = None
+        self._author: User = None
         self._parent: Post = None
         self._message: str = None
         self._created: datetime = None
@@ -28,12 +28,16 @@ class Post(Model):
         return self._forum
 
     @property
-    def user(self) -> User:
-        return self._user
+    def author(self) -> User:
+        return self._author
 
     @property
     def parent(self) -> "Post":
         return self._parent
+
+    @property
+    def message(self) -> str:
+        return self._message
 
     @property
     def created(self) -> datetime:
@@ -43,11 +47,11 @@ class Post(Model):
     def is_edited(self) -> bool:
         return self._is_edited
 
-    def fill(self, thread: Thread, forum: Forum, user: User, parent: "Post",
+    def fill(self, thread: Thread, forum: Forum, author: User, parent: "Post",
              message: str, created: datetime, is_edited: bool) -> "Post":
         self._thread = thread
         self._forum = forum
-        self._user = user
+        self._author = author
         self._parent = parent
         self._message = message
         self._created = created
