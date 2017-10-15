@@ -53,7 +53,7 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
 
             except UniqueViolationError:
                 forum = self.__service.get_by_slug(request.json['slug'])
-                return self._return_one_with_status(forum, 409)
+                return self._return_one(forum, status=409)
 
             except NoDataFoundError:
                 return self._return_error(f"Can't find user with nickname {request.json['user']}", 404)
@@ -62,7 +62,7 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
         def _details(slug: str):
             try:
                 model = self._service.get_by_slug(slug)
-                return self._return_one_with_status(model, 200)
+                return self._return_one(model, status=200)
             except NoDataFoundError:
                 return self._return_error(f"Can't find forum details by slag = {slug}", 404)
 

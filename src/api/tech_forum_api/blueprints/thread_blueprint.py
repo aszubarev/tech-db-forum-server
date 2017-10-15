@@ -7,6 +7,7 @@ from apiutils import BaseBlueprint
 
 from tech_forum_api.serializers.thread_serializer import ThreadSerializer
 from sqlutils import NoDataFoundError, UniqueViolationError
+from tech_forum_api.services.forum_service import ForumService
 from tech_forum_api.services.thread_service import ThreadService
 
 logging.basicConfig(level=logging.INFO)
@@ -45,5 +46,17 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
             except UniqueViolationError:
                 return self._return_error(f"Can't create thread by slag = {slug}", 409)
+
+        @blueprint.route('forum/<slug>/threads', methods=['GET'])
+        def _get_threads_by_forum(slug: str):
+            try:
+                models = self.__service.get_for_forum(slug)
+                return self._return_many(models,
+                                         status=200,
+                                         sort_key=lambda thread: thread.created,
+                                         sort_reverse=True)
+
+            except NoDataFoundError:
+                return self._return_error(f"Can't get threads by forum slag = {slug}", 404)
 
         return blueprint

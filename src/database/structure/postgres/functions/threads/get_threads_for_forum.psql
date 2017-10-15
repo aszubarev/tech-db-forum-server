@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_thread_by_user_id(p_user_id INT)
+CREATE OR REPLACE FUNCTION get_threads_for_forum(p_forum_id INT)
   RETURNS TABLE(thread_id INT,
                 slug CITEXT,
                 forum_id INT,
@@ -12,7 +12,7 @@ $BODY$
     RETURN QUERY SELECT th.thread_id, th.slug, th.forum_id, th.user_id,
                         th.created, th.message, th.title
     FROM threads th
-    WHERE th.user_id = p_user_id;
+    WHERE th.forum_id = p_forum_id;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
