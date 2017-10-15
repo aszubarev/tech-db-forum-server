@@ -6,7 +6,7 @@ from werkzeug.wsgi import DispatcherMiddleware
 
 from tech_forum_api.application import Application
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.config['APPLICATION_ROOT'] = '/api'

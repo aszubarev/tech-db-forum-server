@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION add_posts(
+CREATE OR REPLACE FUNCTION add_post(
   p_thread_id INT,
   p_forum_id INT,
   p_user_id INT,

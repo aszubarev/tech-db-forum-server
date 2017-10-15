@@ -173,10 +173,14 @@ class BaseBlueprint(Generic[S]):
         return entity
 
     def _parse_many(self, manage_data: Dict[str, Any]):
+
         entities = []
+        load_data_list = request.json
+        if not load_data_list:
+            return entities
+
         try:
             prepared_load_data = self._serializer.prepare_load_data(manage_data)
-            load_data_list = request.json
             for load_data in load_data_list:
                 load_data.update(prepared_load_data)
                 entity = self._serializer.load(load_data)

@@ -39,7 +39,7 @@ class PostBlueprint(BaseBlueprint[PostService]):
         def _add_many(slug_or_id: str):
             try:
                 managed_data = {
-                    'slug_or_id': slug_or_id
+                    'thread_slug_or_id': slug_or_id
                 }
                 return self._add_many(managed_data)
 

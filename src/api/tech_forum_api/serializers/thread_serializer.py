@@ -78,5 +78,7 @@ class ThreadSerializer(Serializer):
         message = None if data.get('message') is None or data.get('message') == 'null' else data['message']
         title = None if data.get('title') is None or data.get('title') == 'null' else data['title']
 
+        logging.info(f"[ThreadSerializer.load] Complete load entity")
+
         return ThreadDTO(uid=thread_id, slug=slug, forum_id=forum_id, user_id=user_id,
                          created=created, message=message, title=title)

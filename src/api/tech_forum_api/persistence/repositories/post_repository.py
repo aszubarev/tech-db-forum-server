@@ -22,7 +22,7 @@ class PostRepository(Repository[PostDTO]):
 
     def add(self, entity: PostDTO) -> Optional[PostDTO]:
         data = self._context.callproc('add_post', [entity.thread_id, entity.forum_id, entity.user_id,
-                                                   entity.parent_id, entity.message, entity.created, entity.is_edited])
+                                                   entity.parent_id, entity.message, entity.created, False])
 
         return create_one(PostDTO, data)
 

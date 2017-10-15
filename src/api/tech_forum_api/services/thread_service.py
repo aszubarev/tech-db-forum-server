@@ -30,6 +30,10 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
     def get_by_id(self, uid: int) -> Optional[Thread]:
         return super().get_by_id(uid)
 
+    def get_by_slug(self, slug: str) -> Optional[Thread]:
+        data = self._repo.get_by_slug(slug)
+        return self._convert(data)
+
     def get_for_forum(self, slug: str) -> List[Thread]:
         forum = self._forum_service.get_by_slug(slug)
         if forum is None:
