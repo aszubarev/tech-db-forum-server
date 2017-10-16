@@ -38,13 +38,21 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
         @blueprint.route('forum/<slug>/create', methods=['POST'])
         def _add(slug: str):
             try:
-                return self._add({'forum': slug})
+                logging.info(f"[ThreadBlueprint._add] Try add thread by slug = {slug}")
+                response = self._add({'forum': slug})
+                logging.info(f"[ThreadBlueprint._add] Complete add thread by slug = {slug}")
+                return response
 
             except NoDataFoundError:
                 return self._return_error(f"Can't create thread by slag = {slug}", 404)
 
             except UniqueViolationError:
-                return self._return_error(f"Can't create thread by slag = {slug}", 409)
+                logging.info(f"[ThreadBlueprint._add] Try Handle UniqueViolationError")
+                thread_slug = request.json['slug']
+                model = self._service.get_by_slug(thread_slug)
+                response = self._return_one(model, status=409)
+                logging.info(f"[ThreadBlueprint._add] Complete Handle UniqueViolationError")
+                return response
 
         @blueprint.route('forum/<slug>/threads', methods=['GET'])
         def _get_threads_by_forum(slug: str):

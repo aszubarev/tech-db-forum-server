@@ -18,6 +18,7 @@ class ThreadRepository(Repository[ThreadDTO]):
         return create_one(ThreadDTO, data)
 
     def get_by_slug(self, slug: str) -> Optional[ThreadDTO]:
+        logging.info(f"[ThreadRepository.get_by_slug] slug = {slug}")
         data = self._context.callproc('get_thread_by_slug', [slug])
         return create_one(ThreadDTO, data)
 
@@ -53,6 +54,8 @@ class ThreadRepository(Repository[ThreadDTO]):
         raise NotImplementedError
 
     def add(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
+        logging.info(f"[ThreadRepository.add] slug = {entity.slug}, forum_id = {entity.forum_id}, "
+                     f"user_id = {entity.user_id}, title = {entity.title}")
         data = self._context.callproc('add_thread', [entity.slug, entity.forum_id, entity.user_id,
                                                      entity.created, entity.message, entity.title])
         return create_one(ThreadDTO, data)
