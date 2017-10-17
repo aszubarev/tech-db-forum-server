@@ -59,16 +59,12 @@ class ThreadSerializer(Serializer):
 
     def load(self, data: Dict[str, Any]) -> ThreadDTO:
 
-        logging.info(f"[ThreadSerializer.load] Try load entity")
-
         author = self._userService.get_by_nickname(data.get('author'))
         if not author:
-            logging.error(f"[ThreadSerializer.load] Can't find author for thread by nickname = {data.get('author')}")
             raise NoDataFoundError(f"Can't find author for thread by nickname = {data.get('author')}")
 
         forum = self._forum_service.get_by_slug(data.get('forum'))
         if not forum:
-            logging.error(f"[ThreadSerializer.load] Can't find author for thread by nickname = {data.get('forum')}")
             raise NoDataFoundError(f"Can't find forum for thread by nickname = {data.get('forum')}")
 
         thread_id = None if data.get('id') is None or data.get('id') == 'null' else data['id']
@@ -78,8 +74,6 @@ class ThreadSerializer(Serializer):
         created = None if data.get('created') is None or data.get('created') == 'null' else dateutil.parser.parse(data['created'])
         message = None if data.get('message') is None or data.get('message') == 'null' else data['message']
         title = None if data.get('title') is None or data.get('title') == 'null' else data['title']
-
-        logging.info(f"[ThreadSerializer.load] Complete load entity")
 
         return ThreadDTO(uid=thread_id, slug=slug, forum_id=forum_id, user_id=user_id,
                          created=created, message=message, title=title)

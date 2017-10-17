@@ -7,6 +7,8 @@ import pytz as pytz
 from injector import inject, singleton
 
 from apiutils import Serializer
+from apiutils.errors.bad_request_error import BadRequestError
+from apiutils.errors.server_error import ServerError
 
 from tech_forum_api.models.post import Post
 from tech_forum_api.persistence.dto.post_dto import PostDTO
@@ -28,7 +30,7 @@ class PostSerializer(Serializer):
         self._forum_service = forum_service
         self._thread_service = thread_service
 
-    def dump(self, model: Post) -> Optional[Dict[str, Any]]:
+    def dump(self, model: Post, **kwargs) -> Optional[Dict[str, Any]]:
 
         if not model:
             return None
@@ -56,28 +58,21 @@ class PostSerializer(Serializer):
         return data
 
     def prepare_load_data(self, **kwargs) -> Dict[str, Any]:
-        logging.info(f"[PostSerializer.prepare_load_data] Try prepare load data")
 
         thread_slug_or_id = kwargs.get('thread_slug_or_id')
 
-        # TODO change type exception
         if thread_slug_or_id is None:
-            logging.debug(f"[PostSerializer.prepare_load_data] Bad request")
-            raise NoDataFoundError(f"Bad request")
+            raise ServerError(f"Can't get parameter 'thread_slug_or_id'")
 
         try:
-            logging.info(f"[PostSerializer.prepare_load_data] Try cast to int {thread_slug_or_id}")
             cast_thread_id = int(thread_slug_or_id)
             thread = self._thread_service.get_by_id(cast_thread_id)
 
         except ValueError:
-            logging.info(f"[PostSerializer.prepare_load_data] Can't cast to int {thread_slug_or_id}")
             thread_slug = thread_slug_or_id
             thread = self._thread_service.get_by_slug(thread_slug)
 
         if not thread:
-            logging.info(f"[PostSerializer.prepare_load_data] "
-                         f"Can't find thread by thread_slug_or_id = {thread_slug_or_id}")
             raise NoDataFoundError(f"Can't find thread by thread_slug_or_id = {thread_slug_or_id}")
 
         prepare_data = {
@@ -93,13 +88,11 @@ class PostSerializer(Serializer):
 
         nickname = data.get('author')
         if nickname is None:
-            logging.error(f"[PostSerializer._get_user_id] Bad request")
-            raise NoDataFoundError(f"Bad request")
+            raise BadRequestError(f"Can't get parameter 'nickname'")
 
         author = self._userService.get_by_nickname(nickname)
         if not author:
-            logging.error(f"[PostSerializer.load] Can't find author for thread by nickname = {nickname}")
-            raise NoDataFoundError(f"Can't find author for thread by nickname = {nickname}")
+            raise NoDataFoundError(f"Can't find author by nickname = {nickname}")
 
         return author.uid
 
@@ -108,25 +101,21 @@ class PostSerializer(Serializer):
         parent_id = data.get('parent')
         if parent_id is None:
             return 0
-        # TODO raise another exception
+
         try:
             cast_parent_id = int(parent_id)  # try cast parent_id to int
         except ValueError as exp:
-            logging.error(f"[PostSerializer._get_parent_id] Bad request")
-            raise NoDataFoundError(f"Bad request") from exp
+            raise BadRequestError(f"Bad request") from exp
 
         if cast_parent_id != 0:
             parent = self._post_service.get_by_id(cast_parent_id)
             if not parent:
-                logging.error(f"[PostSerializer._get_parent_id] Can't find parent for post by uid = {cast_parent_id}")
                 raise NoDataFoundError(f"Can't find parent for post by uid = {cast_parent_id}")
             return parent.uid
         else:
             return 0
 
     def load(self, data: Dict[str, Any]) -> PostDTO:
-
-        logging.info(f"[PostSerializer.load] Try load entity")
 
         post_id = None if data.get('id') is None or data.get('id') == 'null' else data['id']
         user_id = self._get_user_id(data)
@@ -136,8 +125,6 @@ class PostSerializer(Serializer):
         created = datetime.now(tz=pytz.utc) if data.get('created') is None or data.get('created') == 'null' else dateutil.parser.parse(data['created'])
         message = None if data.get('message') is None or data.get('message') == 'null' else data['message']
         is_edited = None if data.get('is_edited') is None or data.get('is_edited') == 'null' else data['is_edited']
-
-        logging.info(f"[PostSerializer.load] Complete load entity")
 
         return PostDTO(uid=post_id, thread_id=thread_id, forum_id=forum_id, user_id=user_id,
                        parent_id=parent_id, message=message, created=created, is_edited=is_edited)
