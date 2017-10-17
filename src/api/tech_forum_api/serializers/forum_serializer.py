@@ -17,7 +17,7 @@ class ForumSerializer(Serializer):
     def __init__(self, user_service: UserService):
         self._userService = user_service
 
-    def dump(self, model: Forum) -> Optional[Dict[str, Any]]:
+    def dump(self, model: Forum, **kwargs) -> Optional[Dict[str, Any]]:
 
         if not model:
             return None
@@ -34,8 +34,8 @@ class ForumSerializer(Serializer):
 
         return data
 
-    def prepare_load_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        return {}
+    def prepare_load_data(self, **kwargs) -> Dict[str, Any]:
+        raise NotImplementedError
 
     def load(self, data: Dict[str, Any]) -> ForumDTO:
 

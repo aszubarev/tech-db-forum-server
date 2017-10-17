@@ -1,3 +1,4 @@
+from functools import reduce
 from typing import Optional, List
 
 from injector import inject, singleton
@@ -17,6 +18,30 @@ class VoteService(Service[Vote, VoteDTO, VoteRepository]):
     def __init__(self, repo: VoteRepository) -> None:
         super().__init__(repo)
         self._converter = VoteConverter()
+
+    def get_by_id(self, uid: int) -> Optional[Vote]:
+        return super().get_by_id(uid)
+
+    def get_for_thread(self, thread_id: int) -> List[Vote]:
+        entities = self.__repo.get_for_thread(thread_id)
+        return self._convert_many(entities)
+
+    def count_for_thread(self, thread_id: int):
+        """
+        :param thread_id:
+        :return number of all voices for thread:
+        """
+        models = self.get_for_thread(thread_id=thread_id)
+        return len(models)  # return number of all models
+
+    def votes(self, thread_id: int) -> int:
+        """
+        :param thread_id:
+        :return sum of all voices for thread:
+        """
+        models = self.get_for_thread(thread_id=thread_id)
+        votes = reduce(lambda a, vote: a + vote.value, models, 0)
+        return votes
 
     @property
     def __repo(self) -> VoteRepository:

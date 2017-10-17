@@ -4,5 +4,8 @@ CREATE INDEX vote_users_idx
 CREATE INDEX vote_threads_idx
   ON vote (thread_id);
 
+CREATE UNIQUE INDEX vote_user_thread_unique_idx
+  ON vote (user_id, thread_id)
+
 
 

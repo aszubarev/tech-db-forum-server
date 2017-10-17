@@ -11,11 +11,11 @@ E = TypeVar("E", bound="Entity")
 class Serializer(Generic[T, E]):
 
     @abstractmethod
-    def dump(self, model: T) -> Dict[str, Any]:
+    def dump(self, model: T, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError
 
     @abstractmethod
-    def prepare_load_data(self, managed_data: Dict[str, Any]) -> Dict[str, Any]:
+    def prepare_load_data(self, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError
 
     @abstractmethod

@@ -41,7 +41,7 @@ class UserBlueprint(BaseBlueprint[UserService]):
         @blueprint.route('/<nickname>/create', methods=['POST'])
         def _add(nickname: str):
             try:
-                return self._add({'nickname': nickname})
+                return self._add(nickname=nickname)
 
             except UniqueViolationError:
                 data = self.__service.get_by_nickname_or_email(nickname=nickname, email=request.json['email'])
@@ -65,8 +65,8 @@ class UserBlueprint(BaseBlueprint[UserService]):
         @blueprint.route('/<nickname>/profile', methods=['POST'])
         def _update(nickname: str):
             try:
-                data = {'nickname': nickname}
-                return self._update(data)
+
+                return self._update(nickname=nickname)
 
             except NoDataFoundError:
                 logging.info(f"Can't find user with nickname {nickname}")

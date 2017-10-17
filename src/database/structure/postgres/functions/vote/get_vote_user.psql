@@ -1,12 +1,12 @@
-CREATE OR REPLACE FUNCTION get_vote_by_user_id(p_user_id INT)
+CREATE OR REPLACE FUNCTION get_vote_user(p_user_id INT)
   RETURNS TABLE(vote_id INT,
                 user_id INT,
                 thread_id INT,
-                vote_value TEXT)
+                vote_value INT)
 AS
 $BODY$
   BEGIN
-    RETURN QUERY SELECT v.vote_id, v.user_id, v.emathread_idil, v.about, v.fullname
+    RETURN QUERY SELECT v.vote_id, v.user_id, v.thread_id, v.vote_value
     FROM vote v
     WHERE v.user_id = p_user_id;
   END;

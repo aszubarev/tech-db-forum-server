@@ -12,6 +12,7 @@ from tech_forum_api.persistence.dto.thread_dto import ThreadDTO
 from tech_forum_api.services.forum_service import ForumService
 from tech_forum_api.services.user_service import UserService
 from sqlutils import NoDataFoundError
+# from tech_forum_api.services.vote_service import VoteService
 
 
 @singleton
@@ -22,7 +23,7 @@ class ThreadSerializer(Serializer):
         self._userService = user_service
         self._forum_service = forum_service
 
-    def dump(self, model: Thread) -> Optional[Dict[str, Any]]:
+    def dump(self, model: Thread, **kwargs) -> Optional[Dict[str, Any]]:
 
         if not model:
             return None
@@ -53,8 +54,8 @@ class ThreadSerializer(Serializer):
 
         return data
 
-    def prepare_load_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        return {}
+    def prepare_load_data(self, **kwargs) -> Dict[str, Any]:
+        raise NotImplementedError
 
     def load(self, data: Dict[str, Any]) -> ThreadDTO:
 
