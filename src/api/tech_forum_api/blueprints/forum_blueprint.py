@@ -49,7 +49,7 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
         @blueprint.route('forum/create', methods=['POST'])
         def _add():
             try:
-                return self._add({})
+                return self._add()
 
             except UniqueViolationError:
                 forum = self.__service.get_by_slug(request.json['slug'])

@@ -16,7 +16,7 @@ class UserSerializer(Serializer):
     def __init__(self):
         pass
 
-    def dump(self, model: User) -> Optional[Dict[str, Any]]:
+    def dump(self, model: User, **kwargs) -> Optional[Dict[str, Any]]:
 
         if not model:
             return None
@@ -33,8 +33,8 @@ class UserSerializer(Serializer):
 
         return data
 
-    def prepare_load_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        return {}
+    def prepare_load_data(self, **kwargs) -> Dict[str, Any]:
+        raise NotImplementedError
 
     def load(self, data: Dict[str, Any]) -> UserDTO:
         user_id = None if data.get('id') is None or data.get('id') == 'null' else int(data['id'])

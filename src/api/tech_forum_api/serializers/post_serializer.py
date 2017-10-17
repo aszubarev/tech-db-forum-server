@@ -55,11 +55,12 @@ class PostSerializer(Serializer):
 
         return data
 
-    def prepare_load_data(self, managed_data: Dict[str, Any]) -> Dict[str, Any]:
+    def prepare_load_data(self, **kwargs) -> Dict[str, Any]:
         logging.info(f"[PostSerializer.prepare_load_data] Try prepare load data")
 
-        thread_slug_or_id = managed_data.get('thread_slug_or_id')
+        thread_slug_or_id = kwargs.get('thread_slug_or_id')
 
+        # TODO change type exception
         if thread_slug_or_id is None:
             logging.debug(f"[PostSerializer.prepare_load_data] Bad request")
             raise NoDataFoundError(f"Bad request")
@@ -73,15 +74,6 @@ class PostSerializer(Serializer):
             logging.info(f"[PostSerializer.prepare_load_data] Can't cast to int {thread_slug_or_id}")
             thread_slug = thread_slug_or_id
             thread = self._thread_service.get_by_slug(thread_slug)
-
-        # thread = None
-        # if isinstance(thread_slug_or_id, int) is True:
-        #     logging.info(f"[PostSerializer.prepare_load_data] thread_slug_or_id has type int")
-        #     thread = self._thread_service.get_by_id(thread_slug_or_id)
-        #
-        # elif isinstance(thread_slug_or_id, str) is True:
-        #     logging.info(f"[PostSerializer.prepare_load_data] thread_slug_or_id has type str")
-        #     thread = self._thread_service.get_by_slug(thread_slug_or_id)
 
         if not thread:
             logging.info(f"[PostSerializer.prepare_load_data] "

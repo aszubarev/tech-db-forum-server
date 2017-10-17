@@ -117,19 +117,24 @@ class BaseBlueprint(Generic[S]):
             logging.exception("Can't get all {0} models".format(self._name))
             abort(500)
 
-    def _add(self, manage_data: Dict[str, Any] = None):
-        entity = self._parse(manage_data)
+    def _add(self, **kwargs):
+        entity = self._parse(**kwargs)
         model = self._add_entity(entity)
         response = self._serializer.dump(model)
-        return Response(response=json.dumps(response), status=201, mimetype='application/json')
 
-    def _add_many(self, manage_data: Dict[str, Any]):
-        entities = self._parse_many(manage_data)
+        status = kwargs.get('status')
+        if not status:
+            status = 201
+
+        return Response(response=json.dumps(response), status=status, mimetype='application/json')
+
+    def _add_many(self, **kwargs):
+        entities = self._parse_many(**kwargs)
         models = self._add_many_entity(entities)
         return self._return_many(models, status=201)
 
-    def _update(self, manage_data: Dict[str, Any]):
-        entity = self._parse(manage_data)
+    def _update(self, **kwargs):
+        entity = self._parse(**kwargs)
         model = self._update_entity(entity)
         response = self._serializer.dump(model)
         return Response(response=json.dumps(response), status=200, mimetype='application/json')
@@ -156,14 +161,13 @@ class BaseBlueprint(Generic[S]):
     def _create_blueprint(self) -> Blueprint:
         raise NotImplementedError
 
-    def _parse(self, manage_data: Dict[str, Any] = None):
+    def _parse(self, **kwargs):
 
         entity = None
         try:
-            if manage_data is None:
-                manage_data = {}
+
             load_data = request.json
-            load_data.update(manage_data)
+            load_data.update(kwargs)
             entity = self._serializer.load(load_data)
         except NoDataFoundError as exp:
             raise NoDataFoundError(f"Can't parse {self._name} entity") from exp
@@ -172,7 +176,7 @@ class BaseBlueprint(Generic[S]):
             abort(400)
         return entity
 
-    def _parse_many(self, manage_data: Dict[str, Any]):
+    def _parse_many(self, **kwargs):
 
         entities = []
         load_data_list = request.json
@@ -180,7 +184,7 @@ class BaseBlueprint(Generic[S]):
             return entities
 
         try:
-            prepared_load_data = self._serializer.prepare_load_data(manage_data)
+            prepared_load_data = self._serializer.prepare_load_data(**kwargs)
             for load_data in load_data_list:
                 load_data.update(prepared_load_data)
                 entity = self._serializer.load(load_data)

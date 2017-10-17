@@ -38,10 +38,7 @@ class PostBlueprint(BaseBlueprint[PostService]):
         @blueprint.route('thread/<slug_or_id>/create', methods=['POST'])
         def _add_many(slug_or_id: str):
             try:
-                managed_data = {
-                    'thread_slug_or_id': slug_or_id
-                }
-                return self._add_many(managed_data)
+                return self._add_many(thread_slug_or_id=slug_or_id)
 
             except NoDataFoundError:
                 return self._return_error(f"Can't find thread by slag = {slug_or_id}", 404)

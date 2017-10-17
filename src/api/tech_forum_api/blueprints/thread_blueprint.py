@@ -8,6 +8,7 @@ from apiutils import BaseBlueprint
 from tech_forum_api.serializers.thread_serializer import ThreadSerializer
 from sqlutils import NoDataFoundError, UniqueViolationError
 from tech_forum_api.services.thread_service import ThreadService
+from tech_forum_api.services.vote_service import VoteService
 
 logging.basicConfig(level=logging.INFO)
 
@@ -16,9 +17,11 @@ logging.basicConfig(level=logging.INFO)
 class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
     @inject
-    def __init__(self, service: ThreadService, serializer: ThreadSerializer) -> None:
+    def __init__(self, service: ThreadService, serializer: ThreadSerializer,
+                 vote_service: VoteService) -> None:
         super().__init__(service)
         self.__serializer = serializer
+        self._vote_service = vote_service
 
     @property
     def _name(self) -> str:
@@ -38,13 +41,15 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
         @blueprint.route('forum/<slug>/create', methods=['POST'])
         def _add(slug: str):
             try:
-                return self._add({'forum': slug})
+                return self._add(forum=slug)
 
             except NoDataFoundError:
                 return self._return_error(f"Can't create thread by slag = {slug}", 404)
 
             except UniqueViolationError:
-                return self._return_error(f"Can't create thread by slag = {slug}", 409)
+                thread_slug = request.json['slug']
+                model = self._service.get_by_slug(thread_slug)
+                return self._return_one(model, status=409)
 
         @blueprint.route('forum/<slug>/threads', methods=['GET'])
         def _get_threads_by_forum(slug: str):
@@ -54,5 +59,8 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
             except NoDataFoundError:
                 return self._return_error(f"Can't get threads by forum slag = {slug}", 404)
-
+        
         return blueprint
+
+
+
