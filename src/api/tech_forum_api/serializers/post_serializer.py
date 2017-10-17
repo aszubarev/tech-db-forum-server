@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
 import dateutil.parser
@@ -17,6 +17,7 @@ from tech_forum_api.services.post_service import PostService
 from tech_forum_api.services.thread_service import ThreadService
 from tech_forum_api.services.user_service import UserService
 from sqlutils import NoDataFoundError
+from tzlocal import get_localzone
 
 
 @singleton
@@ -29,6 +30,7 @@ class PostSerializer(Serializer):
         self._userService = user_service
         self._forum_service = forum_service
         self._thread_service = thread_service
+        self._tz = pytz.timezone('Europe/Moscow')
 
     def dump(self, model: Post, **kwargs) -> Optional[Dict[str, Any]]:
 
@@ -52,7 +54,12 @@ class PostSerializer(Serializer):
 
             if model.created is not None:
                 data.update({
-                    'created': model.created.astimezone().isoformat()
+                    'created':  model.created.astimezone(tz=self._tz).isoformat()
+                })
+
+            if model.parent.uid != 0:
+                data.update({
+                    'parent': model.parent.uid
                 })
 
         return data
@@ -75,12 +82,15 @@ class PostSerializer(Serializer):
         if not thread:
             raise NoDataFoundError(f"Can't find thread by thread_slug_or_id = {thread_slug_or_id}")
 
+        created = kwargs.get('created')
+        if not created:
+            created = datetime.now(tz=self._tz).astimezone(tz=self._tz).isoformat()
+
         prepare_data = {
             'thread_id': thread.uid,
-            'forum_id': thread.forum.uid
+            'forum_id': thread.forum.uid,
+            'created': created
         }
-
-        logging.info(f"[PostSerializer.prepare_load_data] Complete prepare load data")
 
         return prepare_data
 
@@ -122,7 +132,7 @@ class PostSerializer(Serializer):
         parent_id = self._get_parent_id(data)
         thread_id = None if data.get('thread_id') is None or data.get('thread_id') == 'null' else data['thread_id']
         forum_id = None if data.get('forum_id') is None or data.get('forum_id') == 'null' else data['forum_id']
-        created = datetime.now(tz=pytz.utc) if data.get('created') is None or data.get('created') == 'null' else dateutil.parser.parse(data['created'])
+        created = None if data.get('created') is None or data.get('created') == 'null' else dateutil.parser.parse(data['created'])
         message = None if data.get('message') is None or data.get('message') == 'null' else data['message']
         is_edited = None if data.get('is_edited') is None or data.get('is_edited') == 'null' else data['is_edited']
 
