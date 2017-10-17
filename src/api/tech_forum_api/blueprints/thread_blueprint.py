@@ -4,6 +4,7 @@ from flask import Blueprint, abort, request, Response, json
 from injector import inject, singleton
 
 from apiutils import BaseBlueprint
+from apiutils.errors.bad_request_error import BadRequestError
 
 from tech_forum_api.serializers.thread_serializer import ThreadSerializer
 from sqlutils import NoDataFoundError, UniqueViolationError
@@ -59,7 +60,22 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
             except NoDataFoundError:
                 return self._return_error(f"Can't get threads by forum slag = {slug}", 404)
-        
+
+        @blueprint.route('thread/<slug_or_id>/details', methods=['GET'])
+        def _details(slug_or_id: str):
+            try:
+
+                model = self.__service.get_by_slug_or_id(slug_or_id)
+                return self._return_one(model, status=200)
+
+            except NoDataFoundError as exp:
+                logging.error(exp, exc_info=True)
+                return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
+
+            except BadRequestError as exp:
+                logging.error(exp, exc_info=True)
+                return self._return_error(f"Bad request", 400)
+
         return blueprint
 
 

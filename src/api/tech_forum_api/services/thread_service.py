@@ -34,6 +34,21 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         data = self._repo.get_by_slug(slug)
         return self._convert(data)
 
+    def get_by_slug_or_id(self, slug_or_id: str) -> Optional[Thread]:
+
+        try:
+            cast_thread_id = int(slug_or_id)
+            thread = self.get_by_id(cast_thread_id)
+
+        except ValueError:
+            thread_slug = slug_or_id
+            thread = self.get_by_slug(thread_slug)
+
+        if not thread:
+            raise NoDataFoundError(f"Can't find thread by thread_slug_or_id = {slug_or_id}")
+
+        return thread
+
     def get_for_forum(self, slug: str) -> List[Thread]:
         forum = self._forum_service.get_by_slug(slug)
         if forum is None:
