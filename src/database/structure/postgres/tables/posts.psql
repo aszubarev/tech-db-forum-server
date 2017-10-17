@@ -7,5 +7,6 @@ CREATE TABLE posts
     parent_id int NOT NULL,
     message TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-    is_edited BOOLEAN NOT NULL
+    is_edited BOOLEAN NOT NULL,
+    path integer[] DEFAULT NULL
 );

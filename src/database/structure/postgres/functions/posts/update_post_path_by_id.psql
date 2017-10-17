@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION update_post_path_by_id(
+    p_post_id INT,
+    p_path INT[])
+
+RETURNS void AS
+$BODY$
+  BEGIN
+    UPDATE posts
+      SET path = p_path
+      WHERE posts.post_id = p_post_id;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
