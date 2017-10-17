@@ -17,6 +17,24 @@ class PostRepository(Repository[PostDTO]):
         data = self._context.callproc('get_post_by_id', [uid])
         return create_one(PostDTO, data)
 
+    def get_posts_for_thread(self, thread_id: int, **kwargs) -> List[PostDTO]:
+        sort = kwargs.get('sort')
+        limit = kwargs.get('limit')
+        since = kwargs.get('since')
+        desc = kwargs.get('desc')
+
+        data = None
+
+        # FLAT SORT
+        if sort == 'flat':
+            if limit is not None and since is None and desc is None:
+                data = self._context.callproc('get_posts_for_thread_flat_limit', [thread_id, limit])
+
+            elif limit is None and since is None and desc is None:
+                data = self._context.callproc('get_posts_for_thread_flat', [thread_id])
+
+        return create_many(PostDTO, data)
+
     def get_all(self) -> List[PostDTO]:
         raise NotImplementedError
 

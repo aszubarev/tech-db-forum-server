@@ -41,17 +41,20 @@ class PostBlueprint(BaseBlueprint[PostService]):
             try:
                 return self._add_many(thread_slug_or_id=slug_or_id)
 
-            except NoDataFoundError:
+            except NoDataFoundError as exp:
+                logging.error(exp, exc_info=True)
                 return self._return_error(f"Can't find thread by slag = {slug_or_id}", 404)
 
-            except UniqueViolationError:
+            except UniqueViolationError as exp:
+                logging.error(exp, exc_info=True)
                 return self._return_error(f"Can't create thread by slag = {slug_or_id}", 409)
 
         @blueprint.route('thread/<slug_or_id>/posts', methods=['GET'])
         def _posts(slug_or_id: str):
             try:
 
-                pass
+                models = self.__service.get_posts_for_thread(slug_or_id)
+                return self._return_many(models, status=200)
 
             except NoDataFoundError as exp:
                 logging.error(exp, exc_info=True)
