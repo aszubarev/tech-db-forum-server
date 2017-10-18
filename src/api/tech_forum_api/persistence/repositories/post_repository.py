@@ -34,7 +34,7 @@ class PostRepository(Repository[PostDTO]):
                 data = self._context.callproc('get_posts_for_thread_flat', [thread_id])
 
         # TREE SORT
-        if sort == 'tree':
+        elif sort == 'tree':
             if limit is not None and since is None and desc is None:
                 data = self._context.callproc('get_posts_for_thread_tree_limit', [thread_id, limit])
 
@@ -42,7 +42,7 @@ class PostRepository(Repository[PostDTO]):
             #     data = self._context.callproc('get_posts_for_thread_flat', [thread_id])
 
         # TREE SORT
-        if sort == 'parent_tree':
+        elif sort == 'parent_tree':
             if limit is not None and since is None and desc is None:
                 data = self._context.callproc('get_posts_for_thread_limit', [thread_id, limit])
                 parents = create_many(PostDTO, data)
@@ -72,9 +72,9 @@ class PostRepository(Repository[PostDTO]):
             # elif limit is None and since is None and desc is None:
             #     data = self._context.callproc('get_posts_for_thread_flat', [thread_id])
 
-        if sort is None:
+        elif sort is None:
             if limit is not None and since is None and desc is not None:
-                pass
+                data = self._context.callproc('get_posts_for_thread_desc_limit', [thread_id, desc, limit])
 
         return create_many(PostDTO, data)
 
