@@ -30,6 +30,9 @@ class PostRepository(Repository[PostDTO]):
             if limit is not None and since is None and desc is None:
                 data = self._context.callproc('get_posts_for_thread_flat_limit', [thread_id, limit])
 
+            elif limit is not None and since is None and desc is not None:
+                data = self._context.callproc('get_post_for_thread_flat_desc_limit', [thread_id, desc, limit])
+
             elif limit is None and since is None and desc is None:
                 data = self._context.callproc('get_posts_for_thread_flat', [thread_id])
 
