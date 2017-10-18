@@ -132,12 +132,21 @@ class PostRepository(Repository[PostDTO]):
             data.clear()
             data = self._context.callproc('get_post_by_parent_id', [parent.uid])
             children = create_many(PostDTO, data)
+
+            logging.info(f"===================================================================================")
+            logging.info(f"[PostRepository] parent: uid = {parent.uid}; parent_id = {parent.parent_id}")
+            logging.info(f"[PostRepository] numb children = {len(children)}")
+
             if len(children) == 0:
                 continue
 
             entities.append(parent)
             for child in children:
+                logging.info(f"[PostRepository] child: uid = {child.uid}; parent_id = {child.parent_id}")
                 entities.append(child)
+
+        logging.info(f"===================================================================================")
+        logging.info(f"numb entities = {len(entities)}")
 
         return entities
 
