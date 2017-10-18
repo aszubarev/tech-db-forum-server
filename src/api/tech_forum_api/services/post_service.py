@@ -47,9 +47,6 @@ class PostService(Service[Post, PostDTO, PostRepository]):
         since = request.args.get('since')
         sort = request.args.get('sort')
 
-        if since is not None:
-            since = dateutil.parser.parse(since)
-
         entities = self.__repo.get_posts_for_thread(thread_id=thread_id, desc=desc, limit=limit, since=since, sort=sort)
         return self._convert_many(entities)
 
