@@ -56,9 +56,11 @@ class PostRepository(Repository[PostDTO]):
         # PARENT_TREE SORT
         elif sort == 'parent_tree':
             if limit is not None and since is None and desc is None:
-                return self._get_posts_for_thread_limit(thread_id=thread_id, limit=limit)
+                data = self._context.callproc('get_posts_for_thread_parent_tree_limit', [thread_id, limit])
+                # return create_many(PostDTO, data)
+                # return self._get_posts_for_thread_limit(thread_id=thread_id, limit=limit)
 
-            if limit is not None and since is None and desc is not None:
+            elif limit is not None and since is None and desc is not None:
                 return self._get_posts_for_thread_desc_limit(thread_id=thread_id, desc=desc, limit=limit)
 
             # elif limit is not None and since is not None and desc is None:
@@ -168,18 +170,10 @@ class PostRepository(Repository[PostDTO]):
                 if len(children) == 0:
                     continue
 
-                logging.info(f"===================================================================================")
-                logging.info(f"[PostRepository] parent: uid = {parent.uid}; parent_id = {parent.parent_id}")
-                logging.info(f"[PostRepository] numb children = {len(children)}")
-
                 for child in reversed(children):
-                    logging.info(f"[PostRepository] child: uid = {child.uid}; parent_id = {child.parent_id}")
                     entities.append(child)
 
                 entities.append(parent)
-
-            logging.info(f"===================================================================================")
-            logging.info(f"numb parents = {len(parents)}; numb entities = {len(entities)}")
 
             return entities
 
