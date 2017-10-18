@@ -14,15 +14,27 @@ $BODY$
                         pst.parent_id, pst.message, pst.created, pst.is_edited
     FROM posts pst
     WHERE pst.thread_id = p_thread_id
-    ORDER BY pst.created, CASE p_desc_flag
-                                WHEN false THEN pst.post_id
-                                ELSE NULL
-                             END ASC,
+    ORDER BY CASE p_desc_flag
+                WHEN false THEN pst.created
+                ELSE NULL
+             END ASC,
 
-                             CASE p_desc_flag
-                                WHEN true THEN pst.post_id
-                                ELSE NULL
-                             END DESC
+             CASE p_desc_flag
+                WHEN true THEN  pst.created
+                ELSE NULL
+             END DESC,
+
+             CASE p_desc_flag
+                WHEN false THEN pst.post_id
+                ELSE NULL
+             END ASC,
+
+             CASE p_desc_flag
+                WHEN true THEN pst.post_id
+                ELSE NULL
+             END DESC
+
+
     LIMIT p_limit;
   END;
 $BODY$
