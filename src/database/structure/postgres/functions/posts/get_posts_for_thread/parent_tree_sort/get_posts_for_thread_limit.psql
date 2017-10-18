@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_post_by_parent_id(p_parent_id INT)
+CREATE OR REPLACE FUNCTION get_posts_for_thread_limit(p_thread_id INT, p_limit INT)
 RETURNS TABLE(post_id INT,
               thread_id INT,
               forum_id INT,
@@ -13,8 +13,9 @@ $BODY$
     RETURN QUERY SELECT pst.post_id, pst.thread_id, pst.forum_id, pst.user_id,
                         pst.parent_id, pst.message, pst.created, pst.is_edited
     FROM posts pst
-    WHERE pst.parent_id = p_parent_id
-    ORDER BY pst.post_id;
+    WHERE pst.thread_id = p_thread_id
+    ORDER BY pst.post_id
+    LIMIT p_limit;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
