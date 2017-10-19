@@ -1,0 +1,43 @@
+CREATE OR REPLACE FUNCTION get_posts_for_thread_parent_tree_since_limit(
+    p_thread_id INT,
+    p_since INT,
+    p_limit INT)
+
+RETURNS TABLE(post_id INT,
+              thread_id INT,
+              forum_id INT,
+              user_id INT,
+              parent_id INT,
+              message TEXT,
+              created TIMESTAMP WITH TIME ZONE,
+              is_edited BOOLEAN)
+AS
+$BODY$
+DECLARE since_offset int;
+  BEGIN
+
+
+  DROP TABLE IF EXISTS parent_tree;
+  CREATE TEMP TABLE parent_tree
+  AS select * from get_posts_for_thread_parent_tree_all(p_thread_id);
+
+
+  SELECT rn INTO since_offset
+  FROM (
+    SELECT ROW_NUMBER() OVER (ORDER BY parent_tree.path) as rn, parent_tree.post_id
+    FROM parent_tree
+  ) rn_table
+  WHERE rn_table.post_id = p_since
+  LIMIT 1;
+
+  RETURN QUERY
+  SELECT pt.post_id, pt.thread_id, pt.forum_id, pt.user_id,
+         pt.parent_id, pt.message, pt.created, pt.is_edited
+  FROM parent_tree pt
+  ORDER BY pt.path
+  OFFSET since_offset
+  LIMIT p_limit;
+
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

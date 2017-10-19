@@ -57,24 +57,29 @@ class PostRepository(Repository[PostDTO]):
         elif sort == 'parent_tree':
             if limit is not None and since is None and desc is None:
                 data = self._context.callproc('get_posts_for_thread_parent_tree_limit', [thread_id, limit])
-                # return create_many(PostDTO, data)
-                # return self._get_posts_for_thread_limit(thread_id=thread_id, limit=limit)
 
             elif limit is not None and since is None and desc is not None:
                 return self._get_posts_for_thread_desc_limit(thread_id=thread_id, desc=desc, limit=limit)
 
-            # elif limit is not None and since is not None and desc is None:
-            #     data = self._get_posts_for_thread_parent_tree_limit_since(thread_id=thread_id, limit=limit, since=since)
+            elif limit is not None and since is not None and desc is None:
+                data = self._context.callproc('get_posts_for_thread_parent_tree_since_limit', [thread_id, since, limit])
 
-                # elif limit is None and since is None and desc is None:
-            #     data = self._context.callproc('get_posts_for_thread_flat', [thread_id])
+            # elif limit is not None and since is not None and desc is not None:
+            #     data = self._context.callproc('get_posts_for_thread_parent_tree_since_limit_desc',
+            #                                   [thread_id, since, limit, desc])
+
+            elif limit is None and since is None and desc is None:
+                data = self._context.callproc('get_posts_for_thread_parent_tree_all', [thread_id])
 
         elif sort is None:
-            if limit is not None and since is None and desc is None:
+            if since is None and limit is not None and desc is None:
                 data = self._context.callproc('get_posts_for_thread_limit', [thread_id, limit])
 
-            if limit is not None and since is None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_desc_limit', [thread_id, desc, limit])
+            elif since is None and limit is not None and desc is not None:
+                data = self._context.callproc('get_posts_for_thread_limit_desc', [thread_id, desc, limit])
+
+            elif since is not None and limit is not None and desc is not None:
+                data = self._context.callproc('get_posts_for_thread_since_limit_desc', [thread_id, since, limit, desc])
 
         return create_many(PostDTO, data)
 
