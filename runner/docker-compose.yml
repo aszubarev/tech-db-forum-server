@@ -27,11 +27,11 @@ services:
   api:
     build:
       context: ../src/api
-#      args:
-#        http_proxy: http://10.100.122.141:3128/
-#        https_proxy: http://10.100.122.141:3128/
-#        ftp_proxy: http://10.100.122.141:3128/
-#        no_proxy: registry.gitlab2.rnd.pkcc.ru, *.rnd.pkcc.ru, 10.*, 192.*, 172.16.*
+      args:
+        http_proxy: http://10.100.122.141:3128/
+        https_proxy: http://10.100.122.141:3128/
+        ftp_proxy: http://10.100.122.141:3128/
+        no_proxy: registry.gitlab2.rnd.pkcc.ru, *.rnd.pkcc.ru, 10.*, 192.*, 172.16.*
     networks:
       - backend
     ports:

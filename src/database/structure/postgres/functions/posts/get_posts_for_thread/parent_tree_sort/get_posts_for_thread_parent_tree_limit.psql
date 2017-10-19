@@ -31,12 +31,14 @@ $BODY$
 
         FROM posts pst
         JOIN recursive_post rec ON pst.parent_id = rec.post_id
-        WHERE rn <= p_limit
+        WHERE rec.rn <= p_limit
     )
 
     SELECT rec.post_id, rec.thread_id, rec.forum_id, rec.user_id,
            rec.parent_id, rec.message, rec.created, rec.is_edited
-    FROM recursive_post rec ORDER BY rec.path;
+    FROM recursive_post rec
+    WHERE rec.rn <= p_limit
+    ORDER BY rec.path;
 
   END;
 $BODY$
