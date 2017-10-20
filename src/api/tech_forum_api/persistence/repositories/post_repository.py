@@ -89,8 +89,14 @@ class PostRepository(Repository[PostDTO]):
             elif since is None and limit is not None and desc is not None:
                 data = self._context.callproc('get_posts_for_thread_limit_desc', [thread_id, desc, limit])
 
+            elif since is not None and limit is not None and desc is None:
+                data = self._context.callproc('get_posts_for_thread_since_limit', [thread_id, since, limit])
+
             elif since is not None and limit is not None and desc is not None:
                 data = self._context.callproc('get_posts_for_thread_since_limit_desc', [thread_id, since, limit, desc])
+
+            elif limit is None and since is None and desc is not None:
+                data = self._context.callproc('get_posts_for_thread_desc', [thread_id, desc])
 
             elif since is None and limit is None and desc is None:
                 data = self._context.callproc('get_posts_for_thread_all', [thread_id])
