@@ -25,17 +25,17 @@ DECLARE since_offset int;
 
   SELECT rn INTO since_offset
   FROM (
-    SELECT ROW_NUMBER() OVER () as rn, parent_tree.post_id
-    FROM parent_tree
-    ORDER BY CASE p_desc_flag
-              WHEN false THEN parent_tree.path
-              ELSE NULL
-             END ASC,
+    SELECT ROW_NUMBER() OVER (ORDER BY CASE p_desc_flag
+                                          WHEN false THEN parent_tree.path
+                                          ELSE NULL
+                                       END ASC,
 
-            CASE p_desc_flag
-              WHEN true THEN  parent_tree.path
-              ELSE NULL
-            END DESC
+                                       CASE p_desc_flag
+                                          WHEN true THEN  parent_tree.path
+                                          ELSE NULL
+                                       END DESC
+                             ) as rn, parent_tree.post_id
+    FROM parent_tree
   ) rn_table
   WHERE rn_table.post_id = p_since
 
@@ -45,7 +45,15 @@ DECLARE since_offset int;
   SELECT pt.post_id, pt.thread_id, pt.forum_id, pt.user_id,
          pt.parent_id, pt.message, pt.created, pt.is_edited
   FROM parent_tree pt
-  ORDER BY pt.path
+  ORDER BY CASE p_desc_flag
+              WHEN false THEN pt.path
+              ELSE NULL
+           END ASC,
+
+           CASE p_desc_flag
+              WHEN true THEN  pt.path
+              ELSE NULL
+           END DESC
   OFFSET since_offset
   LIMIT p_limit;
 

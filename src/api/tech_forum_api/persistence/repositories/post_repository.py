@@ -31,7 +31,7 @@ class PostRepository(Repository[PostDTO]):
                 data = self._context.callproc('get_posts_for_thread_flat_limit', [thread_id, limit])
 
             elif limit is not None and since is None and desc is not None:
-                data = self._context.callproc('get_post_for_thread_flat_limit_desc', [thread_id, limit, desc])
+                data = self._context.callproc('get_posts_for_thread_flat_limit_desc', [thread_id, limit, desc])
 
             elif limit is not None and since is not None and desc is None:
                 data = self._context.callproc('get_posts_for_thread_flat_since_limit', [thread_id, since, limit])
@@ -41,7 +41,7 @@ class PostRepository(Repository[PostDTO]):
                                               [thread_id, since, limit, desc])
 
             elif limit is None and since is None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_flat', [thread_id])
+                data = self._context.callproc('get_posts_for_thread_flat_all', [thread_id])
 
         # TREE SORT
         elif sort == 'tree':
@@ -49,13 +49,17 @@ class PostRepository(Repository[PostDTO]):
                 data = self._context.callproc('get_posts_for_thread_tree_limit', [thread_id, limit])
 
             elif limit is not None and since is None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_tree_desc_limit', [thread_id, desc, limit])
+                data = self._context.callproc('get_posts_for_thread_tree_limit_desc', [thread_id, limit, desc])
 
             elif limit is not None and since is not None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_three_limit_since', [thread_id, limit, since])
+                data = self._context.callproc('get_posts_for_thread_three_since_limit', [thread_id, since, limit])
 
-            # elif limit is None and since is None and desc is None:
-            #     data = self._context.callproc('get_posts_for_thread_flat', [thread_id])
+            elif limit is not None and since is not None and desc is not None:
+                data = self._context.callproc('get_posts_for_thread_tree_since_limit_desc',
+                                              [thread_id, since, limit, desc])
+
+            elif limit is None and since is None and desc is None:
+                data = self._context.callproc('get_posts_for_thread_tree_all', [thread_id])
 
         # PARENT_TREE SORT
         elif sort == 'parent_tree':
