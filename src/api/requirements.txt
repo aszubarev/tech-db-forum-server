@@ -15,3 +15,4 @@ flasgger
 injector
 python-dateutil
 pytz
+tzlocal

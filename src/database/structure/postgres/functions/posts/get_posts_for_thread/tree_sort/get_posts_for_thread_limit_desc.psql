@@ -1,0 +1,34 @@
+CREATE OR REPLACE FUNCTION get_posts_for_thread_tree_limit_desc(
+    p_thread_id INT,
+    p_limit INT,
+    p_desc_flag BOOLEAN)
+
+RETURNS TABLE(post_id INT,
+              thread_id INT,
+              forum_id INT,
+              user_id INT,
+              parent_id INT,
+              message TEXT,
+              created TIMESTAMP WITH TIME ZONE,
+              is_edited BOOLEAN)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT pst.post_id, pst.thread_id, pst.forum_id, pst.user_id,
+                        pst.parent_id, pst.message, pst.created, pst.is_edited
+    FROM posts pst
+    WHERE pst.thread_id = p_thread_id
+    ORDER BY CASE p_desc_flag
+                    WHEN false THEN pst.path
+                    ELSE NULL
+                 END ASC,
+
+             CASE p_desc_flag
+                WHEN true THEN pst.path
+                ELSE NULL
+             END DESC
+
+    LIMIT p_limit;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

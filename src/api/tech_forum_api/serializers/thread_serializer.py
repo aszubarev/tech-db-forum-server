@@ -6,6 +6,7 @@ import dateutil.parser
 from injector import inject, singleton
 
 from apiutils import Serializer
+from apiutils.coverters.datetime_coverter import DatetimeConverter
 
 from tech_forum_api.models.thread import Thread
 from tech_forum_api.persistence.dto.thread_dto import ThreadDTO
@@ -43,8 +44,11 @@ class ThreadSerializer(Serializer):
             })
 
             if model.created is not None:
+                created = model.created.astimezone().isoformat()
+                logging.info(f"[ThreadSerializer.dump] author: {author.nickname},"
+                             f" created: {created}")
                 data.update({
-                    'created': model.created.astimezone().isoformat()
+                    'created': created
                 })
 
             if model.slug is not None:
