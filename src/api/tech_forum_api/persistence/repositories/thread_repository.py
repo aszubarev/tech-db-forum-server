@@ -60,6 +60,38 @@ class ThreadRepository(Repository[ThreadDTO]):
                                                      entity.created, entity.message, entity.title])
         return create_one(ThreadDTO, data)
 
+    def update_by_slug(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
+        msg = entity.message
+        title = entity.title
+
+        data = None
+        if msg is not None and title is not None:
+            data = self._context.callproc('update_thread_by_slug_by_msg_title', [entity.slug, msg, title])
+
+        elif msg is not None and title is None:
+            data = self._context.callproc('update_thread_by_slug_by_msg', [entity.slug, msg])
+
+        elif msg is None and title is not None:
+            data = self._context.callproc('update_thread_by_slug_by_title', [entity.slug, title])
+
+        return create_one(ThreadDTO, data)
+
+    def update_by_uid(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
+        msg = entity.message
+        title = entity.title
+
+        data = None
+        if msg is not None and title is not None:
+            data = self._context.callproc('update_thread_by_uid_by_msg_title', [entity.uid, msg, title])
+
+        elif msg is not None and title is None:
+            data = self._context.callproc('update_thread_by_uid_by_msg', [entity.uid, msg])
+
+        elif msg is None and title is not None:
+            data = self._context.callproc('update_thread_by_uid_by_title', [entity.uid, title])
+
+        return create_one(ThreadDTO, data)
+
     def update(self, entity: ThreadDTO):
         raise NotImplementedError
 

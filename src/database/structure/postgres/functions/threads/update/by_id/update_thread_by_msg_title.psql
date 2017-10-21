@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION update_thread_by_id_by_msg_title(
+CREATE OR REPLACE FUNCTION update_thread_by_uid_by_msg_title(
   p_thread_id INT,
   p_msg TEXT,
   p_title TEXT)
