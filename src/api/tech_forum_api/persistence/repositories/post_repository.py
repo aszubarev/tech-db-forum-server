@@ -135,8 +135,11 @@ class PostRepository(Repository[PostDTO]):
 
         return entity
 
-    def update(self, entity: PostDTO):
-        raise NotImplementedError
+    def update(self, entity: PostDTO) -> Optional[PostDTO]:
+        data = None
+        if entity.message is not None:
+            data = self._context.callproc('update_post', [entity.uid, entity.message])
+        return create_one(PostDTO, data)
 
     def delete(self, uid: int) -> None:
         raise NotImplementedError

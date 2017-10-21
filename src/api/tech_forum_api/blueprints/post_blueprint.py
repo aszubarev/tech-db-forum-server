@@ -8,6 +8,7 @@ from apiutils.errors.bad_request_error import BadRequestError
 
 from tech_forum_api.serializers.post_serializer import PostSerializer
 from sqlutils import NoDataFoundError, UniqueViolationError
+from tech_forum_api.serializers.post_serializer_detail import PostSerializerFull
 from tech_forum_api.services.post_service import PostService
 
 logging.basicConfig(level=logging.INFO)
@@ -17,9 +18,11 @@ logging.basicConfig(level=logging.INFO)
 class PostBlueprint(BaseBlueprint[PostService]):
 
     @inject
-    def __init__(self, service: PostService, serializer: PostSerializer) -> None:
+    def __init__(self, service: PostService, serializer: PostSerializer,
+                 post_serializer_full: PostSerializerFull) -> None:
         super().__init__(service)
         self.__serializer = serializer
+        self._postSerializerFull = post_serializer_full
 
     @property
     def _name(self) -> str:
@@ -63,5 +66,24 @@ class PostBlueprint(BaseBlueprint[PostService]):
             except BadRequestError as exp:
                 logging.error(exp, exc_info=True)
                 return self._return_error(f"Bad request", 400)
+
+        @blueprint.route('post/<uid>/details', methods=['GET'])
+        def _details(uid: int):
+            model = self.__service.get_by_id(uid)
+
+            if not model:
+                return self._retunr_error(f"Can't find post by id = {uid}", 404)
+
+            response = self._postSerializerFull.dump(model)
+            return Response(response=json.dumps(response), status=200, mimetype='application/json')
+
+        @blueprint.route('post/<uid>/details', methods=['POST'])
+        def _update(uid: int):
+            model = self.__service.get_by_id(uid)
+
+            if not model:
+                return self._retunr_error(f"Can't find post by uid = {uid}", 404)
+
+            return self._update(id=uid, message=request.json.get('message'))
 
         return blueprint

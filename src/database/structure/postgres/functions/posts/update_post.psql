@@ -1,0 +1,25 @@
+CREATE OR REPLACE FUNCTION update_post(
+    p_post_id INT,
+    p_message TEXT)
+
+RETURNS TABLE(post_id INT,
+              thread_id INT,
+              forum_id INT,
+              user_id INT,
+              parent_id INT,
+              message TEXT,
+              created TIMESTAMP WITH TIME ZONE,
+              is_edited BOOLEAN)
+
+AS
+$BODY$
+  BEGIN
+      RETURN QUERY
+      UPDATE posts
+      SET message = p_message, is_edited = TRUE
+      WHERE posts.post_id = p_post_id
+      RETURNING posts.post_id, posts.thread_id, posts.forum_id, posts.user_id,
+                posts.parent_id, posts.message, posts.created, posts.is_edited;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
