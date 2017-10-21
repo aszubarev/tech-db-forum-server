@@ -27,9 +27,11 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
     def __repo(self) -> ThreadRepository:
         return self._repo
 
+    @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Thread]:
         return super().get_by_id(uid)
 
+    @cache.memoize(600)
     def get_by_slug(self, slug: str) -> Optional[Thread]:
         data = self._repo.get_by_slug(slug)
         return self._convert(data)
@@ -72,6 +74,6 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
 
     @staticmethod
     def _clear_cache() -> None:
-        # cache.delete_memoized(ThreadService.get_by_id)
-        pass
-        #TODO dont remember update cache
+        # TODO don't remember update cache
+        cache.delete_memoized(ThreadService.get_by_id)
+        cache.delete_memoized(ThreadService.get_by_slug)

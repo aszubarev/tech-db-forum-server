@@ -27,6 +27,7 @@ class PostService(Service[Post, PostDTO, PostRepository]):
     def __repo(self) -> PostRepository:
         return self._repo
 
+    @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Post]:
         return super().get_by_id(uid)
 
@@ -58,6 +59,5 @@ class PostService(Service[Post, PostDTO, PostRepository]):
 
     @staticmethod
     def _clear_cache() -> None:
-        # cache.delete_memoized(PostService.get_by_id)
-        pass
-        #TODO dont remember update cache
+        # TODO don't remember update cache
+        cache.delete_memoized(PostService.get_by_id)

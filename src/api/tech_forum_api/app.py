@@ -5,11 +5,14 @@ from flask import Flask, Response, url_for
 from werkzeug.wsgi import DispatcherMiddleware
 
 from tech_forum_api.application import Application
+from tech_forum_api.cache import cache
 
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.config['APPLICATION_ROOT'] = '/api'
+app.config['CACHE_TYPE'] = os.environ['CACHE_TYPE']
+cache.init_app(app)
 
 application = Application()
 application.register(app)
