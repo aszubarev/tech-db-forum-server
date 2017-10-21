@@ -31,6 +31,11 @@ class PostService(Service[Post, PostDTO, PostRepository]):
     def get_by_id(self, uid: int) -> Optional[Post]:
         return super().get_by_id(uid)
 
+    @cache.memoize(600)
+    def get_number_posts_for_forum(self, forum_id: int) -> int:
+        data = self.__repo.get_number_posts_for_forum(forum_id)
+        return data
+
     def get_posts_for_thread(self, thread_slug_or_id: str) -> List[Post]:
 
         try:
@@ -61,3 +66,4 @@ class PostService(Service[Post, PostDTO, PostRepository]):
     def _clear_cache() -> None:
         # TODO don't remember update cache
         cache.delete_memoized(PostService.get_by_id)
+        cache.delete_memoized(PostService.get_number_posts_for_forum)

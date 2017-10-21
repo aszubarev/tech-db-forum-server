@@ -50,12 +50,17 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         return create_many(ThreadDTO, data)
 
+    def get_number_threads_for_forum(self, forum_id: int) -> int:
+        data = self._context.callproc('get_number_threads_for_forum', [forum_id])
+        if data is None or len(data) == 0:
+            return 0
+        result_dict = data[0]
+        return result_dict.get('number_threads')
+
     def get_all(self) -> List[ThreadDTO]:
         raise NotImplementedError
 
     def add(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
-        logging.info(f"[ThreadRepository.add] slug = {entity.slug}, forum_id = {entity.forum_id}, "
-                     f"user_id = {entity.user_id}, title = {entity.title}")
         data = self._context.callproc('add_thread', [entity.slug, entity.forum_id, entity.user_id,
                                                      entity.created, entity.message, entity.title])
         return create_one(ThreadDTO, data)

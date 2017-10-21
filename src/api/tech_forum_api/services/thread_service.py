@@ -52,6 +52,11 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
 
         return thread
 
+    @cache.memoize(600)
+    def get_number_threads_for_forum(self, forum_id: int) -> Optional[int]:
+        data = self.__repo.get_number_threads_for_forum(forum_id)
+        return data
+
     def update_by_uid(self, entity: ThreadDTO) -> Optional[Thread]:
         data = self.__repo.update_by_uid(entity)
         self._clear_cache()
@@ -89,3 +94,4 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         cache.delete_memoized(ThreadService.get_by_id)
         cache.delete_memoized(ThreadService.get_by_slug)
         cache.delete_memoized(ThreadService.get_by_slug_or_id)
+        cache.delete_memoized(ThreadService.get_number_threads_for_forum)

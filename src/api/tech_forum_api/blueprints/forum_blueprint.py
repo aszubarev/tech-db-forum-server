@@ -62,7 +62,7 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
         def _details(slug: str):
             try:
                 model = self._service.get_by_slug(slug)
-                return self._return_one(model, status=200)
+                return self._return_one(model, status=200, expand_details=True)
             except NoDataFoundError:
                 return self._return_error(f"Can't find forum details by slag = {slug}", 404)
 

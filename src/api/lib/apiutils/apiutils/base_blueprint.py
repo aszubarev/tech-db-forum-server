@@ -41,7 +41,7 @@ def return_one(model: Model, serializer: Serializer, **kwargs) -> Response:
     if model is None:
         abort(404)
 
-    response = serializer.dump(model)
+    response = serializer.dump(model, **kwargs)
 
     status = kwargs.get('status')
     if status is None:
