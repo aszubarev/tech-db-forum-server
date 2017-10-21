@@ -50,14 +50,51 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         return create_many(ThreadDTO, data)
 
+    def get_number_threads_for_forum(self, forum_id: int) -> int:
+        data = self._context.callproc('get_number_threads_for_forum', [forum_id])
+        if data is None or len(data) == 0:
+            return 0
+        result_dict = data[0]
+        return result_dict.get('number_threads')
+
     def get_all(self) -> List[ThreadDTO]:
         raise NotImplementedError
 
     def add(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
-        logging.info(f"[ThreadRepository.add] slug = {entity.slug}, forum_id = {entity.forum_id}, "
-                     f"user_id = {entity.user_id}, title = {entity.title}")
         data = self._context.callproc('add_thread', [entity.slug, entity.forum_id, entity.user_id,
                                                      entity.created, entity.message, entity.title])
+        return create_one(ThreadDTO, data)
+
+    def update_by_slug(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
+        msg = entity.message
+        title = entity.title
+
+        data = None
+        if msg is not None and title is not None:
+            data = self._context.callproc('update_thread_by_slug_by_msg_title', [entity.slug, msg, title])
+
+        elif msg is not None and title is None:
+            data = self._context.callproc('update_thread_by_slug_by_msg', [entity.slug, msg])
+
+        elif msg is None and title is not None:
+            data = self._context.callproc('update_thread_by_slug_by_title', [entity.slug, title])
+
+        return create_one(ThreadDTO, data)
+
+    def update_by_uid(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
+        msg = entity.message
+        title = entity.title
+
+        data = None
+        if msg is not None and title is not None:
+            data = self._context.callproc('update_thread_by_uid_by_msg_title', [entity.uid, msg, title])
+
+        elif msg is not None and title is None:
+            data = self._context.callproc('update_thread_by_uid_by_msg', [entity.uid, msg])
+
+        elif msg is None and title is not None:
+            data = self._context.callproc('update_thread_by_uid_by_title', [entity.uid, title])
+
         return create_one(ThreadDTO, data)
 
     def update(self, entity: ThreadDTO):

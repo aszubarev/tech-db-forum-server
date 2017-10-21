@@ -22,13 +22,16 @@ class UserService(Service[User, UserDTO, UserRepository]):
     def __repo(self) -> UserRepository:
         return self._repo
 
+    @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[User]:
         return super().get_by_id(uid)
 
+    @cache.memoize(600)
     def get_by_nickname(self, nickname: str) -> Optional[User]:
         data = self.__repo.get_by_nickname(nickname)
         return self._convert(data)
 
+    @cache.memoize(600)
     def get_by_nickname_or_email(self, nickname: str, email: str) -> List[User]:
         data = self.__repo.get_by_nickname_or_email(nickname, email)
         return self._convert_many(data)
@@ -41,6 +44,7 @@ class UserService(Service[User, UserDTO, UserRepository]):
 
     @staticmethod
     def _clear_cache() -> None:
-        # cache.delete_memoized(UserService.get_by_id)
-        pass
-        #TODO dont remember update cache
+        # TODO don't remember update cache
+        cache.delete_memoized(UserService.get_by_id)
+        cache.delete_memoized(UserService.get_by_nickname)
+        cache.delete_memoized(UserService.get_by_nickname_or_email)

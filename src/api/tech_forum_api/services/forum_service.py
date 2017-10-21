@@ -23,9 +23,11 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
     def __repo(self) -> ForumRepository:
         return self._repo
 
+    @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Forum]:
         return super().get_by_id(uid)
 
+    @cache.memoize(600)
     def get_by_slug(self, slug: str) -> Optional[Forum]:
         dto = self.__repo.get_by_slug(slug)
         model = self._convert(dto)
@@ -42,6 +44,7 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
 
     @staticmethod
     def _clear_cache() -> None:
-        # cache.delete_memoized(ForumService.get_by_id)
-        pass
-        #TODO dont remember update cache
+        # TODO don't remember update cache
+        cache.delete_memoized(ForumService.get_by_id)
+        cache.delete_memoized(ForumService.get_by_slug)
+

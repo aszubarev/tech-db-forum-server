@@ -19,13 +19,16 @@ class VoteService(Service[Vote, VoteDTO, VoteRepository]):
         super().__init__(repo)
         self._converter = VoteConverter()
 
+    @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Vote]:
         return super().get_by_id(uid)
 
+    @cache.memoize(600)
     def get_for_thread(self, thread_id: int) -> List[Vote]:
         entities = self.__repo.get_for_thread(thread_id)
         return self._convert_many(entities)
 
+    @cache.memoize(600)
     def count_for_thread(self, thread_id: int):
         """
         :param thread_id:
@@ -34,6 +37,7 @@ class VoteService(Service[Vote, VoteDTO, VoteRepository]):
         models = self.get_for_thread(thread_id=thread_id)
         return len(models)  # return number of all models
 
+    @cache.memoize(600)
     def votes(self, thread_id: int) -> int:
         """
         :param thread_id:
@@ -55,6 +59,9 @@ class VoteService(Service[Vote, VoteDTO, VoteRepository]):
 
     @staticmethod
     def _clear_cache() -> None:
-        # cache.delete_memoized(VoteService.get_by_id)
-        pass
-        #TODO dont remember update cache
+        # TODO don't remember update cache
+        cache.delete_memoized(VoteService.get_by_id)
+        cache.delete_memoized(VoteService.get_for_thread)
+        cache.delete_memoized(VoteService.count_for_thread)
+        cache.delete_memoized(VoteService.votes)
+

@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 
 import dateutil.parser
 from flask import request
@@ -27,13 +27,16 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
     def __repo(self) -> ThreadRepository:
         return self._repo
 
+    @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Thread]:
         return super().get_by_id(uid)
 
+    @cache.memoize(600)
     def get_by_slug(self, slug: str) -> Optional[Thread]:
         data = self._repo.get_by_slug(slug)
         return self._convert(data)
 
+    @cache.memoize(600)
     def get_by_slug_or_id(self, slug_or_id: str) -> Optional[Thread]:
 
         try:
@@ -48,6 +51,21 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
             raise NoDataFoundError(f"Can't find thread by thread_slug_or_id = {slug_or_id}")
 
         return thread
+
+    @cache.memoize(600)
+    def get_number_threads_for_forum(self, forum_id: int) -> Optional[int]:
+        data = self.__repo.get_number_threads_for_forum(forum_id)
+        return data
+
+    def update_by_uid(self, entity: ThreadDTO) -> Optional[Thread]:
+        data = self.__repo.update_by_uid(entity)
+        self._clear_cache()
+        return self._convert(data)
+
+    def update_by_slug(self, entity: ThreadDTO) -> Optional[Thread]:
+        data = self.__repo.update_by_slug(entity)
+        self._clear_cache()
+        return self._convert(data)
 
     def get_for_forum(self, slug: str) -> List[Thread]:
         forum = self._forum_service.get_by_slug(slug)
@@ -72,6 +90,8 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
 
     @staticmethod
     def _clear_cache() -> None:
-        # cache.delete_memoized(ThreadService.get_by_id)
-        pass
-        #TODO dont remember update cache
+        # TODO don't remember update cache
+        cache.delete_memoized(ThreadService.get_by_id)
+        cache.delete_memoized(ThreadService.get_by_slug)
+        cache.delete_memoized(ThreadService.get_by_slug_or_id)
+        cache.delete_memoized(ThreadService.get_number_threads_for_forum)

@@ -1,0 +1,19 @@
+CREATE OR REPLACE FUNCTION get_number_posts_for_forum(
+  p_forum_id INT)
+
+RETURNS TABLE(
+  number_posts BIGINT
+)
+AS
+$BODY$
+BEGIN
+
+  RETURN QUERY
+  SELECT COUNT(*) as numb
+  FROM posts ps
+  WHERE ps.forum_id = p_forum_id
+  GROUP BY ps.forum_id;
+
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

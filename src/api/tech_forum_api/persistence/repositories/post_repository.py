@@ -103,6 +103,13 @@ class PostRepository(Repository[PostDTO]):
 
         return create_many(PostDTO, data)
 
+    def get_number_posts_for_forum(self, forum_id: int) -> int:
+        data = self._context.callproc('get_number_posts_for_forum', [forum_id])
+        if data is None or len(data) == 0:
+            return 0
+        result_dict = data[0]
+        return result_dict.get('number_posts')
+
     def get_all(self) -> List[PostDTO]:
         raise NotImplementedError
 
