@@ -25,6 +25,39 @@ class UserRepository(Repository[UserDTO]):
         data = self._context.callproc('get_users_by_nickname_or_email', [nickname, email])
         return create_many(UserDTO, data)
 
+    def get_for_forum(self, forum_id: int, **kwargs) -> List[UserDTO]:
+
+        data = None
+        desc = kwargs.get('desc')
+        limit = kwargs.get('limit')
+        since = kwargs.get('since')
+
+        if since is not None and limit is None and desc is None:
+            data = self._context.callproc('get_users_for_forum_since', [forum_id, since])
+
+        elif since is None and limit is not None and desc is None:
+            data = self._context.callproc('get_users_for_forum_limit', [forum_id, limit])
+
+        elif since is None and limit is None and desc is not None:
+            data = self._context.callproc('get_users_for_forum_desc', [forum_id, desc])
+
+        elif since is None and limit is not None and desc is not None:
+            data = self._context.callproc('get_users_for_forum_limit_desc', [forum_id, limit, desc])
+
+        elif since is not None and limit is not None and desc is None:
+            data = self._context.callproc('get_users_for_forum_since_limit', [forum_id, since, limit])
+
+        elif since is not None and limit is None and desc is not None:
+            data = self._context.callproc('get_users_for_forum_since_desc', [forum_id, since, desc])
+
+        elif since is not None and limit is not None and desc is not None:
+            data = self._context.callproc('get_users_for_forum_since_limit_desc', [forum_id, since, limit, desc])
+
+        elif since is None and limit is None and desc is None:
+            data = self._context.callproc('get_users_for_forum', [forum_id])
+
+        return create_many(UserDTO, data)
+
     def get_all(self) -> List[UserDTO]:
         raise NotImplementedError
 
@@ -34,11 +67,8 @@ class UserRepository(Repository[UserDTO]):
 
     def update(self, entity: UserDTO) -> Optional[UserDTO]:
 
-        logging.info(f"nickname = {entity.nickname}; email = {entity.email}; fullname = {entity.fullname}")
-
         params = [p for p in [entity.nickname, entity.email, entity.about, entity.fullname] if p is not None]
         data = None
-        logging.info(f"len params = {len(params)}")
 
         if entity.email is not None and entity.about is not None and entity.fullname is not None:
             data = self._context.callproc('update_user', params)

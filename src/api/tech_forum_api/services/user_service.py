@@ -1,6 +1,8 @@
 from typing import Optional, List
 
+from flask import request
 from injector import inject, singleton
+
 from sqlutils import Service
 
 from tech_forum_api.cache import cache
@@ -34,6 +36,15 @@ class UserService(Service[User, UserDTO, UserRepository]):
     @cache.memoize(600)
     def get_by_nickname_or_email(self, nickname: str, email: str) -> List[User]:
         data = self.__repo.get_by_nickname_or_email(nickname, email)
+        return self._convert_many(data)
+
+    def get_for_forum(self, forum_id: int) -> List[User]:
+
+        desc = request.args.get('desc')
+        limit = request.args.get('limit')
+        since = request.args.get('since')
+
+        data = self.__repo.get_for_forum(forum_id, since=since, limit=limit, desc=desc)
         return self._convert_many(data)
 
     def _convert(self, entity: UserDTO) -> Optional[User]:

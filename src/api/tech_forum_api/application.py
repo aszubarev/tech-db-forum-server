@@ -20,7 +20,7 @@ class Application(object):
         self._votes = ioc.get(VoteBlueprint, scope=singleton).blueprint
 
     def register(self, app: Flask) -> None:
-        app.register_blueprint(self._users, url_prefix='/user')
+        app.register_blueprint(self._users, url_prefix='/')
         app.register_blueprint(self._forums, url_prefix='/')
         app.register_blueprint(self._threads, url_prefix='/')
         app.register_blueprint(self._posts, url_prefix='/')

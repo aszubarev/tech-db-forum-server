@@ -1,0 +1,41 @@
+CREATE OR REPLACE FUNCTION get_users_for_forum_since_limit_desc(
+    p_forum_id INT,
+    p_since CITEXT,
+    p_limit INT,
+    p_desc_flag BOOLEAN
+)
+
+RETURNS TABLE(user_id INT,
+              nickname CITEXT,
+              email CITEXT,
+              about TEXT,
+              fullname TEXT)
+AS
+$BODY$
+DECLARE since_offset INT;
+BEGIN
+
+  DROP TABLE IF EXISTS tmp_users;
+  CREATE TEMP TABLE tmp_users
+  AS
+  SELECT *
+  FROM get_users_for_forum_desc(p_forum_id, p_desc_flag);
+
+  SELECT rn INTO since_offset, nickname
+  FROM (
+    SELECT ROW_NUMBER() OVER () as rn, tmp_users.nickname as nickname
+    FROM tmp_users
+  ) tmp
+  WHERE tmp.nickname = p_since COLLATE "ucs_basic"
+  LIMIT 1;
+
+
+  RETURN QUERY
+  SELECT tmp.user_id, tmp.nickname, tmp.email, tmp.about, tmp.fullname
+  FROM tmp_users tmp
+  OFFSET since_offset
+  LIMIT p_limit;
+
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
