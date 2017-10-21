@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 
 import dateutil.parser
 from flask import request
@@ -52,22 +52,15 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
 
         return thread
 
-    def update_by_slug_or_id(self, slug_or_id: str) -> Optional[Thread]:
+    def update_by_uid(self, entity: ThreadDTO) -> Optional[Thread]:
+        data = self.__repo.update_by_uid(entity)
+        self._clear_cache()
+        return self._convert(data)
 
-        # TODO FIX HERE
-        try:
-            cast_thread_id = int(slug_or_id)
-            thread = self.get_by_id(cast_thread_id)
-
-        # TODO FIX HERE
-        except ValueError:
-            thread_slug = slug_or_id
-            thread = self.get_by_slug(thread_slug)
-
-        if not thread:
-            raise NoDataFoundError(f"Can't update thread by thread_slug_or_id = {slug_or_id}")
-
-        return thread
+    def update_by_slug(self, entity: ThreadDTO) -> Optional[Thread]:
+        data = self.__repo.update_by_slug(entity)
+        self._clear_cache()
+        return self._convert(data)
 
     def get_for_forum(self, slug: str) -> List[Thread]:
         forum = self._forum_service.get_by_slug(slug)

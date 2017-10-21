@@ -94,12 +94,36 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
         def _update(slug_or_id: str):
             try:
 
-                thread = self.__service.update_by_slug_or_id(slug_or_id)
+                data = request.json
+
+                try:
+                    cast_thread_id = int(slug_or_id)
+
+                    data.update({
+                        'id': cast_thread_id
+                    })
+
+                    entity = self._serializer.load(data)
+                    thread = self.__service.update_by_uid(entity)
+
+                except ValueError:
+                    thread_slug = slug_or_id
+
+                    data.update({
+                        'slug': thread_slug
+                    })
+
+                    entity = self._serializer.load(data)
+                    thread = self.__service.update_by_slug(entity)
+
+                if not thread:
+                    return self._return_error(f"Can't update thread by forum slug_or_id = {slug_or_id}", 404)
+
                 return self._return_one(thread, status=200)
 
             except NoDataFoundError as exp:
                 logging.error(exp, exc_info=True)
-                return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
+                return self._return_error(f"Can't update thread by forum slug_or_id = {slug_or_id}", 404)
 
             except BadRequestError as exp:
                 logging.error(exp, exc_info=True)
