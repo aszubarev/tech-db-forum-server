@@ -36,6 +36,7 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         data = self._repo.get_by_slug(slug)
         return self._convert(data)
 
+    @cache.memoize(600)
     def get_by_slug_or_id(self, slug_or_id: str) -> Optional[Thread]:
 
         try:
@@ -48,6 +49,23 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
 
         if not thread:
             raise NoDataFoundError(f"Can't find thread by thread_slug_or_id = {slug_or_id}")
+
+        return thread
+
+    def update_by_slug_or_id(self, slug_or_id: str) -> Optional[Thread]:
+
+        # TODO FIX HERE
+        try:
+            cast_thread_id = int(slug_or_id)
+            thread = self.get_by_id(cast_thread_id)
+
+        # TODO FIX HERE
+        except ValueError:
+            thread_slug = slug_or_id
+            thread = self.get_by_slug(thread_slug)
+
+        if not thread:
+            raise NoDataFoundError(f"Can't update thread by thread_slug_or_id = {slug_or_id}")
 
         return thread
 
@@ -77,3 +95,4 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         # TODO don't remember update cache
         cache.delete_memoized(ThreadService.get_by_id)
         cache.delete_memoized(ThreadService.get_by_slug)
+        cache.delete_memoized(ThreadService.get_by_slug_or_id)

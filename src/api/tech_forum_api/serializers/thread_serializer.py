@@ -63,21 +63,13 @@ class ThreadSerializer(Serializer):
 
     def load(self, data: Dict[str, Any]) -> ThreadDTO:
 
-        author = self._userService.get_by_nickname(data.get('author'))
-        if not author:
-            raise NoDataFoundError(f"Can't find author for thread by nickname = {data.get('author')}")
+        thread_id = None if data.get('id') is None else data['id']
+        slug = None if data.get('slug') is None else data['slug']
+        forum_id = None if data.get('forum_id') is None else data['forum_id']
+        user_id = None if data.get('author_id') is None else data['author_id']
+        created = None if data.get('created') is None else dateutil.parser.parse(data['created'])
+        message = None if data.get('message') is None else data['message']
+        title = None if data.get('title') is None else data['title']
 
-        forum = self._forum_service.get_by_slug(data.get('forum'))
-        if not forum:
-            raise NoDataFoundError(f"Can't find forum for thread by nickname = {data.get('forum')}")
-
-        thread_id = None if data.get('id') is None or data.get('id') == 'null' else data['id']
-        slug = None if data.get('slug') is None or data.get('slug') == 'null' else data['slug']
-        forum_id = forum.uid
-        user_id = author.uid
-        created = None if data.get('created') is None or data.get('created') == 'null' else dateutil.parser.parse(data['created'])
-        message = None if data.get('message') is None or data.get('message') == 'null' else data['message']
-        title = None if data.get('title') is None or data.get('title') == 'null' else data['title']
-
-        return ThreadDTO(uid=thread_id, slug=slug, forum_id=forum_id, user_id=user_id,
-                         created=created, message=message, title=title)
+        return ThreadDTO(uid=thread_id, slug=slug, forum_id=forum_id,
+                         user_id=user_id, created=created, message=message, title=title)

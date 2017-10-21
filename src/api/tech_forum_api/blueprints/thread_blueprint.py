@@ -8,7 +8,9 @@ from apiutils.errors.bad_request_error import BadRequestError
 
 from tech_forum_api.serializers.thread_serializer import ThreadSerializer
 from sqlutils import NoDataFoundError, UniqueViolationError
+from tech_forum_api.services.forum_service import ForumService
 from tech_forum_api.services.thread_service import ThreadService
+from tech_forum_api.services.user_service import UserService
 from tech_forum_api.services.vote_service import VoteService
 
 logging.basicConfig(level=logging.INFO)
@@ -19,10 +21,12 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
     @inject
     def __init__(self, service: ThreadService, serializer: ThreadSerializer,
-                 vote_service: VoteService) -> None:
+                 vote_service: VoteService, user_service: UserService, forum_service: ForumService) -> None:
         super().__init__(service)
         self.__serializer = serializer
-        self._vote_service = vote_service
+        self._voteService = vote_service
+        self._userService = user_service
+        self._forumService = forum_service
 
     @property
     def _name(self) -> str:
@@ -42,13 +46,23 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
         @blueprint.route('forum/<slug>/create', methods=['POST'])
         def _add(slug: str):
             try:
-                return self._add(forum=slug)
+                data = request.json
+                author = self._userService.get_by_nickname(data.get('author'))
+                if not author:
+                    return self._return_error(f"Can't find author for thread by nickname = {data.get('author')}", 404)
+
+                forum = self._forumService.get_by_slug(slug)
+                if not forum:
+                    return self._return_error(f"Can't find forum for thread by slug = {slug}", 404)
+
+                return self._add(author_id=author.uid, forum_id=forum.uid)
 
             except NoDataFoundError:
                 return self._return_error(f"Can't create thread by slag = {slug}", 404)
 
+            # TODO here possible id, not a slug
             except UniqueViolationError:
-                thread_slug = request.json['slug']
+                thread_slug = request.json['slug']  # here 'slug' is unique name of thread
                 model = self._service.get_by_slug(thread_slug)
                 return self._return_one(model, status=409)
 
@@ -67,6 +81,21 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
                 model = self.__service.get_by_slug_or_id(slug_or_id)
                 return self._return_one(model, status=200)
+
+            except NoDataFoundError as exp:
+                logging.error(exp, exc_info=True)
+                return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
+
+            except BadRequestError as exp:
+                logging.error(exp, exc_info=True)
+                return self._return_error(f"Bad request", 400)
+
+        @blueprint.route('thread/<slug_or_id>/details', methods=['POST'])
+        def _update(slug_or_id: str):
+            try:
+
+                thread = self.__service.update_by_slug_or_id(slug_or_id)
+                return self._return_one(thread, status=200)
 
             except NoDataFoundError as exp:
                 logging.error(exp, exc_info=True)
