@@ -5,6 +5,7 @@ db_name=$3
 db_user=$4
 db_password=$5
 db_dir=$6
+#db_exec=psql -h ${db_host} -U "postgres" -p ${db_port} -c
 
 export PGPASSWORD=postgres
 export PATH=$PATH:/bin/
@@ -16,16 +17,16 @@ echo ${SOURCE}
 cd -P "$( dirname "$SOURCE" )"
 
 function create_extensions {
-    psql -h ${db_host} -U "postgres" -d ${db_name} -c "CREATE EXTENSION \"${1}\";"
+    psql -h ${db_host} -U "postgres" -p ${db_port} -d ${db_name} -c "CREATE EXTENSION \"${1}\";"
 }
 
 
 function re_create_database {
     echo delete from "${db_host}" database ${db_name}
-    psql -h ${db_host} -U "postgres" -c "drop database ${1}"
-    psql -h ${db_host} -U "postgres" -c "create database ${1}"
-    psql -h ${db_host} -U "postgres" -c "create user ${2} with password '${3}'"
-    psql -h ${db_host} -U "postgres" -c "grant all privileges on database ${1} to ${2}"
+    psql -h ${db_host} -U "postgres" -p ${db_port} -c "drop database ${1}"
+    psql -h ${db_host} -U "postgres" -p ${db_port} -c "create database ${1}"
+    psql -h ${db_host} -U "postgres" -p ${db_port} -c "create user ${2} with password '${3}'"
+    psql -h ${db_host} -U "postgres" -p ${db_port} -c "grant all privileges on database ${1} to ${2}"
     create_extensions "citext"
     export PGPASSWORD=$db_password
 }
@@ -76,9 +77,10 @@ function load_database_constraints {
 function wait_postgres {
     echo "Waiting postgres to run on ${db_host} ${db_port}..."
 
-    while ! psql -h ${db_host} -U "postgres" -c "SELECT datname FROM pg_database LIMIT 1" >&/dev/null;
+#    while ! psql -h ${db_host} -U "postgres" -c "SELECT datname FROM pg_database LIMIT 1" >&/dev/null;
+    while ! psql -h ${db_host} -U "postgres" -p ${db_port} -c "SELECT datname FROM pg_database LIMIT 1";
     do
-      sleep 0.1
+      sleep 5
     done
 
     echo "Postgres launched"
@@ -90,6 +92,8 @@ then
     wait_postgres
 fi
 
+
+wait_postgres
 re_create_database "${db_name}" "${db_user}" "${db_password}"
 load_database_structure
 load_database_constraints
