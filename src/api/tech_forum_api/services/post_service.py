@@ -36,17 +36,8 @@ class PostService(Service[Post, PostDTO, PostRepository]):
         data = self.__repo.get_number_posts_for_forum(forum_id)
         return data
 
-    def get_posts_for_thread(self, thread_slug_or_id: str) -> List[Post]:
-
-        try:
-            thread_id = int(thread_slug_or_id)
-
-        except ValueError:
-            thread_slug = thread_slug_or_id
-            thread = self._thread_service.get_by_slug(slug=thread_slug)
-            if not thread:
-                raise NoDataFoundError("Can't find thread by slug = {thread_slug_or_id}")
-            thread_id = thread.uid
+    # TODO refactor this shit
+    def get_posts_for_thread(self, thread_id: int) -> List[Post]:
 
         desc = request.args.get('desc')
         limit = request.args.get('limit')

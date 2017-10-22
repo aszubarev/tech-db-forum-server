@@ -179,22 +179,24 @@ class BaseBlueprint(Generic[S]):
     def _parse_many(self, **kwargs):
 
         entities = []
+
+        prepared_load_data = self._serializer.prepare_load_data(**kwargs)
+
         load_data_list = request.json
         if not load_data_list:
             return entities
 
-        try:
-            prepared_load_data = self._serializer.prepare_load_data(**kwargs)
-            for load_data in load_data_list:
-                load_data.update(prepared_load_data)
-                entity = self._serializer.load(load_data)
-                entities.append(entity)
+        for load_data in load_data_list:
+            load_data.update(prepared_load_data)
+            entity = self._serializer.load(load_data)
+            entities.append(entity)
 
-        except NoDataFoundError as exp:
-            raise NoDataFoundError(f"Can't parse {self._name} entity") from exp
-        except BaseException:
-            logging.exception(f"Can't parse {self._name} entity")
-            abort(400)
+        # except NoDataFoundError as exp:
+        #     raise NoDataFoundError(f"Can't parse {self._name} entity") from exp
+
+        # except BaseException:
+        #     logging.exception(f"Can't parse {self._name} entity")
+        #     abort(400)
         return entities
 
     def _add_entity(self, entity: Any) -> Any:

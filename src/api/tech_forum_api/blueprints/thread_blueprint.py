@@ -80,11 +80,9 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
             try:
 
                 model = self.__service.get_by_slug_or_id(slug_or_id)
+                if not model:
+                    return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
                 return self._return_one(model, status=200)
-
-            except NoDataFoundError as exp:
-                logging.error(exp, exc_info=True)
-                return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
 
             except BadRequestError as exp:
                 logging.error(exp, exc_info=True)

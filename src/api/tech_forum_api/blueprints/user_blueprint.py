@@ -85,8 +85,8 @@ class UserBlueprint(BaseBlueprint[UserService]):
             try:
 
                 forum = self._forumService.get_by_slug(forum_slug)
-                if not forum_slug:
-                    return self._return_error(f"Can't find users for forum: forum_slug =  {forum_slug}", 404)
+                if not forum:
+                    return self._return_error(f"Can't find forum: forum_slug =  {forum_slug}", 404)
 
                 models = self._service.get_for_forum(forum.uid)
                 return self._return_many(models, status=200)

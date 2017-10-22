@@ -116,7 +116,7 @@ class PostRepository(Repository[PostDTO]):
     # TODO refactor this shit
     def add(self, entity: PostDTO) -> Optional[PostDTO]:
         data = self._context.callproc('add_post', [entity.thread_id, entity.forum_id, entity.user_id,
-                                                   entity.parent_id, entity.message, entity.created, False])
+                                                   entity.parent_id, entity.message, entity.created])
         entity = create_one(PostDTO, data)
         if entity.parent_id == 0:
             path = [entity.uid]

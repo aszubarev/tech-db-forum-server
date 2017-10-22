@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from sqlutils import Model
 from tech_forum_api.models.user import User
@@ -18,6 +19,7 @@ class Post(Model):
         self._message: str = None
         self._created: datetime = None
         self._is_edited: bool = None
+        self._path: List[int] = None
 
     @property
     def thread(self) -> Thread:
@@ -47,8 +49,12 @@ class Post(Model):
     def is_edited(self) -> bool:
         return self._is_edited
 
+    @property
+    def path(self) -> List[int]:
+        return self._path
+
     def fill(self, thread: Thread, forum: Forum, author: User, parent: "Post",
-             message: str, created: datetime, is_edited: bool) -> "Post":
+             message: str, created: datetime, is_edited: bool, path: List[int]) -> "Post":
         self._thread = thread
         self._forum = forum
         self._author = author
@@ -56,5 +62,6 @@ class Post(Model):
         self._message = message
         self._created = created
         self._is_edited = is_edited
+        self._path = path
         self._filled()
         return self

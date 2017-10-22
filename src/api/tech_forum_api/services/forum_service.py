@@ -31,9 +31,6 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
     def get_by_slug(self, slug: str) -> Optional[Forum]:
         dto = self.__repo.get_by_slug(slug)
         model = self._convert(dto)
-        if not model:
-            raise NoDataFoundError(f"Can't find forum by slug = {slug}")
-
         return model
 
     def _convert(self, entity: ForumDTO) -> Optional[Forum]:
