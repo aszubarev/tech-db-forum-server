@@ -89,6 +89,9 @@ class ThreadRepository(Repository[ThreadDTO]):
         elif msg is None and title is not None:
             data = self._context.callproc('update_thread_by_slug_by_title', [entity.slug, title])
 
+        # elif msg is None and title is None:
+        #     return self.get_by_slug(entity.slug)
+
         return create_one(ThreadDTO, data)
 
     def update_by_uid(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
@@ -104,6 +107,9 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         elif msg is None and title is not None:
             data = self._context.callproc('update_thread_by_uid_by_title', [entity.uid, title])
+
+        # elif msg is None and title is None:
+        #     return self.get_by_id(entity.uid)
 
         return create_one(ThreadDTO, data)
 

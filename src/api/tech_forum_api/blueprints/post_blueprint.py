@@ -83,7 +83,7 @@ class PostBlueprint(BaseBlueprint[PostService]):
             model = self.__service.get_by_id(uid)
 
             if not model:
-                return self._retunr_error(f"Can't find post by id = {uid}", 404)
+                return self._return_error(f"Can't find post by id = {uid}", 404)
 
             response = self._postSerializerFull.dump(model)
             return Response(response=json.dumps(response), status=200, mimetype='application/json')

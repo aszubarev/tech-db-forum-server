@@ -94,7 +94,15 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
                 data = request.json
 
+                # empty request
+                if not data:
+                    thread = self.__service.get_by_slug_or_id(slug_or_id)
+                    if not thread:
+                        return self._return_error(f"Can't get thread by slug_or_id = {slug_or_id}", 404)
+                    return self._return_one(thread, status=200)
+
                 try:
+
                     cast_thread_id = int(slug_or_id)
 
                     data.update({
@@ -115,7 +123,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                     thread = self.__service.update_by_slug(entity)
 
                 if not thread:
-                    return self._return_error(f"Can't update thread by forum slug_or_id = {slug_or_id}", 404)
+                    return self._return_error(f"Can't update thread by slug_or_id = {slug_or_id}", 404)
 
                 return self._return_one(thread, status=200)
 
