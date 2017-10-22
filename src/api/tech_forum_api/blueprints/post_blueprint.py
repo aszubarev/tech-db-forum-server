@@ -85,17 +85,34 @@ class PostBlueprint(BaseBlueprint[PostService]):
             if not model:
                 return self._return_error(f"Can't find post by id = {uid}", 404)
 
-            response = self._postSerializerFull.dump(model)
+            related = request.args.get('related')
+
+            response = self._postSerializerFull.dump(model, related=related)
             return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
         @blueprint.route('post/<uid>/details', methods=['POST'])
         def _update(uid: int):
-            model = self.__service.get_by_id(uid)
+
+            data = request.json
+
+            # empty request
+            if not data:
+                post = self.__service.get_by_id(uid)
+                if not post:
+                    return self._return_error(f"Can't get post by uid = {uid}", 404)
+                return self._return_one(post, status=200)
+
+            # related = request.args.get('related')
+            entity = self._parse(id=uid)
+            model = self.__service.update(entity)
 
             if not model:
-                return self._retunr_error(f"Can't find post by uid = {uid}", 404)
+                return self._return_error(f"Can't find post by uid = {uid}", 404)
 
-            return self._update(id=uid, message=request.json.get('message'))
+            return self._return_one(model, status=200)
+            #
+            # response = self._postSerializerFull.dump(model, related=related)
+            # return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
         return blueprint
 

@@ -62,6 +62,7 @@ class PostSerializer(Serializer):
                 'thread': model.thread.uid,
                 'message': model.message,
                 'isEdited': model.is_edited
+
             })
 
             if model.created is not None:

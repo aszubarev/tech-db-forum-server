@@ -44,11 +44,29 @@ class PostSerializerFull(Serializer):
             return None
 
         data = {}
-        author = self._userService.get_by_id(model.author.uid)
-        forum = self._forumService.get_by_id(model.forum.uid)
-        thread = self._threadService.get_by_id(model.thread.uid)
 
         if model.is_loaded:
+
+            related = kwargs.get('related')
+            if related is not None:
+
+                if 'user' in related:
+                    author = self._userService.get_by_id(model.author.uid)
+                    data.update({
+                        'author': self._userSerializer.dump(author)
+                    })
+
+                if 'thread' in related:
+                    thread = self._threadService.get_by_id(model.thread.uid)
+                    data.update({
+                        'thread': self._threadSerializer.dump(thread)
+                    })
+
+                if 'forum' in related:
+                    forum = self._forumService.get_by_id(model.forum.uid)
+                    data.update({
+                        'forum': self._forumSerializer.dump(forum, expand_details=True)
+                    })
 
             data.update({
                 'post': self._postSerializer.dump(model)
