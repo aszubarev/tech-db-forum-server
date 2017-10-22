@@ -9,27 +9,39 @@ from injector import inject, singleton
 from apiutils import Serializer
 from apiutils.errors.bad_request_error import BadRequestError
 from apiutils.errors.server_error import ServerError
+from tech_forum_api.exceptions.post_invalid_parent import PostInvalidParentError
 
 from tech_forum_api.models.post import Post
 from tech_forum_api.persistence.dto.post_dto import PostDTO
+from tech_forum_api.serializers.forum_serializer import ForumSerializer
+from tech_forum_api.serializers.thread_serializer import ThreadSerializer
+from tech_forum_api.serializers.user_serializer import UserSerializer
 from tech_forum_api.services.forum_service import ForumService
 from tech_forum_api.services.post_service import PostService
 from tech_forum_api.services.thread_service import ThreadService
 from tech_forum_api.services.user_service import UserService
 from sqlutils import NoDataFoundError
-from tzlocal import get_localzone
 
 
 @singleton
 class PostSerializer(Serializer):
 
     @inject
-    def __init__(self, post_service: PostService, thread_service: ThreadService,
-                 user_service: UserService, forum_service: ForumService) -> None:
+    def __init__(self, post_service: PostService,
+                 user_service: UserService, user_serializer: UserSerializer,
+                 forum_service: ForumService, forum_serializer: ForumSerializer,
+                 thread_service: ThreadService, thread_serializer: ThreadSerializer) -> None:
+
         self._post_service = post_service
+
         self._userService = user_service
         self._forum_service = forum_service
         self._thread_service = thread_service
+
+        self._user_serializer = user_serializer
+        self._forum_serializer = forum_serializer
+        self._thread_serializer = thread_serializer
+
         self._tz = pytz.timezone('Europe/Moscow')
 
     def dump(self, model: Post, **kwargs) -> Optional[Dict[str, Any]]:
@@ -42,6 +54,7 @@ class PostSerializer(Serializer):
         forum = self._forum_service.get_by_id(model.forum.uid)
 
         if model.is_loaded:
+
             data.update({
                 'id': model.uid,
                 'author': author.nickname,
@@ -71,16 +84,15 @@ class PostSerializer(Serializer):
         if thread_slug_or_id is None:
             raise ServerError(f"Can't get parameter 'thread_slug_or_id'")
 
-        try:
-            cast_thread_id = int(thread_slug_or_id)
-            thread = self._thread_service.get_by_id(cast_thread_id)
-
-        except ValueError:
-            thread_slug = thread_slug_or_id
-            thread = self._thread_service.get_by_slug(thread_slug)
-
+        thread = self._thread_service.get_by_slug_or_id(thread_slug_or_id)
         if not thread:
-            raise NoDataFoundError(f"Can't find thread by thread_slug_or_id = {thread_slug_or_id}")
+            logging.error(f"[PostSerializer.prepare_load_data] thread is None")
+            raise NoDataFoundError(f"[PostSerializer.prepare_load_data] thread is None \n"
+                                   f" Can't find thread by thread_slug_or_id = {thread_slug_or_id}")
+
+        else:
+            logging.error(f"[PostSerializer.prepare_load_data] thread is not None; "
+                          f"thread_slug_or_id = {thread_slug_or_id}\n")
 
         created = kwargs.get('created')
         if not created:
@@ -94,11 +106,11 @@ class PostSerializer(Serializer):
 
         return prepare_data
 
-    def _get_user_id(self, data: Dict[str, Any]) -> int:
+    def _get_user_id(self, data: Dict[str, Any]) -> Optional[int]:
 
         nickname = data.get('author')
         if nickname is None:
-            raise BadRequestError(f"Can't get parameter 'nickname'")
+            return None
 
         author = self._userService.get_by_nickname(nickname)
         if not author:
@@ -106,11 +118,11 @@ class PostSerializer(Serializer):
 
         return author.uid
 
-    def _get_parent_id(self, data: Dict[str, Any]) -> int:
+    def _get_parent(self, data: Dict[str, Any]) -> Post:
 
         parent_id = data.get('parent')
         if parent_id is None:
-            return 0
+            return Post(uid=0)
 
         try:
             cast_parent_id = int(parent_id)  # try cast parent_id to int
@@ -120,21 +132,29 @@ class PostSerializer(Serializer):
         if cast_parent_id != 0:
             parent = self._post_service.get_by_id(cast_parent_id)
             if not parent:
-                raise NoDataFoundError(f"Can't find parent for post by uid = {cast_parent_id}")
-            return parent.uid
+                raise PostInvalidParentError(f"Can't find parent for post by uid = {cast_parent_id}")
+            return parent
         else:
-            return 0
+            return Post(uid=0)
 
+    # TODO move declaration of user_id and parent_id to upper level
     def load(self, data: Dict[str, Any]) -> PostDTO:
 
         post_id = None if data.get('id') is None or data.get('id') == 'null' else data['id']
         user_id = self._get_user_id(data)
-        parent_id = self._get_parent_id(data)
-        thread_id = None if data.get('thread_id') is None or data.get('thread_id') == 'null' else data['thread_id']
-        forum_id = None if data.get('forum_id') is None or data.get('forum_id') == 'null' else data['forum_id']
-        created = None if data.get('created') is None or data.get('created') == 'null' else dateutil.parser.parse(data['created'])
-        message = None if data.get('message') is None or data.get('message') == 'null' else data['message']
-        is_edited = None if data.get('is_edited') is None or data.get('is_edited') == 'null' else data['is_edited']
+
+        parent = self._get_parent(data)
+        parent_id = parent.uid
+
+        thread_id = None if data.get('thread_id') is None else data['thread_id']
+        if parent.thread is not None and thread_id is not None:
+            if parent.thread.uid != thread_id:
+                raise PostInvalidParentError(f"Parent post was created in another thread: uid = {parent.thread.uid}")
+
+        forum_id = None if data.get('forum_id') is None else data['forum_id']
+        created = None if data.get('created') is None else dateutil.parser.parse(data['created'])
+        message = None if data.get('message') is None else data['message']
+        is_edited = None if data.get('is_edited') is None else data['is_edited']
 
         return PostDTO(uid=post_id, thread_id=thread_id, forum_id=forum_id, user_id=user_id,
                        parent_id=parent_id, message=message, created=created, is_edited=is_edited)

@@ -16,5 +16,6 @@ class PostConverter(Converter[Post, PostDTO]):
             parent=Post(entity.parent_id),
             message=entity.message,
             created=entity.created,
-            is_edited=entity.is_edited
+            is_edited=entity.is_edited,
+            path=entity.path
         )

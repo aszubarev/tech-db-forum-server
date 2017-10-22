@@ -14,15 +14,17 @@ from tech_forum_api.services.forum_service import ForumService
 from tech_forum_api.services.user_service import UserService
 from sqlutils import NoDataFoundError
 # from tech_forum_api.services.vote_service import VoteService
+from tech_forum_api.services.vote_service import VoteService
 
 
 @singleton
 class ThreadSerializer(Serializer):
 
     @inject
-    def __init__(self, user_service: UserService, forum_service: ForumService):
+    def __init__(self, user_service: UserService, forum_service: ForumService, vote_service: VoteService):
         self._userService = user_service
-        self._forum_service = forum_service
+        self._forumService = forum_service
+        self._voteService = vote_service
 
     def dump(self, model: Thread, **kwargs) -> Optional[Dict[str, Any]]:
 
@@ -31,7 +33,8 @@ class ThreadSerializer(Serializer):
 
         data = {}
         author = self._userService.get_by_id(model.author.uid)
-        forum = self._forum_service.get_by_id(model.forum.uid)
+        forum = self._forumService.get_by_id(model.forum.uid)
+        votes = self._voteService.votes(model.uid)
 
         if model.is_loaded:
             data.update({
@@ -54,6 +57,11 @@ class ThreadSerializer(Serializer):
             if model.slug is not None:
                 data.update({
                     'slug': model.slug
+                })
+
+            if votes is not None and votes != 0:
+                data.update({
+                    'votes': votes
                 })
 
         return data

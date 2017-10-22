@@ -57,6 +57,16 @@ class ThreadRepository(Repository[ThreadDTO]):
         result_dict = data[0]
         return result_dict.get('number_threads')
 
+    def get_count(self) -> int:
+        data = self._context.callproc('get_threads_count', [])
+        if data is None or len(data) == 0:
+            return 0
+        result_dict = data[0]
+        return result_dict.get('threads_count')
+
+    def clear(self):
+        self._context.callproc('clear_threads', [])
+
     def get_all(self) -> List[ThreadDTO]:
         raise NotImplementedError
 
@@ -79,6 +89,9 @@ class ThreadRepository(Repository[ThreadDTO]):
         elif msg is None and title is not None:
             data = self._context.callproc('update_thread_by_slug_by_title', [entity.slug, title])
 
+        # elif msg is None and title is None:
+        #     return self.get_by_slug(entity.slug)
+
         return create_one(ThreadDTO, data)
 
     def update_by_uid(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
@@ -94,6 +107,9 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         elif msg is None and title is not None:
             data = self._context.callproc('update_thread_by_uid_by_title', [entity.uid, title])
+
+        # elif msg is None and title is None:
+        #     return self.get_by_id(entity.uid)
 
         return create_one(ThreadDTO, data)
 

@@ -36,17 +36,12 @@ class PostService(Service[Post, PostDTO, PostRepository]):
         data = self.__repo.get_number_posts_for_forum(forum_id)
         return data
 
-    def get_posts_for_thread(self, thread_slug_or_id: str) -> List[Post]:
+    @cache.memoize(600)
+    def get_count(self) -> int:
+        return self.__repo.get_count()
 
-        try:
-            thread_id = int(thread_slug_or_id)
-
-        except ValueError:
-            thread_slug = thread_slug_or_id
-            thread = self._thread_service.get_by_slug(slug=thread_slug)
-            if not thread:
-                raise NoDataFoundError("Can't find thread by slug = {thread_slug_or_id}")
-            thread_id = thread.uid
+    # TODO refactor this shit
+    def get_posts_for_thread(self, thread_id: int) -> List[Post]:
 
         desc = request.args.get('desc')
         limit = request.args.get('limit')
@@ -62,8 +57,13 @@ class PostService(Service[Post, PostDTO, PostRepository]):
 
         return self._converter.convert(entity)
 
+    def clear(self) -> None:
+        self.__repo.clear()
+        self._clear_cache()
+
     @staticmethod
     def _clear_cache() -> None:
         # TODO don't remember update cache
         cache.delete_memoized(PostService.get_by_id)
         cache.delete_memoized(PostService.get_number_posts_for_forum)
+        cache.delete_memoized(PostService.get_count)

@@ -57,6 +57,10 @@ class VoteService(Service[Vote, VoteDTO, VoteRepository]):
 
         return self._converter.convert(entity)
 
+    def clear(self) -> None:
+        self.__repo.clear()
+        self._clear_cache()
+
     @staticmethod
     def _clear_cache() -> None:
         # TODO don't remember update cache

@@ -31,10 +31,11 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
     def get_by_slug(self, slug: str) -> Optional[Forum]:
         dto = self.__repo.get_by_slug(slug)
         model = self._convert(dto)
-        if not model:
-            raise NoDataFoundError(f"Can't find forum by slug = {slug}")
-
         return model
+
+    @cache.memoize(600)
+    def get_count(self) -> int:
+        return self.__repo.get_count()
 
     def _convert(self, entity: ForumDTO) -> Optional[Forum]:
         if not entity:
@@ -42,9 +43,14 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
 
         return self._converter.convert(entity)
 
+    def clear(self) -> None:
+        self.__repo.clear()
+        self._clear_cache()
+
     @staticmethod
     def _clear_cache() -> None:
         # TODO don't remember update cache
         cache.delete_memoized(ForumService.get_by_id)
         cache.delete_memoized(ForumService.get_by_slug)
+        cache.delete_memoized(ForumService.get_count)
 

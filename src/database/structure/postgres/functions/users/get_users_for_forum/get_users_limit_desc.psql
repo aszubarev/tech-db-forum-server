@@ -1,0 +1,51 @@
+CREATE OR REPLACE FUNCTION get_users_for_forum_limit_desc(
+    p_forum_id INT,
+    p_limit INT,
+    p_desc_flag BOOLEAN
+)
+
+RETURNS TABLE(user_id INT,
+              nickname CITEXT,
+              email CITEXT,
+              about TEXT,
+              fullname TEXT)
+AS
+$BODY$
+BEGIN
+
+  RETURN QUERY
+
+  SELECT res.user_id, res.nickname, res.email, res.about, res.fullname
+  FROM (
+
+        ( SELECT users.user_id, users.nickname, users.email, users.about, users.fullname
+          FROM forums
+          JOIN posts on forums.forum_id = posts.forum_id
+          JOIN users on posts.user_id = users.user_id
+          WHERE posts.forum_id = p_forum_id
+        )
+
+        UNION
+
+        ( SELECT users.user_id, users.nickname, users.email, users.about, users.fullname
+          FROM forums
+          JOIN threads ON forums.forum_id = threads.forum_id
+          JOIN users on threads.user_id = users.user_id
+          WHERE threads.forum_id = p_forum_id
+        )
+  ) res
+  ORDER BY CASE p_desc_flag
+              WHEN false THEN res.nickname
+              ELSE NULL
+           END COLLATE "ucs_basic" ASC,
+
+           CASE p_desc_flag
+              WHEN true THEN res.nickname
+              ELSE NULL
+           END COLLATE "ucs_basic" DESC
+
+  LIMIT p_limit;
+
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
