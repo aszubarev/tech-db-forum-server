@@ -110,8 +110,18 @@ class PostRepository(Repository[PostDTO]):
         result_dict = data[0]
         return result_dict.get('number_posts')
 
+    def get_count(self) -> int:
+        data = self._context.callproc('get_posts_count', [])
+        if data is None or len(data) == 0:
+            return 0
+        result_dict = data[0]
+        return result_dict.get('posts_count')
+
     def get_all(self) -> List[PostDTO]:
         raise NotImplementedError
+
+    def clear(self):
+        self._context.callproc('clear_posts', [])
 
     # TODO refactor this shit
     def add(self, entity: PostDTO) -> Optional[PostDTO]:

@@ -24,6 +24,9 @@ class VoteRepository(Repository[VoteDTO]):
     def get_all(self) -> List[VoteDTO]:
         raise NotImplementedError
 
+    def clear(self):
+        self._context.callproc('clear_vote', [])
+
     def add(self, entity: VoteDTO) -> Optional[VoteDTO]:
         logging.info(f"[VoteRepository.add] user_id = {entity.user_id}, thread_id = {entity.thread_id}, "
                      f"voice = {entity.vote_value}")

@@ -38,6 +38,10 @@ class UserService(Service[User, UserDTO, UserRepository]):
         data = self.__repo.get_by_nickname_or_email(nickname, email)
         return self._convert_many(data)
 
+    @cache.memoize(600)
+    def get_count(self) -> int:
+        return self.__repo.get_count()
+
     def get_for_forum(self, forum_id: int) -> List[User]:
 
         desc = request.args.get('desc')
@@ -53,9 +57,14 @@ class UserService(Service[User, UserDTO, UserRepository]):
 
         return self._converter.convert(entity)
 
+    def clear(self) -> None:
+        self.__repo.clear()
+        self._clear_cache()
+
     @staticmethod
     def _clear_cache() -> None:
         # TODO don't remember update cache
         cache.delete_memoized(UserService.get_by_id)
         cache.delete_memoized(UserService.get_by_nickname)
         cache.delete_memoized(UserService.get_by_nickname_or_email)
+        cache.delete_memoized(UserService.get_count)

@@ -58,8 +58,18 @@ class UserRepository(Repository[UserDTO]):
 
         return create_many(UserDTO, data)
 
+    def get_count(self) -> int:
+        data = self._context.callproc('get_users_count', [])
+        if data is None or len(data) == 0:
+            return 0
+        result_dict = data[0]
+        return result_dict.get('users_count')
+
     def get_all(self) -> List[UserDTO]:
         raise NotImplementedError
+
+    def clear(self):
+        self._context.callproc('clear_users', [])
 
     def add(self, entity: UserDTO) -> Optional[UserDTO]:
         data = self._context.callproc('add_user', [entity.nickname, entity.email, entity.about, entity.fullname])

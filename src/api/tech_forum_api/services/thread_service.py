@@ -36,6 +36,7 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         data = self._repo.get_by_slug(slug)
         return self._convert(data)
 
+    @cache.memoize(600)
     def get_by_slug_or_id(self, slug_or_id: str) -> Optional[Thread]:
 
         try:
@@ -52,6 +53,10 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
     def get_number_threads_for_forum(self, forum_id: int) -> Optional[int]:
         data = self.__repo.get_number_threads_for_forum(forum_id)
         return data
+
+    @cache.memoize(600)
+    def get_count(self) -> int:
+        return self.__repo.get_count()
 
     def update_by_uid(self, entity: ThreadDTO) -> Optional[Thread]:
         data = self.__repo.update_by_uid(entity)
@@ -84,9 +89,15 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
 
         return self._converter.convert(entity)
 
+    def clear(self) -> None:
+        self.__repo.clear()
+        self._clear_cache()
+
     @staticmethod
     def _clear_cache() -> None:
         # TODO don't remember update cache
         cache.delete_memoized(ThreadService.get_by_id)
         cache.delete_memoized(ThreadService.get_by_slug)
         cache.delete_memoized(ThreadService.get_number_threads_for_forum)
+        cache.delete_memoized(ThreadService.get_by_slug_or_id)
+        cache.delete_memoized(ThreadService.get_count)
