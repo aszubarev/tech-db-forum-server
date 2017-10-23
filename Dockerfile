@@ -16,8 +16,8 @@ ENV DB_SERVICE postgres
 ENV SERVER_NAME forum_server
 ENV WEB_PORT 5000
 
-ENV http_proxy http://10.100.122.141:3128/
-ENV https_proxy https://10.100.122.141:3128/
+#ENV http_proxy http://10.100.122.141:3128/
+#ENV https_proxy https://10.100.122.141:3128/
 
 
 ########################################################################################################################
@@ -67,15 +67,14 @@ RUN pip freeze | grep apiutils
 RUN pip freeze | grep sqlutils
 RUN pip freeze | grep forum
 
-COPY ./src/api/main.py /usr/local/forum/main.py
-WORKDIR /usr/local/forum
+#COPY ./src/api/main.py /usr/local/forum/main.py
+WORKDIR /tmp/api/forum
 ENV PYTHONPATH /tmp/api/
 
 USER postgres
-EXPOSE 8000
-#EXPOSE $DB_PORT
-EXPOSE $WEB_PORT
+EXPOSE 54545
+EXPOSE 5000
 
 CMD /usr/lib/postgresql/$PGVER/bin/pg_ctl -o "-p ${DB_PORT}" -D /var/lib/postgresql/$PGVER/main start &&\
     bash /loader/create_db.sh $DB_HOST $DB_PORT $DB_NAME $DB_USER $DB_PASS $DATABASE &&\
-    /usr/local/bin/gunicorn -w 1 -b 0.0.0.0:5000 main:app
+    /usr/local/bin/gunicorn -w 1 -b 0.0.0.0:$WEB_PORT app:app
