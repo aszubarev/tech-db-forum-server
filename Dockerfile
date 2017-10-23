@@ -16,8 +16,8 @@ ENV DB_SERVICE postgres
 ENV SERVER_NAME forum_server
 ENV WEB_PORT 5000
 
-#ENV http_proxy http://10.100.122.141:3128/
-#ENV https_proxy https://10.100.122.141:3128/
+ENV http_proxy http://10.100.122.141:3128/
+ENV https_proxy https://10.100.122.141:3128/
 
 
 ########################################################################################################################
@@ -72,9 +72,10 @@ WORKDIR /usr/local/forum
 ENV PYTHONPATH /tmp/api/
 
 USER postgres
-EXPOSE $DB_PORT
+EXPOSE 8000
+#EXPOSE $DB_PORT
 EXPOSE $WEB_PORT
 
 CMD /usr/lib/postgresql/$PGVER/bin/pg_ctl -o "-p ${DB_PORT}" -D /var/lib/postgresql/$PGVER/main start &&\
     bash /loader/create_db.sh $DB_HOST $DB_PORT $DB_NAME $DB_USER $DB_PASS $DATABASE &&\
-    /usr/local/bin/gunicorn -w 1 -b 0.0.0.0:$WEB_PORT main:app
+    /usr/local/bin/gunicorn -w 1 -b 0.0.0.0:5000 main:app
