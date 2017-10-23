@@ -1,6 +1,6 @@
 import logging
 
-from tech_forum_api.app import app
+from forum.app import app
 
 logging.basicConfig(level=logging.DEBUG)
 

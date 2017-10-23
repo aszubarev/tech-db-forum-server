@@ -37,12 +37,12 @@ services:
     ports:
       - "5000:80"
     volumes:
-      - ../src/api/tech_forum_api:/tmp/api/tech_forum_api
+      - ../src/api/forum:/tmp/api/forum
     env_file: .env
     environment:
       - CACHE_TYPE=simple
       - PYTHONPATH=/tmp/api/
-    command: bash -c "cd /tmp/api/tech_forum_api && /usr/local/bin/gunicorn -w 1 -b :80 app:app"
+    command: bash -c "cd /tmp/api/forum && /usr/local/bin/gunicorn -w 1 -b :80 app:app"
 
 
 networks:
