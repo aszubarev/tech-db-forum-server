@@ -34,6 +34,7 @@ RUN apt-get install -y postgresql-$PGVER
 USER postgres
 RUN echo "local all all trust" >> /var/lib/postgresql/$PGVER/main/pg_hba.conf
 RUN echo "host  all all 127.0.0.1/32 trust	" >> /var/lib/postgresql/$PGVER/main/pg_hba.conf
+RUN echo "host  all all ::1/128 md5	" >> /var/lib/postgresql/$PGVER/main/pg_hba.conf
 RUN echo "listen_addresses='*'" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
 
 USER root
