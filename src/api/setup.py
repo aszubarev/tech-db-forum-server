@@ -2,7 +2,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 setup(
-    name='tech_forum_api',
+    name='forum',
     version='0.0.1',
     author='Zubarev Anton Sergeevich',
     author_email='ya.zubarevanton@yandex.ru',

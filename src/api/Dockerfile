@@ -23,8 +23,8 @@ RUN pip freeze | grep apiutils
 RUN pip freeze | grep sqlutils
 RUN pip freeze | grep tech
 
-COPY ./main.py /usr/local/tech_forum_api/main.py
-WORKDIR /usr/local/tech_forum_api
+COPY ./main.py /usr/local/forum/main.py
+WORKDIR /usr/local/forum
 
 ENV CACHE_TYPE simple
 ENV DB_NAME forum_server
