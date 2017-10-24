@@ -55,7 +55,8 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 if not forum:
                     return self._return_error(f"Can't find forum for thread by slug = {slug}", 404)
 
-                return self._add(author_id=author.uid, forum_id=forum.uid)
+                return self._add(author_id=author.uid, forum_id=forum.uid,
+                                 author_nickname=author.nickname, forum_skug=forum.slug)
 
             except NoDataFoundError:
                 return self._return_error(f"Can't create thread by slag = {slug}", 404)

@@ -60,3 +60,11 @@ class ThreadDTO(Entity):
     @property
     def title(self) -> str:
         return self._title
+
+    @user_nickname.setter
+    def user_nickname(self, value):
+        self._user_nickname = value
+
+    @forum_slug.setter
+    def forum_slug(self, value):
+        self._forum_slug = value

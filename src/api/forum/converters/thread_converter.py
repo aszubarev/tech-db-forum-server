@@ -10,8 +10,8 @@ class ThreadConverter(Converter[Thread, ThreadDTO]):
     def convert(self, entity: ThreadDTO) -> Thread:
         return Thread(uid=entity.uid).fill(
             slug=entity.slug,
-            forum=Forum(entity.forum_id),
-            author=User(entity.user_id),
+            forum=Forum(entity.forum_id).fill(slug=entity.forum_slug),
+            author=User(entity.user_id).fill(nickname=entity.user_nickname),
             created=entity.created,
             message=entity.message,
             title=entity.title

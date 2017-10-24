@@ -73,7 +73,11 @@ class ThreadRepository(Repository[ThreadDTO]):
     def add(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
         data = self._context.callproc('add_thread', [entity.slug, entity.forum_id, entity.user_id,
                                                      entity.created, entity.message, entity.title])
-        return create_one(ThreadDTO, data)
+        new_entity = create_one(ThreadDTO, data)
+        new_entity.user_nickname = entity.user_nickname
+        new_entity.forum_slug = entity.forum_slug
+
+        return new_entity
 
     def update_by_slug(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
         msg = entity.message
@@ -88,9 +92,6 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         elif msg is None and title is not None:
             data = self._context.callproc('update_thread_by_slug_by_title', [entity.slug, title])
-
-        # elif msg is None and title is None:
-        #     return self.get_by_slug(entity.slug)
 
         return create_one(ThreadDTO, data)
 
