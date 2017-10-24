@@ -18,7 +18,6 @@ class ThreadRepository(Repository[ThreadDTO]):
         return create_one(ThreadDTO, data)
 
     def get_by_slug(self, slug: str) -> Optional[ThreadDTO]:
-        logging.info(f"[ThreadRepository.get_by_slug] slug = {slug}")
         data = self._context.callproc('get_thread_by_slug', [slug])
         return create_one(ThreadDTO, data)
 
@@ -74,6 +73,10 @@ class ThreadRepository(Repository[ThreadDTO]):
         data = self._context.callproc('add_thread', [entity.slug, entity.forum_id, entity.user_id,
                                                      entity.created, entity.message, entity.title])
         new_entity = create_one(ThreadDTO, data)
+        logging.info(f"[ThreadRepository.add] new_entity: nickname = {new_entity.user_nickname}; "
+                     f"slug = {new_entity.forum_slug};")
+        logging.info(f"[ThreadRepository.add] entity: nickname = {entity.user_nickname}; "
+                     f"slug = {entity.forum_slug};")
         new_entity.user_nickname = entity.user_nickname
         new_entity.forum_slug = entity.forum_slug
 

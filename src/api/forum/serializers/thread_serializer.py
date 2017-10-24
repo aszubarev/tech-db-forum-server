@@ -31,13 +31,17 @@ class ThreadSerializer(Serializer):
 
         data = {}
         if model.author.nickname is None:
-            author_nickanme =  self._userService.get_by_id(model.author.uid).nickname
+            logging.info(f"[ThreadSerializer.dump] get nickname from DB")
+            author_nickname = self._userService.get_by_id(model.author.uid).nickname
         else:
-            author_nickanme = model.author.nickname
+            logging.info(f"[ThreadSerializer.dump] get nickname from model")
+            author_nickname = model.author.nickname
 
         if model.forum.slug is None:
+            logging.info(f"[ThreadSerializer.dump] get slug from DB")
             forum_slug = self._forumService.get_by_id(model.forum.uid).slug
         else:
+            logging.info(f"[ThreadSerializer.dump] get slug from model")
             forum_slug = model.forum.slug
 
         votes = self._voteService.votes(model.uid)
@@ -45,7 +49,7 @@ class ThreadSerializer(Serializer):
         if model.is_loaded:
             data.update({
                 'id': model.uid,
-                'author': author_nickanme,
+                'author': author_nickname,
                 'forum': forum_slug,
                 'message': model.message,
                 'title': model.title
