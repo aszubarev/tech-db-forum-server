@@ -10,6 +10,8 @@ class ForumConverter(Converter[Forum, ForumDTO]):
     def convert(self, entity: ForumDTO) -> Forum:
         return Forum(uid=entity.uid).fill(
             slug=entity.slug,
-            user=User(entity.user_id),
-            title=entity.title
+            user=User(entity.user_id).fill(nickname=entity.user_nickname),
+            title=entity.title,
+            threads=entity.threads,
+            posts=entity.posts
         )

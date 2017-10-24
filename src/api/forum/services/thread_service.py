@@ -27,6 +27,12 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
     def __repo(self) -> ThreadRepository:
         return self._repo
 
+    def add(self, entity: ThreadDTO):
+        dto = self._repo.add(entity)
+        self._forum_service.increment_threads(entity.forum_id)
+        self._clear_cache()
+        return self._convert(dto)
+
     @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Thread]:
         return super().get_by_id(uid)

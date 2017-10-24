@@ -27,7 +27,7 @@ class User(Model):
     def fullname(self) -> str:
         return self._fullname
 
-    def fill(self, nickname: str, email: str, about: str, fullname: str) -> "User":
+    def fill(self, nickname: str = None, email: str = None, about: str = None, fullname: str = None) -> "User":
         self._nickname = nickname
         self._email = email
         self._about = about

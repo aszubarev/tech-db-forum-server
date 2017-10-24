@@ -23,6 +23,14 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
     def __repo(self) -> ForumRepository:
         return self._repo
 
+    def increment_threads(self, uid: int):
+        self.__repo.increment_threads(uid)
+        self._clear_cache()
+
+    def increment_posts(self, uid: int):
+        self.__repo.increment_posts(uid)
+        self._clear_cache()
+
     @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Forum]:
         return super().get_by_id(uid)
