@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION forum_increment_posts(
-  p_forum_id)
+  p_forum_id INT)
 
 RETURNS void
 AS

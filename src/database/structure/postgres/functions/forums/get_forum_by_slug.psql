@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION get_forum_by_slug(p_slug CITEXT)
                 user_id INT,
                 title TEXT,
                 threads INT,
-                posts INT
+                posts INT,
                 user_nickname CITEXT)
 AS
 $BODY$

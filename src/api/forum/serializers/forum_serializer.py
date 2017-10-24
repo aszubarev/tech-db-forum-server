@@ -40,11 +40,11 @@ class ForumSerializer(Serializer):
         if expand_details is not None:
             if expand_details is True:
 
-                numb_threads = self._threadService.get_number_threads_for_forum(model.uid)
+                # numb_threads = self._threadService.get_number_threads_for_forum(model.uid)
                 numb_posts = self._postService.get_number_posts_for_forum(model.uid)
 
                 data.update({
-                    'threads': numb_threads,
+                    'threads': model.threads,
                     'posts': numb_posts
                 })
 
