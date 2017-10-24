@@ -12,7 +12,9 @@ class ThreadDTO(Entity):
     def __init__(self, uid: int = None,
                  slug: str = None,
                  forum_id: int = None,
+                 forum_slug: str = None,
                  user_id: int = None,
+                 user_nickname: str = None,
                  created: datetime = None,
                  message: str = None,
                  title: str = None) -> None:
@@ -20,7 +22,9 @@ class ThreadDTO(Entity):
 
         self._slug = slug
         self._forum_id = forum_id
+        self._forum_slug = forum_slug
         self._user_id = user_id
+        self._user_nickname = user_nickname
         self._created = created
         self._message = message
         self._title = title
@@ -34,8 +38,16 @@ class ThreadDTO(Entity):
         return self._forum_id
 
     @property
+    def forum_slug(self) -> str:
+        return self._forum_slug
+
+    @property
     def user_id(self) -> int:
         return self._user_id
+
+    @property
+    def user_nickname(self) -> str:
+        return self._user_nickname
 
     @property
     def created(self) -> datetime:
