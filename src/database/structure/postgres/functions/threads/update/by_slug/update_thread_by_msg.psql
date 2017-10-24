@@ -8,16 +8,20 @@ RETURNS TABLE(thread_id INT,
               user_id INT,
               created TIMESTAMP WITH TIME ZONE,
               message TEXT,
-              title TEXT)
+              title TEXT,
+              user_nickname CITEXT,
+              forum_slug CITEXT)
 AS
 $BODY$
   BEGIN
     RETURN QUERY
-        UPDATE threads
+
+        UPDATE threads AS th
         SET message = p_msg
-        WHERE threads.slug = p_slug
-        RETURNING threads.thread_id, threads.slug, threads.forum_id, threads.user_id,
-                  threads.created, threads.message, threads.title;
+        FROM users u, forums f
+        WHERE th.slug = p_slug and th.user_id = u.user_id and th.forum_id = f.forum_id
+        RETURNING th.thread_id, th.slug, th.forum_id, th.user_id,
+                  th.created, th.message, th.title, u.nickname, f.slug;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
