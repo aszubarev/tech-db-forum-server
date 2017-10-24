@@ -5,15 +5,20 @@ CREATE OR REPLACE FUNCTION get_threads_for_forum(p_forum_id INT)
                 user_id INT,
                 created TIMESTAMP WITH TIME ZONE,
                 message TEXT,
-                title TEXT)
+                title TEXT,
+                user_nickname CITEXT,
+                forum_slug CITEXT)
 AS
 $BODY$
-  BEGIN
-    RETURN QUERY SELECT th.thread_id, th.slug, th.forum_id, th.user_id,
-                        th.created, th.message, th.title
+BEGIN
+    RETURN QUERY
+    SELECT th.thread_id, th.slug, th.forum_id, th.user_id,
+           th.created, th.message, th.title, u.nickname, f.slug
     FROM threads th
+    JOIN users u  on th.user_id = u.user_id
+    JOIN forums f on th.forum_id = f.forum_id
     WHERE th.forum_id = p_forum_id;
 
-  END;
+END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
