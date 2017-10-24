@@ -34,8 +34,11 @@ RUN apt-get install -y postgresql-$PGVER
 USER postgres
 RUN echo "local all all trust" >> /var/lib/postgresql/$PGVER/main/pg_hba.conf
 RUN echo "host  all all 127.0.0.1/32 trust" >> /var/lib/postgresql/$PGVER/main/pg_hba.conf
+
 RUN echo "host  all all ::1/128 trust" >> /var/lib/postgresql/$PGVER/main/pg_hba.conf
 RUN echo "host  all all 0.0.0.0/0 trust" >> /var/lib/postgresql/$PGVER/main/pg_hba.conf
+
+RUN cat /var/lib/postgresql/$PGVER/main/pg_hba.conf
 
 RUN echo "listen_addresses='*'" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
 RUN echo "synchronous_commit = off" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
