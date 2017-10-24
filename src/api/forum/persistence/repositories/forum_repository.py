@@ -20,9 +20,11 @@ class ForumRepository(Repository[ForumDTO]):
         data = self._context.callproc('get_forum_by_slug', [slug])
         return create_one(ForumDTO, data)
 
-    def get_by_thread_id(self, thread_id: int) -> Optional[ForumDTO]:
-        data = self._context.callproc('get_forum_by_slug', [thread_id])
-        return create_one(ForumDTO, data)
+    def increment_threads(self, uid: int) -> None:
+        self._context.callproc('forum_increment_threads', [uid])
+
+    def increment_posts(self, uid: int) -> None:
+        self._context.callproc('forum_increment_posts', [uid])
 
     def get_count(self) -> int:
         data = self._context.callproc('get_forums_count', [])
@@ -39,7 +41,9 @@ class ForumRepository(Repository[ForumDTO]):
 
     def add(self, entity: ForumDTO) -> Optional[ForumDTO]:
         data = self._context.callproc('add_forum', [entity.slug, entity.user_id, entity.title])
-        return create_one(ForumDTO, data)
+        new_entity = create_one(ForumDTO, data)
+        new_entity.user_nickname = entity.user_nickname
+        return new_entity
 
     def update(self, entity: ForumDTO):
         raise NotImplementedError

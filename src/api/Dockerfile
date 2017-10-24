@@ -21,7 +21,7 @@ RUN rm -rf /api
 
 RUN pip freeze | grep apiutils
 RUN pip freeze | grep sqlutils
-RUN pip freeze | grep tech
+RUN pip freeze | grep forum
 
 COPY ./main.py /usr/local/forum/main.py
 WORKDIR /usr/local/forum
