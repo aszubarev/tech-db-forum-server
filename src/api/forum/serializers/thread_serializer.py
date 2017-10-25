@@ -30,24 +30,20 @@ class ThreadSerializer(Serializer):
             return None
 
         data = {}
-        author = self._userService.get_by_id(model.author.uid)
-        forum = self._forumService.get_by_id(model.forum.uid)
-        votes = self._voteService.votes(model.uid)
 
         if model.is_loaded:
             data.update({
                 'id': model.uid,
-                'author': author.nickname,
-                'forum': forum.slug,
+                'author': model.author.nickname,
+                'forum': model.forum.slug,
                 'message': model.message,
-                'title': model.title
+                'title': model.title,
+                'votes': model.votes
 
             })
 
             if model.created is not None:
                 created = model.created.astimezone().isoformat()
-                logging.info(f"[ThreadSerializer.dump] author: {author.nickname},"
-                             f" created: {created}")
                 data.update({
                     'created': created
                 })
@@ -55,11 +51,6 @@ class ThreadSerializer(Serializer):
             if model.slug is not None:
                 data.update({
                     'slug': model.slug
-                })
-
-            if votes is not None and votes != 0:
-                data.update({
-                    'votes': votes
                 })
 
         return data
@@ -72,10 +63,12 @@ class ThreadSerializer(Serializer):
         thread_id = None if data.get('id') is None else data['id']
         slug = None if data.get('slug') is None else data['slug']
         forum_id = None if data.get('forum_id') is None else data['forum_id']
+        forum_slug = None if data.get('forum_slug') is None else data['forum_slug']
         user_id = None if data.get('author_id') is None else data['author_id']
+        user_nickname = None if data.get('author_nickname') is None else data['author_nickname']
         created = None if data.get('created') is None else dateutil.parser.parse(data['created'])
         message = None if data.get('message') is None else data['message']
         title = None if data.get('title') is None else data['title']
 
-        return ThreadDTO(uid=thread_id, slug=slug, forum_id=forum_id,
-                         user_id=user_id, created=created, message=message, title=title)
+        return ThreadDTO(uid=thread_id, slug=slug, forum_id=forum_id, forum_slug=forum_slug, user_id=user_id,
+                         user_nickname=user_nickname, created=created, message=message, title=title)

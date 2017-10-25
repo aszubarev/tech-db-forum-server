@@ -4,6 +4,8 @@ from typing import Optional, List, Any, Dict
 import dateutil.parser
 from flask import request
 from injector import inject, singleton
+
+from forum.persistence.dto.vote_dto import VoteDTO
 from sqlutils import Service, NoDataFoundError
 
 from forum.cache import cache
@@ -27,11 +29,21 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
     def __repo(self) -> ThreadRepository:
         return self._repo
 
-    def add(self, entity: ThreadDTO):
+    def add(self, entity: ThreadDTO) -> Optional[Thread]:
         dto = self._repo.add(entity)
         self._forum_service.increment_threads(entity.forum_id)
         self._clear_cache()
         return self._convert(dto)
+
+    def vote(self, entity: VoteDTO) -> Optional[int]:
+        """
+        Function returning number of vote for thread
+        :param entity: VoteDTO
+        :return votes: int 
+        """
+        votes = self.__repo.vote(entity)
+        self._clear_cache()
+        return votes
 
     @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Thread]:

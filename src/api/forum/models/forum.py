@@ -33,7 +33,8 @@ class Forum(Model):
     def posts(self) -> int:
         return self._posts
 
-    def fill(self, slug: str, user: User, title: str, threads: int = None, posts: int = None) -> "Forum":
+    def fill(self, slug: str = None, user: User = None,
+             title: str = None, threads: int = None, posts: int = None) -> "Forum":
         self._slug = slug
         self._user = user
         self._title = title

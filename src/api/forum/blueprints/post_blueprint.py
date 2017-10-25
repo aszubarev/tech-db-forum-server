@@ -11,7 +11,7 @@ from forum.exceptions.post_invalid_parent import PostInvalidParentError
 from forum.persistence.dto.post_dto import PostDTO
 
 from forum.serializers.post_serializer import PostSerializer
-from sqlutils import NoDataFoundError, UniqueViolationError
+from sqlutils import NoDataFoundError
 from forum.serializers.post_serializer_detail import PostSerializerFull
 from forum.services.post_service import PostService
 from forum.services.thread_service import ThreadService
@@ -102,7 +102,6 @@ class PostBlueprint(BaseBlueprint[PostService]):
                     return self._return_error(f"Can't get post by uid = {uid}", 404)
                 return self._return_one(post, status=200)
 
-            # related = request.args.get('related')
             entity = self._parse(id=uid)
             model = self.__service.update(entity)
 
@@ -110,9 +109,6 @@ class PostBlueprint(BaseBlueprint[PostService]):
                 return self._return_error(f"Can't find post by uid = {uid}", 404)
 
             return self._return_one(model, status=200)
-            #
-            # response = self._postSerializerFull.dump(model, related=related)
-            # return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
         return blueprint
 

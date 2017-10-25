@@ -7,7 +7,6 @@ from apiutils import Serializer
 from forum.models.forum import Forum
 from forum.persistence.dto.forum_dto import ForumDTO
 from forum.services.post_service import PostService
-from forum.services.thread_service import ThreadService
 from forum.services.user_service import UserService
 from sqlutils import NoDataFoundError
 
@@ -16,9 +15,8 @@ from sqlutils import NoDataFoundError
 class ForumSerializer(Serializer):
 
     @inject
-    def __init__(self, user_service: UserService, thread_service: ThreadService, post_service: PostService):
+    def __init__(self, user_service: UserService, post_service: PostService):
         self._userService = user_service
-        self._threadService = thread_service
         self._postService = post_service
 
     def dump(self, model: Forum, **kwargs) -> Optional[Dict[str, Any]]:
@@ -40,7 +38,6 @@ class ForumSerializer(Serializer):
         if expand_details is not None:
             if expand_details is True:
 
-                # numb_threads = self._threadService.get_number_threads_for_forum(model.uid)
                 numb_posts = self._postService.get_number_posts_for_forum(model.uid)
 
                 data.update({
