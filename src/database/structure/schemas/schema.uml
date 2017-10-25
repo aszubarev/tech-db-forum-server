@@ -30,6 +30,8 @@ forums: forum_id [INT]
 forums: slug [CITEXT]
 forums: user_id [INT]
 forums: title [text]
+forums: threads [int]
+forums: posts [int]
 forums -> users: responsible
 
 threads: thread_id [INT]
@@ -39,6 +41,7 @@ threads: user_id [INT]
 threads: created [DATETIME]
 threads: message [TEXT]
 threads: title [TEXT]
+threads: votes [INT]
 threads -> forums
 threads --> users : author
 

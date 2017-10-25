@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION forum_increment_threads(
+  p_forum_id INT)
+
+RETURNS void
+AS
+$BODY$
+BEGIN
+        UPDATE forums
+        SET threads = threads + 1
+        WHERE forums.forum_id = p_forum_id;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

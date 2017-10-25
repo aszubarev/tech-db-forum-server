@@ -6,5 +6,6 @@ CREATE TABLE threads
     user_id int NOT NULL,
     created TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     message TEXT NOT NULL,
-    title TEXT NOT NULL
+    title TEXT NOT NULL,
+    votes INT DEFAULT 0
 );

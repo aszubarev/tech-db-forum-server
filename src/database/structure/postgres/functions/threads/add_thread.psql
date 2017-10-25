@@ -12,7 +12,8 @@ RETURNS TABLE(thread_id INT,
               user_id INT,
               created TIMESTAMP WITH TIME ZONE,
               message TEXT,
-              title TEXT)
+              title TEXT,
+              votes INT)
 AS
 $BODY$
   BEGIN
@@ -20,7 +21,7 @@ $BODY$
         INSERT INTO threads (slug, forum_id, user_id, created, message, title)
         VALUES (p_slug, p_forum_id, p_user_id, p_created, p_message, p_title)
         RETURNING threads.thread_id, threads.slug, threads.forum_id, threads.user_id,
-                  threads.created, threads.message, threads.title;
+                  threads.created, threads.message, threads.title, threads.votes;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
