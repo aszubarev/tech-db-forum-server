@@ -41,6 +41,7 @@ threads: user_id [INT]
 threads: created [DATETIME]
 threads: message [TEXT]
 threads: title [TEXT]
+threads: votes [INT]
 threads -> forums
 threads --> users : author
 

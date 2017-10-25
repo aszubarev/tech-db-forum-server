@@ -59,7 +59,7 @@ class VoteSerializer(Serializer):
             raise BadRequestError("[VoteSerializer.load] Can't get param 'nickname'")
 
         voice = data.get('voice')
-        if not voice :
+        if not voice:
             raise BadRequestError("[VoteSerializer.load] Can't get param 'voice'")
 
         # find user by input nickname

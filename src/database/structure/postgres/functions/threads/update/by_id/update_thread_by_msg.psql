@@ -10,7 +10,8 @@ RETURNS TABLE(thread_id INT,
               message TEXT,
               title TEXT,
               user_nickname CITEXT,
-              forum_slug CITEXT)
+              forum_slug CITEXT,
+              votes INT)
 AS
 $BODY$
   BEGIN
@@ -21,7 +22,7 @@ $BODY$
         FROM users u, forums f
         WHERE th.thread_id = p_thread_id and th.user_id = u.user_id and th.forum_id = f.forum_id
         RETURNING th.thread_id, th.slug, th.forum_id, th.user_id,
-                  th.created, th.message, th.title, u.nickname, f.slug;
+                  th.created, th.message, th.title, u.nickname, f.slug, th.votes;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
