@@ -72,7 +72,7 @@ class ThreadRepository(Repository[ThreadDTO]):
         raise NotImplementedError
 
     def vote(self, entity: VoteDTO) -> Optional[int]:
-        data = self._context.callproc('add_vote_new', [entity.user_id, entity.thread_id, entity.vote_value])
+        data = self._context.callproc('add_vote', [entity.user_id, entity.thread_id, entity.vote_value])
         if data is None or len(data) == 0:
             return None
         result_dict = data[0]

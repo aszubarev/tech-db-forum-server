@@ -3,26 +3,33 @@ CREATE OR REPLACE FUNCTION add_vote(
   p_thread_id INT,
   p_vote_value INT)
 
-RETURNS TABLE(vote_id INT,
-              user_id INT,
-              thread_id INT,
-              vote_value INT)
+RETURNS TABLE(votes INT)
 AS
 $BODY$
-  BEGIN
+BEGIN
+
+    INSERT INTO vote (user_id, thread_id, vote_value)
+    VALUES (p_user_id, p_thread_id, p_vote_value);
+
     RETURN QUERY
+    UPDATE threads AS th
+    SET votes = (SELECT SUM(vote.vote_value) FROM vote WHERE vote.thread_id = p_thread_id)
+    WHERE th.thread_id = p_thread_id
+    RETURNING th.votes;
 
-        INSERT INTO vote (user_id, thread_id, vote_value)
-        VALUES (p_user_id, p_thread_id, p_vote_value)
-        RETURNING vote.vote_id, vote.user_id, vote.thread_id, vote.vote_value;
+EXCEPTION
 
-  EXCEPTION
-       WHEN unique_violation THEN RETURN QUERY
-                                  UPDATE vote
-                                  SET vote_value = p_vote_value
-                                  WHERE vote.user_id = p_user_id and vote.thread_id = p_thread_id
-                                  RETURNING vote.vote_id, vote.user_id, vote.thread_id, vote.vote_value;
-  END;
+   WHEN unique_violation THEN UPDATE vote
+                              SET vote_value = p_vote_value
+                              WHERE vote.user_id = p_user_id and vote.thread_id = p_thread_id;
+
+    RETURN QUERY
+    UPDATE threads AS th
+    SET votes = (SELECT SUM(vote.vote_value) FROM vote WHERE vote.thread_id = p_thread_id)
+    WHERE th.thread_id = p_thread_id
+    RETURNING th.votes;
+
+END;
 
 $BODY$
 LANGUAGE plpgsql VOLATILE;
