@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.config['APPLICATION_ROOT'] = '/api'
 app.config['CACHE_TYPE'] = os.environ['CACHE_TYPE']
+app.config['CACHE_THRESHOLD'] = 10 ** 6
 cache.init_app(app)
 
 application = Application()

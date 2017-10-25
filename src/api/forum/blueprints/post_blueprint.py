@@ -1,6 +1,7 @@
 import logging
 from typing import List
 
+import sys
 from flask import Blueprint, abort, request, Response, json
 from injector import inject, singleton
 
@@ -85,6 +86,8 @@ class PostBlueprint(BaseBlueprint[PostService]):
             if not model:
                 return self._return_error(f"Can't find post by id = {uid}", 404)
 
+            logging.info(f"[PostBlueprint._details] size of post = {sys.getsizeof(model)} [bytes]")
+            logging.info(f"[PostBlueprint._details] size of post.message = {sys.getsizeof(model.message)} [bytes]")
             related = request.args.get('related')
 
             response = self._postSerializerFull.dump(model, related=related)
