@@ -7,11 +7,11 @@ from apiutils import BaseBlueprint
 from apiutils.errors.bad_request_error import BadRequestError
 
 from forum.serializers.thread_serializer import ThreadSerializer
+from forum.serializers.vote_serializer import VoteSerializer
 from sqlutils import NoDataFoundError, UniqueViolationError
 from forum.services.forum_service import ForumService
 from forum.services.thread_service import ThreadService
 from forum.services.user_service import UserService
-from forum.services.vote_service import VoteService
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,13 +20,13 @@ logging.basicConfig(level=logging.INFO)
 class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
     @inject
-    def __init__(self, service: ThreadService, serializer: ThreadSerializer,
-                 vote_service: VoteService, user_service: UserService, forum_service: ForumService) -> None:
+    def __init__(self, service: ThreadService, serializer: ThreadSerializer, vote_serializer: VoteSerializer,
+                 user_service: UserService, forum_service: ForumService) -> None:
         super().__init__(service)
         self.__serializer = serializer
-        self._voteService = vote_service
         self._userService = user_service
         self._forumService = forum_service
+        self._voteSerializer = vote_serializer
 
     @property
     def _name(self) -> str:
@@ -79,7 +79,6 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
         @blueprint.route('thread/<slug_or_id>/details', methods=['GET'])
         def _details(slug_or_id: str):
             try:
-
                 model = self.__service.get_by_slug_or_id(slug_or_id)
                 if not model:
                     return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
@@ -135,6 +134,44 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
             except BadRequestError as exp:
                 logging.error(exp, exc_info=True)
                 return self._return_error(f"Bad request", 400)
+
+        @blueprint.route('thread/<slug_or_id>/vote', methods=['POST'])
+        def _vote(slug_or_id: str):
+            try:
+
+                data = request.json
+                nickname = data.get('nickname')
+                voice = data.get('voice')
+                if not nickname or not voice:
+                    logging.error(f"[ThreadBlueprint._vote] Bad request; request = {data}")
+                    return self._return_error(f"[ThreadBlueprint._vote] Bad request", 400)
+
+                thread = self._service.get_by_slug_or_id(slug_or_id)
+                if not thread:
+                    return self._return_error(f"Can't find thread by slug_or_id = {slug_or_id}", 404)
+
+                user = self._userService.get_by_nickname(nickname)
+                if not user:
+                    return self._return_error(f"Can't find user by nickname = {nickname}", 404)
+
+                data.update({
+                    'thread_id': thread.uid,
+                    'user_id': user.uid,
+                })
+
+                entity = self._voteSerializer.load(data)
+                votes = self.__service.vote(entity)
+                if not votes:
+                    logging.error(f"[ThreadBlueprint._vote] Can't get votes for thread by slug_or_id = {slug_or_id}")
+                    return self._return_error(f"[ThreadBlueprint._vote] "
+                                              f"Can't get votes for thread by slug_or_id = {slug_or_id}", 500)
+
+                thread.votes = votes
+                return self._return_one(thread, status=200)
+
+            except NoDataFoundError as exp:
+                logging.error(exp, exc_info=True)
+                return self._return_error(f"Can't create thread by request = {request.json}", 404)
 
         return blueprint
 

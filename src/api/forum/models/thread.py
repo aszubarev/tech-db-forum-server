@@ -46,6 +46,10 @@ class Thread(Model):
     def votes(self) -> int:
         return self._votes
 
+    @votes.setter
+    def votes(self, value):
+        self._votes = value
+
     def fill(self, slug: str = None, forum: Forum = None, author: User = None,
              created: datetime = None, message: str = None, title: str = None, votes: int = None) -> "Thread":
         self._slug = slug

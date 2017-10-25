@@ -46,18 +46,18 @@ class VoteBlueprint(BaseBlueprint[VoteService]):
     def _create_blueprint(self) -> Blueprint:
         blueprint = Blueprint(self._name, __name__)
 
-        @blueprint.route('thread/<slug_or_id>/vote', methods=['POST'])
-        def _add(slug_or_id: str):
-            try:
-                return self._add(thread_slug_or_id=slug_or_id, status=200)
-
-            except NoDataFoundError as exp:
-                logging.error(exp, exc_info=True)
-                return self._return_error(f"Can't create thread by request = {request.json}", 404)
-
-            except BadRequestError as exp:
-                logging.error(exp, exc_info=True)
-                return self._return_error(f"Bad request", 400)
+        # @blueprint.route('thread/<slug_or_id>/vote', methods=['POST'])
+        # def _add(slug_or_id: str):
+        #     try:
+        #         return self._add(thread_slug_or_id=slug_or_id, status=200)
+        #
+        #     except NoDataFoundError as exp:
+        #         logging.error(exp, exc_info=True)
+        #         return self._return_error(f"Can't create thread by request = {request.json}", 404)
+        #
+        #     except BadRequestError as exp:
+        #         logging.error(exp, exc_info=True)
+        #         return self._return_error(f"Bad request", 400)
 
         return blueprint
 

@@ -2,6 +2,8 @@ import logging
 from typing import Optional, List
 
 from injector import inject
+
+from forum.persistence.dto.vote_dto import VoteDTO
 from sqlutils import DataContext, Repository, create_one, create_many
 
 from forum.persistence.dto.thread_dto import ThreadDTO
@@ -68,6 +70,13 @@ class ThreadRepository(Repository[ThreadDTO]):
 
     def get_all(self) -> List[ThreadDTO]:
         raise NotImplementedError
+
+    def vote(self, entity: VoteDTO) -> Optional[int]:
+        data = self._context.callproc('add_vote_new', [entity.user_id, entity.thread_id, entity.vote_value])
+        if data is None or len(data) == 0:
+            return None
+        result_dict = data[0]
+        return result_dict.get('votes')
 
     def add(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
         data = self._context.callproc('add_thread', [entity.slug, entity.forum_id, entity.user_id,

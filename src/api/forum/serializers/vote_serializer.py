@@ -49,38 +49,8 @@ class VoteSerializer(Serializer):
 
     def load(self, data: Dict[str, Any]) -> VoteDTO:
 
-        # get request parameters
-        thread_slug_or_id = data.get('thread_slug_or_id')
-        if not thread_slug_or_id:
-            raise BadRequestError("[VoteSerializer.load] Can't get param 'thread_slug_or_id'")
-
-        nickname = data.get('nickname')
-        if not nickname:
-            raise BadRequestError("[VoteSerializer.load] Can't get param 'nickname'")
-
-        voice = data.get('voice')
-        if not voice:
-            raise BadRequestError("[VoteSerializer.load] Can't get param 'voice'")
-
-        # find user by input nickname
-        user = self._user_service.get_by_nickname(nickname)
-        if not user:
-            raise NoDataFoundError(f"[VoteSerializer.load] Can't find user by nickname = {nickname}")
-
-        # find thread by input slug or id
-        try:
-            cast_thread_id = int(thread_slug_or_id)
-            thread = self._thread_service.get_by_id(cast_thread_id)
-
-        except ValueError:
-            thread_slug = thread_slug_or_id
-            thread = self._thread_service.get_by_slug(thread_slug)
-
-        if not thread:
-            raise NoDataFoundError(f"[VoteSerializer.load] Can't find thread by slug_or_id = {thread_slug_or_id}")
-
-        vote_id = None if data.get('id') is None or data.get('id') == 'null' else int(data['id'])
-        user_id = user.uid
-        thread_id = thread.uid
-        vote_value = voice
+        vote_id = None if data.get('id') is None else int(data['id'])
+        user_id = None if data.get('user_id') is None else int(data['user_id'])
+        thread_id = None if data.get('thread_id') is None else int(data['thread_id'])
+        vote_value = None if data.get('voice') is None else int(data['voice'])
         return VoteDTO(uid=vote_id, user_id=user_id, thread_id=thread_id, vote_value=vote_value)

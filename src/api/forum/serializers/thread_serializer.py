@@ -44,7 +44,7 @@ class ThreadSerializer(Serializer):
             logging.info(f"[ThreadSerializer.dump] get slug from model")
             forum_slug = model.forum.slug
 
-        votes = self._voteService.votes(model.uid)
+        # votes = self._voteService.votes(model.uid)
 
         if model.is_loaded:
             data.update({
@@ -52,7 +52,8 @@ class ThreadSerializer(Serializer):
                 'author': author_nickname,
                 'forum': forum_slug,
                 'message': model.message,
-                'title': model.title
+                'title': model.title,
+                'votes': model.votes
 
             })
 
@@ -67,10 +68,10 @@ class ThreadSerializer(Serializer):
                     'slug': model.slug
                 })
 
-            if votes is not None and votes != 0:
-                data.update({
-                    'votes': votes
-                })
+            # if votes is not None and votes != 0:
+            #     data.update({
+            #         'votes': votes
+            #     })
 
         return data
 
