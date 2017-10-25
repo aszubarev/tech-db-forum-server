@@ -16,6 +16,7 @@ class Thread(Model):
         self._created: datetime = None
         self._message: str = None
         self._title: str = None
+        self._votes: int = None
 
     @property
     def slug(self) -> str:
@@ -41,12 +42,18 @@ class Thread(Model):
     def title(self) -> str:
         return self._title
 
-    def fill(self, slug: str, forum: Forum, author: User, created: datetime, message: str, title: str) -> "Thread":
+    @property
+    def votes(self) -> int:
+        return self._votes
+
+    def fill(self, slug: str = None, forum: Forum = None, author: User = None,
+             created: datetime = None, message: str = None, title: str = None, votes: int = None) -> "Thread":
         self._slug = slug
         self._forum = forum
         self._author = author
         self._created = created
         self._message = message
         self._title = title
+        self._votes = votes
         self._filled()
         return self

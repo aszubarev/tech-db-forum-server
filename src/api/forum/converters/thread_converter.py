@@ -14,5 +14,6 @@ class ThreadConverter(Converter[Thread, ThreadDTO]):
             author=User(entity.user_id).fill(nickname=entity.user_nickname),
             created=entity.created,
             message=entity.message,
-            title=entity.title
+            title=entity.title,
+            votes=entity.votes
         )

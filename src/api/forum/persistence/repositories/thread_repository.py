@@ -75,6 +75,7 @@ class ThreadRepository(Repository[ThreadDTO]):
         new_entity = create_one(ThreadDTO, data)
         new_entity.user_nickname = entity.user_nickname
         new_entity.forum_slug = entity.forum_slug
+        new_entity.votes = 0
 
         return new_entity
 

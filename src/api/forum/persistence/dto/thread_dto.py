@@ -17,7 +17,8 @@ class ThreadDTO(Entity):
                  user_nickname: str = None,
                  created: datetime = None,
                  message: str = None,
-                 title: str = None) -> None:
+                 title: str = None,
+                 votes: int = None) -> None:
         super().__init__(uid)
 
         self._slug = slug
@@ -28,6 +29,7 @@ class ThreadDTO(Entity):
         self._created = created
         self._message = message
         self._title = title
+        self._votes = votes
 
     @property
     def slug(self) -> str:
@@ -61,6 +63,10 @@ class ThreadDTO(Entity):
     def title(self) -> str:
         return self._title
 
+    @property
+    def votes(self) -> int:
+        return self._votes
+
     @user_nickname.setter
     def user_nickname(self, value):
         self._user_nickname = value
@@ -68,3 +74,7 @@ class ThreadDTO(Entity):
     @forum_slug.setter
     def forum_slug(self, value):
         self._forum_slug = value
+
+    @votes.setter
+    def votes(self, value):
+        self._votes = value
