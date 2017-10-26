@@ -1,11 +1,8 @@
-import logging
 from typing import Dict, Any, Optional
 
 from injector import inject, singleton
 
 from apiutils import Serializer
-from apiutils.errors.bad_request_error import BadRequestError
-from sqlutils import NoDataFoundError
 
 from forum.models.vote import Vote
 from forum.persistence.dto.vote_dto import VoteDTO

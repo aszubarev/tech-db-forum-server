@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
@@ -91,7 +90,6 @@ class PostSerializer(Serializer):
 
         thread = self._thread_service.get_by_slug_or_id(thread_slug_or_id)
         if not thread:
-            logging.error(f"[PostSerializer.prepare_load_data] thread is None")
             raise NoDataFoundError(f"[PostSerializer.prepare_load_data] thread is None \n"
                                    f" Can't find thread by thread_slug_or_id = {thread_slug_or_id}")
 
@@ -142,7 +140,7 @@ class PostSerializer(Serializer):
     def load(self, data: Dict[str, Any]) -> PostDTO:
 
         post_id = None if data.get('id') is None or data.get('id') == 'null' else data['id']
-        
+
         user = self._get_user_id(data)
         user_id = None if user is None else user.uid
         user_nickname = None if user is None else user.nickname
@@ -162,8 +160,8 @@ class PostSerializer(Serializer):
         message = None if data.get('message') is None else data['message']
         is_edited = None if data.get('is_edited') is None else data['is_edited']
 
-        return PostDTO(uid=post_id, thread_id=thread_id, 
-                       forum_id=forum_id, forum_slug=forum_slug, 
-                       user_id=user_id, user_nickname=user_nickname, 
+        return PostDTO(uid=post_id, thread_id=thread_id,
+                       forum_id=forum_id, forum_slug=forum_slug,
+                       user_id=user_id, user_nickname=user_nickname,
                        parent_id=parent_id, parent_path=parent_path,
                        message=message, created=created, is_edited=is_edited)

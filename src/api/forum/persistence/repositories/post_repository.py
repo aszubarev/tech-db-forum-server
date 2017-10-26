@@ -1,4 +1,3 @@
-import logging
 from typing import Optional, List, Dict, Any, TypeVar, Type
 
 from injector import inject

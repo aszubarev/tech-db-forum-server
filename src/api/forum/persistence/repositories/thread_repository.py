@@ -1,4 +1,3 @@
-import logging
 from typing import Optional, List
 
 from injector import inject
@@ -106,9 +105,6 @@ class ThreadRepository(Repository[ThreadDTO]):
             data = self._context.callproc('update_thread_by_slug_by_title', [entity.slug, title])
 
         new_entity = create_one(ThreadDTO, data)
-        if flag:
-            logging.info(f"[ThreadRepository.update_by_slug] new_entity: nickname = {new_entity.user_nickname};"
-                         f" slug = {new_entity.forum_slug}")
         return new_entity
 
     def update_by_uid(self, entity: ThreadDTO) -> Optional[ThreadDTO]:

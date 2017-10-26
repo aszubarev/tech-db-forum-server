@@ -1,4 +1,3 @@
-import logging
 from typing import Optional, List
 
 from injector import inject
@@ -28,8 +27,6 @@ class VoteRepository(Repository[VoteDTO]):
         self._context.callproc('clear_vote', [])
 
     def add(self, entity: VoteDTO) -> Optional[VoteDTO]:
-        logging.info(f"[VoteRepository.add] user_id = {entity.user_id}, thread_id = {entity.thread_id}, "
-                     f"voice = {entity.vote_value}")
         data = self._context.callproc('add_vote', [entity.user_id, entity.thread_id, entity.vote_value])
         return create_one(VoteDTO, data)
 

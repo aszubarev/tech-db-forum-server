@@ -1,4 +1,3 @@
-import logging
 
 from flask import Blueprint, abort, request, Response, json
 from injector import inject, singleton
@@ -9,7 +8,6 @@ from forum.serializers.user_serializer import UserSerializer
 from forum.services.forum_service import ForumService
 from forum.services.user_service import UserService
 from sqlutils import NoDataFoundError, UniqueViolationError
-logging.basicConfig(level=logging.INFO)
 
 
 @singleton
@@ -39,7 +37,6 @@ class UserBlueprint(BaseBlueprint[UserService]):
 
         @blueprint.route('user/<uid>', methods=['GET'])
         def _get_by_id(uid: str):
-            logging.info(uid)
             return self._get_by_id(int(uid))
 
         @blueprint.route('user/<nickname>/create', methods=['POST'])
@@ -57,13 +54,11 @@ class UserBlueprint(BaseBlueprint[UserService]):
                 user = self.__service.get_by_nickname(nickname=nickname)
 
                 if not user:
-                    logging.exception(f"Can't find user with nickname {nickname};")
                     return self._return_error(f"Can't find user with nickname {nickname}", 404)
 
                 return self._return_one(user)
 
             except NoDataFoundError:
-                logging.exception(f"Can't find user with nickname {nickname}")
                 return self._return_error(f"Can't find user with nickname {nickname}", 404)
 
         @blueprint.route('user/<nickname>/profile', methods=['POST'])
@@ -73,11 +68,9 @@ class UserBlueprint(BaseBlueprint[UserService]):
                 return self._update(nickname=nickname)
 
             except NoDataFoundError as exp:
-                logging.error(exp, exc_info=True)
                 return self._return_error(f"Can't update user with nickname {nickname}", 404)
 
             except UniqueViolationError as exp:
-                logging.error(exp, exc_info=True)
                 return self._return_error(f"Can't update user with nickname {nickname};  Bad request", 409)
 
         @blueprint.route('forum/<forum_slug>/users', methods=['GET'])
@@ -92,7 +85,6 @@ class UserBlueprint(BaseBlueprint[UserService]):
                 return self._return_many(models, status=200)
 
             except NoDataFoundError as exp:
-                logging.error(exp, exc_info=True)
                 return self._return_error(f"Can't find users for forum: forum_slug =  {forum_slug}", 404)
 
         return blueprint

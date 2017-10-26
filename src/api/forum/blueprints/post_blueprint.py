@@ -1,4 +1,3 @@
-import logging
 from typing import List
 
 import sys
@@ -16,8 +15,6 @@ from sqlutils import NoDataFoundError
 from forum.serializers.post_serializer_detail import PostSerializerFull
 from forum.services.post_service import PostService
 from forum.services.thread_service import ThreadService
-
-logging.basicConfig(level=logging.INFO)
 
 
 @singleton
@@ -53,11 +50,9 @@ class PostBlueprint(BaseBlueprint[PostService]):
                 return self._add_many(thread_slug_or_id=slug_or_id)
 
             except NoDataFoundError as exp:
-                logging.error(f"[PostBlueprint._add_many.NoDataFoundError]\n" + str(exp) + "\n\n", exc_info=True)
                 return self._return_error(f"Can't find thread by slag = {slug_or_id}", 404)
 
             except PostInvalidParentError as exp:
-                logging.error(f"[PostBlueprint._add_many.PostInvalidParentError]\n" + str(exp) + "\n\n", exc_info=True)
                 return self._return_error(f"Can't get parent for post", 409)
 
         @blueprint.route('thread/<slug_or_id>/posts', methods=['GET'])
@@ -72,11 +67,9 @@ class PostBlueprint(BaseBlueprint[PostService]):
                 return self._return_many(models, status=200)
 
             except NoDataFoundError as exp:
-                logging.error(exp, exc_info=True)
                 return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
 
             except BadRequestError as exp:
-                logging.error(exp, exc_info=True)
                 return self._return_error(f"Bad request", 400)
 
         @blueprint.route('post/<uid>/details', methods=['GET'])
@@ -86,8 +79,6 @@ class PostBlueprint(BaseBlueprint[PostService]):
             if not model:
                 return self._return_error(f"Can't find post by id = {uid}", 404)
 
-            logging.info(f"[PostBlueprint._details] size of post = {sys.getsizeof(model)} [bytes]")
-            logging.info(f"[PostBlueprint._details] size of post.message = {sys.getsizeof(model.message)} [bytes]")
             related = request.args.get('related')
 
             response = self._postSerializerFull.dump(model, related=related)
@@ -131,6 +122,5 @@ class PostBlueprint(BaseBlueprint[PostService]):
         except NoDataFoundError as exp:
             raise NoDataFoundError(f"Can't parse {self._name} entity") from exp
         except BaseException:
-            logging.exception(f"Can't parse {self._name} entity")
             abort(400)
         return entities

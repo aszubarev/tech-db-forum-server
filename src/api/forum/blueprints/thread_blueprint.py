@@ -1,5 +1,3 @@
-import logging
-
 from flask import Blueprint, abort, request, Response, json
 from injector import inject, singleton
 
@@ -12,8 +10,6 @@ from sqlutils import NoDataFoundError, UniqueViolationError
 from forum.services.forum_service import ForumService
 from forum.services.thread_service import ThreadService
 from forum.services.user_service import UserService
-
-logging.basicConfig(level=logging.INFO)
 
 
 @singleton
@@ -85,7 +81,6 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 return self._return_one(model, status=200)
 
             except BadRequestError as exp:
-                logging.error(exp, exc_info=True)
                 return self._return_error(f"Bad request", 400)
 
         @blueprint.route('thread/<slug_or_id>/details', methods=['POST'])
@@ -128,11 +123,9 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 return self._return_one(thread, status=200)
 
             except NoDataFoundError as exp:
-                logging.error(exp, exc_info=True)
                 return self._return_error(f"Can't update thread by forum slug_or_id = {slug_or_id}", 404)
 
             except BadRequestError as exp:
-                logging.error(exp, exc_info=True)
                 return self._return_error(f"Bad request", 400)
 
         @blueprint.route('thread/<slug_or_id>/vote', methods=['POST'])
@@ -143,7 +136,6 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 nickname = data.get('nickname')
                 voice = data.get('voice')
                 if not nickname or not voice:
-                    logging.error(f"[ThreadBlueprint._vote] Bad request; request = {data}")
                     return self._return_error(f"[ThreadBlueprint._vote] Bad request", 400)
 
                 thread = self._service.get_by_slug_or_id(slug_or_id)
@@ -162,7 +154,6 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 entity = self._voteSerializer.load(data)
                 votes = self.__service.vote(entity)
                 if not votes:
-                    logging.error(f"[ThreadBlueprint._vote] Can't get votes for thread by slug_or_id = {slug_or_id}")
                     return self._return_error(f"[ThreadBlueprint._vote] "
                                               f"Can't get votes for thread by slug_or_id = {slug_or_id}", 500)
 
@@ -170,7 +161,6 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 return self._return_one(thread, status=200)
 
             except NoDataFoundError as exp:
-                logging.error(exp, exc_info=True)
                 return self._return_error(f"Can't create thread by request = {request.json}", 404)
 
         return blueprint

@@ -1,4 +1,3 @@
-import logging
 
 from flask import Blueprint, abort, request, Response, json
 from injector import inject, singleton
@@ -10,8 +9,6 @@ from forum.serializers.thread_serializer import ThreadSerializer
 from forum.services.forum_service import ForumService
 from sqlutils import NoDataFoundError, UniqueViolationError
 from forum.services.thread_service import ThreadService
-
-logging.basicConfig(level=logging.INFO)
 
 
 @singleton
@@ -43,7 +40,6 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
 
         @blueprint.route('forum/<uid>', methods=['GET'])
         def _get_by_id(uid: str):
-            logging.exception(uid)
             return self._get_by_id(int(uid))
 
         @blueprint.route('forum/create', methods=['POST'])
