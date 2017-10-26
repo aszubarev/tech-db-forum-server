@@ -1,7 +1,9 @@
 import logging
-from typing import Optional, List
+from typing import Optional, List, Dict, Any, TypeVar, Type
 
 from injector import inject
+
+from forum.models.thread import Thread
 from sqlutils import DataContext, Repository, create_one, create_many, NoDataFoundError
 
 from forum.persistence.dto.post_dto import PostDTO
@@ -17,11 +19,12 @@ class PostRepository(Repository[PostDTO]):
         data = self._context.callproc('get_post_by_id', [uid])
         return create_one(PostDTO, data)
 
-    def get_posts_for_thread(self, thread_id: int, **kwargs) -> List[PostDTO]:
+    def get_posts_for_thread(self, thread: Thread, **kwargs) -> List[PostDTO]:
         sort = kwargs.get('sort')
         limit = kwargs.get('limit')
         since = kwargs.get('since')
         desc = kwargs.get('desc')
+        thread_id = thread.uid
 
         data = None
 
@@ -101,7 +104,7 @@ class PostRepository(Repository[PostDTO]):
             elif since is None and limit is None and desc is None:
                 data = self._context.callproc('get_posts_for_thread_all', [thread_id])
 
-        return create_many(PostDTO, data)
+        return self._create_many(data, thread)
 
     def get_number_posts_for_forum(self, forum_id: int) -> int:
         data = self._context.callproc('get_number_posts_for_forum', [forum_id])
@@ -159,3 +162,13 @@ class PostRepository(Repository[PostDTO]):
             return None
         result_dict = data[0]
         return result_dict.get('nextval')
+
+    @staticmethod
+    def _create_many(data: List[Dict[str, Any]], thread: Thread) -> List[PostDTO]:
+        entities = []
+        for row in data:
+            entity = PostDTO.create(row)
+            entity.forum_slug = thread.forum.slug
+            entities.append(entity)
+        return entities
+

@@ -4,6 +4,8 @@ from typing import Optional, List
 import dateutil.parser
 from flask import request
 from injector import inject, singleton
+
+from forum.models.thread import Thread
 from sqlutils import Service, NoDataFoundError
 
 from forum.cache import cache
@@ -41,14 +43,14 @@ class PostService(Service[Post, PostDTO, PostRepository]):
         return self.__repo.get_count()
 
     # TODO refactor this shit
-    def get_posts_for_thread(self, thread_id: int) -> List[Post]:
+    def get_posts_for_thread(self, thread: Thread) -> List[Post]:
 
         desc = request.args.get('desc')
         limit = request.args.get('limit')
         since = request.args.get('since')
         sort = request.args.get('sort')
 
-        entities = self.__repo.get_posts_for_thread(thread_id=thread_id, desc=desc, limit=limit, since=since, sort=sort)
+        entities = self.__repo.get_posts_for_thread(thread=thread, desc=desc, limit=limit, since=since, sort=sort)
         return self._convert_many(entities)
 
     def _convert(self, entity: PostDTO) -> Optional[Post]:
