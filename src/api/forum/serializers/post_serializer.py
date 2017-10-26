@@ -50,15 +50,22 @@ class PostSerializer(Serializer):
             return None
 
         data = {}
-        author = self._userService.get_by_id(model.author.uid)
-        forum = self._forum_service.get_by_id(model.forum.uid)
+        if model.author.nickname is None:
+            nickname = self._userService.get_by_id(model.author.uid).nickname
+        else:
+            nickname = model.author.nickname
+
+        if model.forum.slug is None:
+            forum_slug =  self._forum_service.get_by_id(model.forum.uid).slug
+        else:
+            forum_slug = model.forum.slug
 
         if model.is_loaded:
 
             data.update({
                 'id': model.uid,
-                'author': author.nickname,
-                'forum': forum.slug,
+                'author': nickname,
+                'forum': forum_slug,
                 'thread': model.thread.uid,
                 'message': model.message,
                 'isEdited': model.is_edited
