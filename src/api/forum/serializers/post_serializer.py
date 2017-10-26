@@ -12,6 +12,7 @@ from apiutils.errors.server_error import ServerError
 from forum.exceptions.post_invalid_parent import PostInvalidParentError
 
 from forum.models.post import Post
+from forum.models.user import User
 from forum.persistence.dto.post_dto import PostDTO
 from forum.serializers.forum_serializer import ForumSerializer
 from forum.serializers.thread_serializer import ThreadSerializer
@@ -56,7 +57,7 @@ class PostSerializer(Serializer):
             nickname = model.author.nickname
 
         if model.forum.slug is None:
-            forum_slug =  self._forum_service.get_by_id(model.forum.uid).slug
+            forum_slug = self._forum_service.get_by_id(model.forum.uid).slug
         else:
             forum_slug = model.forum.slug
 
@@ -88,18 +89,11 @@ class PostSerializer(Serializer):
 
         thread_slug_or_id = kwargs.get('thread_slug_or_id')
 
-        if thread_slug_or_id is None:
-            raise ServerError(f"Can't get parameter 'thread_slug_or_id'")
-
         thread = self._thread_service.get_by_slug_or_id(thread_slug_or_id)
         if not thread:
             logging.error(f"[PostSerializer.prepare_load_data] thread is None")
             raise NoDataFoundError(f"[PostSerializer.prepare_load_data] thread is None \n"
                                    f" Can't find thread by thread_slug_or_id = {thread_slug_or_id}")
-
-        else:
-            logging.error(f"[PostSerializer.prepare_load_data] thread is not None; "
-                          f"thread_slug_or_id = {thread_slug_or_id}\n")
 
         created = kwargs.get('created')
         if not created:
@@ -108,12 +102,13 @@ class PostSerializer(Serializer):
         prepare_data = {
             'thread_id': thread.uid,
             'forum_id': thread.forum.uid,
+            'forum_slug': thread.forum.slug,
             'created': created
         }
 
         return prepare_data
 
-    def _get_user_id(self, data: Dict[str, Any]) -> Optional[int]:
+    def _get_user_id(self, data: Dict[str, Any]) -> Optional[User]:
 
         nickname = data.get('author')
         if nickname is None:
@@ -123,7 +118,7 @@ class PostSerializer(Serializer):
         if not author:
             raise NoDataFoundError(f"Can't find author by nickname = {nickname}")
 
-        return author.uid
+        return author
 
     def _get_parent(self, data: Dict[str, Any]) -> Post:
 
@@ -144,14 +139,17 @@ class PostSerializer(Serializer):
         else:
             return Post(uid=0)
 
-    # TODO move declaration of user_id and parent_id to upper level
     def load(self, data: Dict[str, Any]) -> PostDTO:
 
         post_id = None if data.get('id') is None or data.get('id') == 'null' else data['id']
-        user_id = self._get_user_id(data)
+        
+        user = self._get_user_id(data)
+        user_id = None if user is None else user.uid
+        user_nickname = None if user is None else user.nickname
 
         parent = self._get_parent(data)
         parent_id = parent.uid
+        parent_path = parent.path
 
         thread_id = None if data.get('thread_id') is None else data['thread_id']
         if parent.thread is not None and thread_id is not None:
@@ -159,9 +157,13 @@ class PostSerializer(Serializer):
                 raise PostInvalidParentError(f"Parent post was created in another thread: uid = {parent.thread.uid}")
 
         forum_id = None if data.get('forum_id') is None else data['forum_id']
+        forum_slug = None if data.get('forum_slug') is None else data['forum_slug']
         created = None if data.get('created') is None else dateutil.parser.parse(data['created'])
         message = None if data.get('message') is None else data['message']
         is_edited = None if data.get('is_edited') is None else data['is_edited']
 
-        return PostDTO(uid=post_id, thread_id=thread_id, forum_id=forum_id, user_id=user_id,
-                       parent_id=parent_id, message=message, created=created, is_edited=is_edited)
+        return PostDTO(uid=post_id, thread_id=thread_id, 
+                       forum_id=forum_id, forum_slug=forum_slug, 
+                       user_id=user_id, user_nickname=user_nickname, 
+                       parent_id=parent_id, parent_path=parent_path,
+                       message=message, created=created, is_edited=is_edited)

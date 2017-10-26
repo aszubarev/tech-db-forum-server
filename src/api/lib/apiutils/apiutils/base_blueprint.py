@@ -12,6 +12,7 @@ from .serializer import Serializer
 T = TypeVar("T", bound="Model")
 S = TypeVar("S", bound="Service")
 
+
 class Error(object):
 
     def __init__(self, msg: str) -> None:
@@ -191,12 +192,6 @@ class BaseBlueprint(Generic[S]):
             entity = self._serializer.load(load_data)
             entities.append(entity)
 
-        # except NoDataFoundError as exp:
-        #     raise NoDataFoundError(f"Can't parse {self._name} entity") from exp
-
-        # except BaseException:
-        #     logging.exception(f"Can't parse {self._name} entity")
-        #     abort(400)
         return entities
 
     def _add_entity(self, entity: Any) -> Any:

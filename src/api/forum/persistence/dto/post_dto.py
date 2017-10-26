@@ -17,6 +17,7 @@ class PostDTO(Entity):
                  user_id: int = None,
                  user_nickname: str = None,
                  parent_id: int = None,
+                 parent_path: List[int] = None,
                  message: str = None,
                  created: datetime = None,
                  is_edited: bool = None,
@@ -29,6 +30,7 @@ class PostDTO(Entity):
         self._user_id = user_id
         self._user_nickname = user_nickname
         self._parent_id = parent_id
+        self._parent_path = parent_path
         self._message = message
         self._created = created
         self._is_edited = is_edited
@@ -59,6 +61,10 @@ class PostDTO(Entity):
         return self._parent_id
 
     @property
+    def parent_path(self) -> List[int]:
+        return self._parent_path
+
+    @property
     def message(self) -> str:
         return self._message
 
@@ -77,3 +83,11 @@ class PostDTO(Entity):
     @path.setter
     def path(self, value):
         self._path = value
+
+    @user_nickname.setter
+    def user_nickname(self, value):
+        self._user_nickname = value
+
+    @forum_slug.setter
+    def forum_slug(self, value):
+        self._forum_slug = value

@@ -125,25 +125,21 @@ class PostRepository(Repository[PostDTO]):
 
     # TODO refactor this shit
     def add(self, entity: PostDTO) -> Optional[PostDTO]:
-        data = self._context.callproc('add_post', [entity.thread_id, entity.forum_id, entity.user_id,
-                                                   entity.parent_id, entity.message, entity.created])
-        entity = create_one(PostDTO, data)
-        if entity.parent_id == 0:
-            path = [entity.uid]
-            self._update_path(uid=entity.uid, path=path)
-            entity.path = path
 
+        uid = self._next_val()
+        if entity.parent_id != 0:
+            path = entity.parent_path
+            path.append(uid)
         else:
-            parent = self.get_by_id(entity.parent_id)
-            if not parent:
-                raise NoDataFoundError(f"Can't find parent by parent_id = {entity.parent_id}")
+            path = [uid]
 
-            path = parent.path
-            path.append(entity.uid)
-            self._update_path(uid=entity.uid, path=path)
-            entity.path = path
+        data = self._context.callproc('add_post_new', [uid, entity.thread_id, entity.forum_id, entity.user_id,
+                                                       entity.parent_id, entity.message, entity.created, path])
+        new_entity = create_one(PostDTO, data)
+        new_entity.user_nickname = entity.user_nickname
+        new_entity.forum_slug = entity.forum_slug
 
-        return entity
+        return new_entity
 
     def update(self, entity: PostDTO) -> Optional[PostDTO]:
         data = None
@@ -156,3 +152,10 @@ class PostRepository(Repository[PostDTO]):
 
     def _update_path(self, uid: int, path: List[int]):
         self._context.callproc('update_post_path_by_id', [uid, path])
+
+    def _next_val(self) -> Optional[int]:
+        data = self._context.execute("SELECT nextval('posts_post_id_seq');", {})
+        if data is None or len(data) == 0:
+            return None
+        result_dict = data[0]
+        return result_dict.get('nextval')
