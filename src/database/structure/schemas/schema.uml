@@ -8,6 +8,7 @@ posts: parent_id [INT]
 posts: message [TEXT]
 posts: created [DATETIME]
 posts: is_edited [BOOLEAN]
+posts: path [ARRAY[int]]
 posts ---> forums
 posts ---> users : author
 posts ---> threads

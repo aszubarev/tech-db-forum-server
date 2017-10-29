@@ -6,7 +6,8 @@ RETURNS TABLE(post_id INT,
               parent_id INT,
               message TEXT,
               created TIMESTAMP WITH TIME ZONE,
-              is_edited BOOLEAN)
+              is_edited BOOLEAN,
+              user_nickname CITEXT)
 AS
 $BODY$
   DECLARE v_row_number int;
@@ -23,8 +24,9 @@ $BODY$
       RETURN;
     END IF;
     RETURN QUERY SELECT pst.post_id, pst.thread_id, pst.forum_id, pst.user_id,
-                        pst.parent_id, pst.message, pst.created, pst.is_edited
+                        pst.parent_id, pst.message, pst.created, pst.is_edited, u.nickname
     FROM posts pst
+    JOIN users u on pst.user_id = u.user_id
     WHERE pst.thread_id = p_thread_id
     ORDER BY pst.path
     LIMIT p_limit OFFSET v_row_number;

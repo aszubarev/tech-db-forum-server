@@ -11,8 +11,8 @@ class PostConverter(Converter[Post, PostDTO]):
     def convert(self, entity: PostDTO) -> Post:
         return Post(uid=entity.uid).fill(
             thread=Thread(entity.thread_id),
-            forum=Forum(entity.forum_id),
-            author=User(entity.user_id),
+            forum=Forum(entity.forum_id).fill(slug=entity.forum_slug),
+            author=User(entity.user_id).fill(nickname=entity.user_nickname),
             parent=Post(entity.parent_id),
             message=entity.message,
             created=entity.created,

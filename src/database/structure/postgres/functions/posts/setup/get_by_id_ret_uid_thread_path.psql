@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION get_post_by_id_ret_uid_thread_path(p_post_id INT)
+RETURNS TABLE(post_id INT,
+              thread_id INT,
+              path INTEGER[])
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT pst.post_id, pst.thread_id, pst.path
+    FROM posts pst
+    WHERE pst.post_id = p_post_id;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

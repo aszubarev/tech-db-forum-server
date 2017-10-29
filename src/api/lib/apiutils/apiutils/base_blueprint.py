@@ -235,8 +235,18 @@ class BaseBlueprint(Generic[S]):
             raise ForeignKeyViolationError(f"Can't update {self._name} entity") from exp
 
     def _add_many_entity(self, entities: List[Any]) -> List[Any]:
-        models = []
-        for entity in entities:
-            models.append(self._add_entity(entity))
-        return models
+
+        try:
+            models = self._service.add_many(entities)
+            return models
+
+        except NoDataFoundError as exp:
+            raise NoDataFoundError("Can't add {0} entity".format(self._name)) from exp
+
+        except UniqueViolationError as exp:
+            raise UniqueViolationError(f"Can't add {self._name} entity") from exp
+
+        except ForeignKeyViolationError as exp:
+            raise ForeignKeyViolationError(f"Can't add {self._name} entity") from exp
+
 

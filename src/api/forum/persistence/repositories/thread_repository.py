@@ -1,4 +1,3 @@
-import logging
 from typing import Optional, List
 
 from injector import inject
@@ -21,6 +20,26 @@ class ThreadRepository(Repository[ThreadDTO]):
 
     def get_by_slug(self, slug: str) -> Optional[ThreadDTO]:
         data = self._context.callproc('get_thread_by_slug', [slug])
+        return create_one(ThreadDTO, data)
+
+    def get_by_id_setup(self, uid: int, load_forum: bool) -> Optional[ThreadDTO]:
+
+        if load_forum is True:
+            data = self._context.callproc('get_thread_by_id_ret_uid_forum', [uid])
+
+        else:
+            data = self._context.callproc('get_thread_by_id_ret_uid', [uid])
+
+        return create_one(ThreadDTO, data)
+
+    def get_by_slug_setup(self, slug: str, load_forum: bool) -> Optional[ThreadDTO]:
+
+        if load_forum is True:
+            data = self._context.callproc('get_thread_by_slug_ret_uid_forum', [slug])
+
+        else:
+            data = self._context.callproc('get_thread_by_slug_ret_uid', [slug])
+
         return create_one(ThreadDTO, data)
 
     def get_for_forum(self, forum_id: int, **kwargs) -> List[ThreadDTO]:
@@ -72,7 +91,7 @@ class ThreadRepository(Repository[ThreadDTO]):
         raise NotImplementedError
 
     def vote(self, entity: VoteDTO) -> Optional[int]:
-        data = self._context.callproc('add_vote_new', [entity.user_id, entity.thread_id, entity.vote_value])
+        data = self._context.callproc('add_vote', [entity.user_id, entity.thread_id, entity.vote_value])
         if data is None or len(data) == 0:
             return None
         result_dict = data[0]
@@ -88,11 +107,12 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         return new_entity
 
+    def add_many(self, entities: List[ThreadDTO]):
+        raise NotImplementedError
+
     def update_by_slug(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
         msg = entity.message
         title = entity.title
-
-        flag = False
 
         data = None
         if msg is not None and title is not None:
@@ -100,15 +120,11 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         elif msg is not None and title is None:
             data = self._context.callproc('update_thread_by_slug_by_msg', [entity.slug, msg])
-            flag = True
 
         elif msg is None and title is not None:
             data = self._context.callproc('update_thread_by_slug_by_title', [entity.slug, title])
 
         new_entity = create_one(ThreadDTO, data)
-        if flag:
-            logging.info(f"[ThreadRepository.update_by_slug] new_entity: nickname = {new_entity.user_nickname};"
-                         f" slug = {new_entity.forum_slug}")
         return new_entity
 
     def update_by_uid(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
@@ -124,9 +140,6 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         elif msg is None and title is not None:
             data = self._context.callproc('update_thread_by_uid_by_title', [entity.uid, title])
-
-        # elif msg is None and title is None:
-        #     return self.get_by_id(entity.uid)
 
         return create_one(ThreadDTO, data)
 

@@ -1,4 +1,3 @@
-import logging
 from typing import Optional, List
 
 from injector import inject
@@ -20,6 +19,9 @@ class SrvRepository(Repository[SrvDTO]):
         raise NotImplementedError
 
     def add(self, entity: SrvDTO) -> Optional[SrvDTO]:
+        raise NotImplementedError
+
+    def add_many(self, entities: List[SrvDTO]):
         raise NotImplementedError
 
     def update(self, entity: SrvDTO) -> Optional[SrvDTO]:

@@ -1,4 +1,3 @@
-import logging
 
 from flask import Blueprint, abort, request, Response, json
 from injector import inject, singleton
@@ -6,8 +5,6 @@ from injector import inject, singleton
 from apiutils import BaseBlueprint
 from forum.serializers.service_serializer import SrvSerializer
 from forum.services.srv_service import SrvService
-
-logging.basicConfig(level=logging.INFO)
 
 
 @singleton
