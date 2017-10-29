@@ -25,6 +25,9 @@ class ForumRepository(Repository[ForumDTO]):
 
     def increment_posts(self, uid: int) -> None:
         self._context.callproc('forum_increment_posts', [uid])
+        
+    def increment_posts_by_number(self, uid: int, number: int) -> None:
+        self._context.callproc('forum_increment_posts_by_number', [uid, number])
 
     def get_count(self) -> int:
         data = self._context.callproc('get_forums_count', [])

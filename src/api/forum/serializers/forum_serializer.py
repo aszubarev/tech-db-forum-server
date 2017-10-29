@@ -31,19 +31,10 @@ class ForumSerializer(Serializer):
             data.update({
                 'slug': model.slug,
                 'title': model.title,
-                'user': model.user.nickname
+                'user': model.user.nickname,
+                'threads': model.threads,
+                'posts': model.posts
             })
-
-        expand_details = kwargs.get("expand_details")
-        if expand_details is not None:
-            if expand_details is True:
-
-                numb_posts = self._postService.get_number_posts_for_forum(model.uid)
-
-                data.update({
-                    'threads': model.threads,
-                    'posts': numb_posts
-                })
 
         return data
 

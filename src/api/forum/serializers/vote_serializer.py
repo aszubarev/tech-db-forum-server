@@ -18,7 +18,7 @@ class VoteSerializer(Serializer):
     @inject
     def __init__(self, vote_service: VoteService, thread_service: ThreadService,
                  user_service: UserService, thread_serializer: ThreadSerializer) -> None:
-        self._vote_service =vote_service
+        self._vote_service = vote_service
         self._thread_service = thread_service
         self._user_service = user_service
         self._thread_serializer = thread_serializer

@@ -1,32 +1,39 @@
 from typing import Optional, List
 
-import dateutil.parser
 from flask import request
 from injector import inject, singleton
 
 from forum.models.thread import Thread
-from sqlutils import Service, NoDataFoundError
+from forum.services.forum_service import ForumService
+from sqlutils import Service
 
 from forum.cache import cache
 from forum.converters.post_converter import PostConverter
 from forum.models.post import Post
 from forum.persistence.dto.post_dto import PostDTO
 from forum.persistence.repositories.post_repository import PostRepository
-from forum.services.thread_service import ThreadService
 
 
 @singleton
 class PostService(Service[Post, PostDTO, PostRepository]):
 
     @inject
-    def __init__(self, repo: PostRepository, thread_service: ThreadService) -> None:
+    def __init__(self, repo: PostRepository, forum_service: ForumService) -> None:
         super().__init__(repo)
         self._converter = PostConverter()
-        self._thread_service = thread_service
+        self._forum_service = forum_service
 
     @property
     def __repo(self) -> PostRepository:
         return self._repo
+
+    def add_many(self, entities: List[PostDTO]):
+        if not entities:
+            return []
+        data = self._repo.add_many(entities)
+        self._forum_service.increment_posts_by_number(entities[0].forum_id, len(entities))
+        self._clear_cache()
+        return self._convert_many(data)
 
     @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Post]:

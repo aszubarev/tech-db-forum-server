@@ -31,6 +31,10 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
         self.__repo.increment_posts(uid)
         self._clear_cache()
 
+    def increment_posts_by_number(self, uid: int, number: int):
+        self.__repo.increment_posts_by_number(uid=uid, number=number)
+        self._clear_cache()
+
     @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Forum]:
         return super().get_by_id(uid)

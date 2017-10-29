@@ -1,0 +1,14 @@
+CREATE OR REPLACE FUNCTION forum_increment_posts_by_number(
+  p_forum_id INT,
+  p_number INT)
+
+RETURNS void
+AS
+$BODY$
+BEGIN
+        UPDATE forums
+        SET posts = posts + p_number
+        WHERE forums.forum_id = p_forum_id;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

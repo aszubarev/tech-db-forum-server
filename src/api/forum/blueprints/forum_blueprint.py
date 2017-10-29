@@ -59,6 +59,6 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
             model = self._service.get_by_slug(slug)
             if not model:
                 return self._return_error(f"Can't find forum details by slag = {slug}", 404)
-            return self._return_one(model, status=200, expand_details=True)
+            return self._return_one(model, status=200)
 
         return blueprint
