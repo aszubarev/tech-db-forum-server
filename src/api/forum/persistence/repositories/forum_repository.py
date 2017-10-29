@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from injector import inject
-from sqlutils import DataContext, Repository, create_one, create_many
+from sqlutils import DataContext, Repository, create_one
 
 from forum.persistence.dto.forum_dto import ForumDTO
 
@@ -20,12 +20,17 @@ class ForumRepository(Repository[ForumDTO]):
         data = self._context.callproc('get_forum_by_slug', [slug])
         return create_one(ForumDTO, data)
 
+    def get_by_slug_setup(self, slug: str) -> Optional[ForumDTO]:
+
+        data = self._context.callproc('get_forum_by_slug_ret_uid', [slug])
+        return create_one(ForumDTO, data)
+
     def increment_threads(self, uid: int) -> None:
         self._context.callproc('forum_increment_threads', [uid])
 
     def increment_posts(self, uid: int) -> None:
         self._context.callproc('forum_increment_posts', [uid])
-        
+
     def increment_posts_by_number(self, uid: int, number: int) -> None:
         self._context.callproc('forum_increment_posts_by_number', [uid, number])
 

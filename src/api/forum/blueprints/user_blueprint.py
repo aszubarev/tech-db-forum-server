@@ -77,7 +77,7 @@ class UserBlueprint(BaseBlueprint[UserService]):
         def _get_users_for_forum(forum_slug: str):
             try:
 
-                forum = self._forumService.get_by_slug(forum_slug)
+                forum = self._forumService.get_by_slug_setup(forum_slug)
                 if not forum:
                     return self._return_error(f"Can't find forum: forum_slug =  {forum_slug}", 404)
 

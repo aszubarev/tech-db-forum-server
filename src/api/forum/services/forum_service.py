@@ -46,6 +46,12 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
         return model
 
     @cache.memoize(600)
+    def get_by_slug_setup(self, slug: str)-> Optional[Forum]:
+        dto = self.__repo.get_by_slug_setup(slug)
+        model = self._convert(dto)
+        return model
+
+    @cache.memoize(600)
     def get_count(self) -> int:
         return self.__repo.get_count()
 
@@ -64,5 +70,6 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
         # TODO don't remember update cache
         cache.delete_memoized(ForumService.get_by_id)
         cache.delete_memoized(ForumService.get_by_slug)
+        cache.delete_memoized(ForumService.get_by_slug_setup)
         cache.delete_memoized(ForumService.get_count)
 
