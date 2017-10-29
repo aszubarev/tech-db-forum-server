@@ -37,6 +37,11 @@ class Service(Generic[T, E, R]):
         self._clear_cache()
         return self._convert(dto)
 
+    def add_many(self, entities: List[E]) -> List[T]:
+        data = self._repo.add_many(entities)
+        self._clear_cache()
+        return self._convert_many(data)
+
     def update(self, entity: E) -> T:
         dto = self._repo.update(entity)
         self._clear_cache()

@@ -21,6 +21,9 @@ class SrvRepository(Repository[SrvDTO]):
     def add(self, entity: SrvDTO) -> Optional[SrvDTO]:
         raise NotImplementedError
 
+    def add_many(self, entities: List[SrvDTO]):
+        raise NotImplementedError
+
     def update(self, entity: SrvDTO) -> Optional[SrvDTO]:
         raise NotImplementedError
 

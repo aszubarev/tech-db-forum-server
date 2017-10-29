@@ -74,6 +74,9 @@ class UserRepository(Repository[UserDTO]):
         data = self._context.callproc('add_user', [entity.nickname, entity.email, entity.about, entity.fullname])
         return create_one(UserDTO, data)
 
+    def add_many(self, entities: List[UserDTO]):
+        raise NotImplementedError
+
     def update(self, entity: UserDTO) -> Optional[UserDTO]:
 
         params = [p for p in [entity.nickname, entity.email, entity.about, entity.fullname] if p is not None]

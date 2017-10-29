@@ -91,3 +91,7 @@ class PostDTO(Entity):
     @forum_slug.setter
     def forum_slug(self, value):
         self._forum_slug = value
+
+    @is_edited.setter
+    def is_edited(self, value):
+        self._is_edited = value

@@ -87,6 +87,9 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         return new_entity
 
+    def add_many(self, entities: List[ThreadDTO]):
+        raise NotImplementedError
+
     def update_by_slug(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
         msg = entity.message
         title = entity.title

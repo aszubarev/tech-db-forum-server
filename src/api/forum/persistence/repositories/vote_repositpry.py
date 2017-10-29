@@ -30,6 +30,9 @@ class VoteRepository(Repository[VoteDTO]):
         data = self._context.callproc('add_vote', [entity.user_id, entity.thread_id, entity.vote_value])
         return create_one(VoteDTO, data)
 
+    def add_many(self, entities: List[VoteDTO]):
+        raise NotImplementedError
+
     def update(self, entity: VoteDTO) -> Optional[VoteDTO]:
         raise NotImplementedError
 

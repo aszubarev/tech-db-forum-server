@@ -45,6 +45,9 @@ class ForumRepository(Repository[ForumDTO]):
         new_entity.user_nickname = entity.user_nickname
         return new_entity
 
+    def add_many(self, entities: List[ForumDTO]):
+        raise NotImplementedError
+
     def update(self, entity: ForumDTO):
         raise NotImplementedError
 

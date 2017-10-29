@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Flask, Response, url_for
+from flask import Flask
 from werkzeug.wsgi import DispatcherMiddleware
 
 from forum.application import Application
@@ -25,9 +25,7 @@ def simple(env, resp):
 
 
 app.wsgi_app = DispatcherMiddleware(simple, {'/api': app.wsgi_app})
-logging.info("[app.py] add DispatcherMiddleware")
 
 
 if __name__ == '__main__':
-    logging.info("try start")
     app.run()
