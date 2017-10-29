@@ -20,6 +20,15 @@ class UserRepository(Repository[UserDTO]):
         data = self._context.callproc('get_user_by_nickname', [nickname])
         return create_one(UserDTO, data)
 
+    def get_by_nickname_setup(self, nickname: str, load_nickname: bool) -> Optional[UserDTO]:
+
+        if load_nickname is True:
+            data = self._context.callproc('get_by_nickname_ret_uid_nickname', [nickname])
+        else:
+            data = self._context.callproc('get_by_nickname_ret_uid', [nickname])
+
+        return create_one(UserDTO, data)
+
     def get_by_nickname_or_email(self, nickname: str, email: str) -> List[UserDTO]:
         data = self._context.callproc('get_users_by_nickname_or_email', [nickname, email])
         return create_many(UserDTO, data)

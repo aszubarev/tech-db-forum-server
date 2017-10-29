@@ -59,6 +59,7 @@ class PostBlueprint(BaseBlueprint[PostService]):
         def _posts(slug_or_id: str):
             try:
 
+                # TODO create light version for only forum
                 thread = self._threadService.get_by_slug_or_id(slug_or_id)
                 if not thread:
                     return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)

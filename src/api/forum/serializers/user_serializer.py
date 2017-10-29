@@ -36,9 +36,9 @@ class UserSerializer(Serializer):
         raise NotImplementedError
 
     def load(self, data: Dict[str, Any]) -> UserDTO:
-        user_id = None if data.get('id') is None or data.get('id') == 'null' else int(data['id'])
-        nickname = None if data.get('nickname') is None or data.get('nickname') == 'null' else data['nickname']
-        email = None if data.get('email') is None or data.get('email') == 'null' else data['email']
-        about = None if data.get('about') is None or data.get('about') == 'null'else data['about']
-        fullname = None if data.get('fullname') is None or data.get('fullname') == 'null' else data['fullname']
+        user_id = None if data.get('id') is None else int(data['id'])
+        nickname = None if data.get('nickname') is None else data['nickname']
+        email = None if data.get('email') is None else data['email']
+        about = None if data.get('about') is None else data['about']
+        fullname = None if data.get('fullname') is None else data['fullname']
         return UserDTO(user_id, nickname, email, about, fullname)

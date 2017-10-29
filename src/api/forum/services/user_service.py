@@ -34,6 +34,11 @@ class UserService(Service[User, UserDTO, UserRepository]):
         return self._convert(data)
 
     @cache.memoize(600)
+    def get_by_nickname_setup(self, nickname: str, load_nickname: bool = False):
+        data = self.__repo.get_by_nickname_setup(nickname, load_nickname)
+        return self._convert(data)
+
+    @cache.memoize(600)
     def get_by_nickname_or_email(self, nickname: str, email: str) -> List[User]:
         data = self.__repo.get_by_nickname_or_email(nickname, email)
         return self._convert_many(data)
@@ -66,5 +71,6 @@ class UserService(Service[User, UserDTO, UserRepository]):
         # TODO don't remember update cache
         cache.delete_memoized(UserService.get_by_id)
         cache.delete_memoized(UserService.get_by_nickname)
+        cache.delete_memoized(UserService.get_by_nickname_setup)
         cache.delete_memoized(UserService.get_by_nickname_or_email)
         cache.delete_memoized(UserService.get_count)

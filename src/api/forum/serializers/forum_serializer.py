@@ -43,7 +43,7 @@ class ForumSerializer(Serializer):
 
     def load(self, data: Dict[str, Any]) -> ForumDTO:
 
-        user = self._userService.get_by_nickname(data.get('user'))
+        user = self._userService.get_by_nickname_setup(data.get('user'), load_nickname=True)
         if not user:
             raise NoDataFoundError(f"Can't find user by nickname = {data.get('user')}")
 

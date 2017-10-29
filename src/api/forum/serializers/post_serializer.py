@@ -88,6 +88,7 @@ class PostSerializer(Serializer):
 
         thread_slug_or_id = kwargs.get('thread_slug_or_id')
 
+        # TODO create light version
         thread = self._thread_service.get_by_slug_or_id(thread_slug_or_id)
         if not thread:
             raise NoDataFoundError(f"[PostSerializer.prepare_load_data] thread is None \n"
@@ -106,13 +107,13 @@ class PostSerializer(Serializer):
 
         return prepare_data
 
-    def _get_user_id(self, data: Dict[str, Any]) -> Optional[User]:
+    def _get_user(self, data: Dict[str, Any]) -> Optional[User]:
 
         nickname = data.get('author')
         if nickname is None:
             return None
 
-        author = self._userService.get_by_nickname(nickname)
+        author = self._userService.get_by_nickname_setup(nickname, load_nickname=True)
         if not author:
             raise NoDataFoundError(f"Can't find author by nickname = {nickname}")
 
@@ -141,7 +142,7 @@ class PostSerializer(Serializer):
 
         post_id = None if data.get('id') is None or data.get('id') == 'null' else data['id']
 
-        user = self._get_user_id(data)
+        user = self._get_user(data)
         user_id = None if user is None else user.uid
         user_nickname = None if user is None else user.nickname
 

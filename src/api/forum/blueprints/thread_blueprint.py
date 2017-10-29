@@ -142,7 +142,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 if not thread:
                     return self._return_error(f"Can't find thread by slug_or_id = {slug_or_id}", 404)
 
-                user = self._userService.get_by_nickname(nickname)
+                user = self._userService.get_by_nickname_setup(nickname, load_nickname=False)
                 if not user:
                     return self._return_error(f"Can't find user by nickname = {nickname}", 404)
 
