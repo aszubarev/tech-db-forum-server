@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import sys
@@ -53,6 +54,7 @@ class PostBlueprint(BaseBlueprint[PostService]):
                 return self._return_error(f"Can't find thread by slag = {slug_or_id}", 404)
 
             except PostInvalidParentError as exp:
+                logging.exception(f"[PostBlueprint._add_many] exp = {exp}")
                 return self._return_error(f"Can't get parent for post", 409)
 
         @blueprint.route('thread/<slug_or_id>/posts', methods=['GET'])

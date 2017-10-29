@@ -20,6 +20,15 @@ class PostRepository(Repository[PostDTO]):
         data = self._context.callproc('get_post_by_id', [uid])
         return create_one(PostDTO, data)
 
+    def get_by_id_setup(self, uid: int, load_path: bool, load_thread: bool) -> Optional[PostDTO]:
+
+        if load_path is True and load_thread is True:
+            data = self._context.callproc('get_post_by_id_ret_uid_thread_path', [uid])
+        else:
+            data = self._context.callproc('get_post_by_id_ret_uid', [uid])
+
+        return create_one(PostDTO, data)
+
     def get_posts_for_thread(self, thread: Thread, **kwargs) -> List[PostDTO]:
         sort = kwargs.get('sort')
         limit = kwargs.get('limit')

@@ -130,7 +130,7 @@ class PostSerializer(Serializer):
             raise BadRequestError(f"Bad request") from exp
 
         if cast_parent_id != 0:
-            parent = self._post_service.get_by_id(cast_parent_id)
+            parent = self._post_service.get_by_id_setup(cast_parent_id, load_thread=True, load_path=True)
             if not parent:
                 raise PostInvalidParentError(f"Can't find parent for post by uid = {cast_parent_id}")
             return parent
