@@ -1,0 +1,11 @@
+CREATE OR REPLACE FUNCTION get_by_nickname_ret_uid(p_nickname CITEXT)
+  RETURNS TABLE(user_id INT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT u.user_id
+    FROM users u
+    WHERE u.nickname = p_nickname;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

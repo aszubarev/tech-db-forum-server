@@ -33,6 +33,10 @@ class Entity(object):
     def uid(self) -> Any:
         return self._uid
 
+    @uid.setter
+    def uid(self, value):
+        self._uid = value
+
     def fill(self, values: Dict[str, Any]) -> None:
         for key, value in values.items():
             if key == self._key_field:

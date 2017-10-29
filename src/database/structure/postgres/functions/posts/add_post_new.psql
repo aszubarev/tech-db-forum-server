@@ -1,0 +1,33 @@
+CREATE OR REPLACE FUNCTION add_post_new(
+  p_post_id INT,
+  p_thread_id INT,
+  p_forum_id INT,
+  p_user_id INT,
+  p_parent_id INT,
+  p_message TEXT,
+  p_created TIMESTAMP WITH TIME ZONE,
+  p_path int[])
+
+RETURNS TABLE(post_id INT,
+              thread_id INT,
+              forum_id INT,
+              user_id INT,
+              parent_id INT,
+              message TEXT,
+              created TIMESTAMP WITH TIME ZONE,
+              is_edited BOOLEAN)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY
+        INSERT INTO posts (post_id, thread_id, forum_id, user_id,
+                           parent_id, message, created, is_edited, path)
+
+        VALUES (p_post_id, p_thread_id, p_forum_id, p_user_id,
+                p_parent_id, p_message, p_created, FALSE, p_path)
+
+        RETURNING posts.post_id, posts.thread_id, posts.forum_id, posts.user_id,
+                  posts.parent_id, posts.message, posts.created, posts.is_edited;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

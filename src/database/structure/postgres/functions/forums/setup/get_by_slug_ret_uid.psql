@@ -1,0 +1,12 @@
+CREATE OR REPLACE FUNCTION get_forum_by_slug_ret_uid(p_slug CITEXT)
+  RETURNS TABLE(forum_id INT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT f.forum_id
+    FROM forums f
+    JOIN users u on f.user_id = u.user_id
+    WHERE f.slug = p_slug;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

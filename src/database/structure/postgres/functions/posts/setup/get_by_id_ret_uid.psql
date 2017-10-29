@@ -1,0 +1,11 @@
+CREATE OR REPLACE FUNCTION get_post_by_id_ret_uid(p_post_id INT)
+RETURNS TABLE(post_id INT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT pst.post_id
+    FROM posts pst
+    WHERE pst.post_id = p_post_id;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

@@ -1,0 +1,14 @@
+CREATE OR REPLACE FUNCTION get_thread_by_id_ret_uid_forum(p_thread_id INT)
+RETURNS TABLE(thread_id INT,
+              forum_id INT,
+              forum_slug CITEXT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT th.thread_id, th.forum_id, f.slug
+    FROM threads th
+    JOIN forums f on th.forum_id = f.forum_id
+    WHERE th.thread_id = p_thread_id;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

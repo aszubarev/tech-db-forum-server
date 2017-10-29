@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, Tuple, List
 
 import psycopg2
@@ -52,6 +53,36 @@ class PostgresDataContext(DataContext):
             cursor.close()
             conn.close()
         return data
+
+    def add_many(self, table: str, values_str: str, args_str: str, params_list: List[List]):
+        """
+        :param table: table name
+        :param values_str: (id, data, ...)
+        :param args_str: "(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        :param params_list: list of insert parameters
+        :return: data
+        """
+
+        conn, cursor = self._create_connection()
+        try:
+            args_str = ','.join(cursor.mogrify(args_str, params).decode('utf-8') for params in params_list)
+            query = f"INSERT INTO {table} {values_str} VALUES {args_str};"
+            cursor.execute(query)
+        except IntegrityError as ex:
+            if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
+                raise UniqueViolationError
+            elif ex.pgcode == errorcodes.FOREIGN_KEY_VIOLATION:
+                raise ForeignKeyViolationError
+            elif ex.pgcode == errorcodes.RESTRICT_VIOLATION:
+                raise RestrictViolationError
+            raise
+        except InternalError as ex:
+            if ex.pgcode == errorcodes.NO_DATA_FOUND:
+                raise NoDataFoundError
+            raise
+        finally:
+            cursor.close()
+            conn.close()
 
     def callproc(self, cmd, params):
         conn, cursor = self._create_connection()
