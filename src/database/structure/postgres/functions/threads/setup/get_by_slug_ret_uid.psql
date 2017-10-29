@@ -1,0 +1,11 @@
+CREATE OR REPLACE FUNCTION get_thread_by_slug_ret_uid(p_slug CITEXT)
+RETURNS TABLE(thread_id INT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT th.thread_id
+    FROM threads th
+    WHERE th.slug = p_slug;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

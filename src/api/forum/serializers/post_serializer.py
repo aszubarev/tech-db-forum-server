@@ -88,8 +88,7 @@ class PostSerializer(Serializer):
 
         thread_slug_or_id = kwargs.get('thread_slug_or_id')
 
-        # TODO create light version
-        thread = self._thread_service.get_by_slug_or_id(thread_slug_or_id)
+        thread = self._thread_service.get_by_slug_or_id_setup(thread_slug_or_id, load_forum=True)
         if not thread:
             raise NoDataFoundError(f"[PostSerializer.prepare_load_data] thread is None \n"
                                    f" Can't find thread by thread_slug_or_id = {thread_slug_or_id}")

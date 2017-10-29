@@ -22,6 +22,26 @@ class ThreadRepository(Repository[ThreadDTO]):
         data = self._context.callproc('get_thread_by_slug', [slug])
         return create_one(ThreadDTO, data)
 
+    def get_by_id_setup(self, uid: int, load_forum: bool) -> Optional[ThreadDTO]:
+
+        if load_forum is True:
+            data = self._context.callproc('get_thread_by_id_ret_uid_forum', [uid])
+
+        else:
+            data = self._context.callproc('get_thread_by_id_ret_uid', [uid])
+
+        return create_one(ThreadDTO, data)
+
+    def get_by_slug_setup(self, slug: str, load_forum: bool) -> Optional[ThreadDTO]:
+
+        if load_forum is True:
+            data = self._context.callproc('get_thread_by_slug_ret_uid_forum', [slug])
+
+        else:
+            data = self._context.callproc('get_thread_by_slug_ret_uid', [slug])
+
+        return create_one(ThreadDTO, data)
+
     def get_for_forum(self, forum_id: int, **kwargs) -> List[ThreadDTO]:
 
         data = None
@@ -94,15 +114,12 @@ class ThreadRepository(Repository[ThreadDTO]):
         msg = entity.message
         title = entity.title
 
-        flag = False
-
         data = None
         if msg is not None and title is not None:
             data = self._context.callproc('update_thread_by_slug_by_msg_title', [entity.slug, msg, title])
 
         elif msg is not None and title is None:
             data = self._context.callproc('update_thread_by_slug_by_msg', [entity.slug, msg])
-            flag = True
 
         elif msg is None and title is not None:
             data = self._context.callproc('update_thread_by_slug_by_title', [entity.slug, title])
@@ -123,9 +140,6 @@ class ThreadRepository(Repository[ThreadDTO]):
 
         elif msg is None and title is not None:
             data = self._context.callproc('update_thread_by_uid_by_title', [entity.uid, title])
-
-        # elif msg is None and title is None:
-        #     return self.get_by_id(entity.uid)
 
         return create_one(ThreadDTO, data)
 

@@ -67,6 +67,28 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         return thread
 
     @cache.memoize(600)
+    def get_by_id_setup(self, uid: int, load_forum: bool) -> Optional[Thread]:
+        data = self._repo.get_by_id_setup(uid, load_forum)
+        return self._convert(data)
+
+    @cache.memoize(600)
+    def get_by_slug_setup(self, slug: str, load_forum: bool) -> Optional[Thread]:
+        data = self._repo.get_by_slug_setup(slug, load_forum)
+        return self._convert(data)
+
+    @cache.memoize(600)
+    def get_by_slug_or_id_setup(self, slug_or_id: str, load_forum: bool = False) -> Optional[Thread]:
+        try:
+            cast_thread_id = int(slug_or_id)
+            thread = self.get_by_id_setup(cast_thread_id, load_forum)
+
+        except ValueError:
+            thread_slug = slug_or_id
+            thread = self.get_by_slug_setup(thread_slug, load_forum)
+
+        return thread
+
+    @cache.memoize(600)
     def get_number_threads_for_forum(self, forum_id: int) -> Optional[int]:
         data = self.__repo.get_number_threads_for_forum(forum_id)
         return data
@@ -115,6 +137,12 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         # TODO don't remember update cache
         cache.delete_memoized(ThreadService.get_by_id)
         cache.delete_memoized(ThreadService.get_by_slug)
-        cache.delete_memoized(ThreadService.get_number_threads_for_forum)
         cache.delete_memoized(ThreadService.get_by_slug_or_id)
+
+        cache.delete_memoized(ThreadService.get_number_threads_for_forum)
+
+        cache.delete_memoized(ThreadService.get_by_id_setup)
+        cache.delete_memoized(ThreadService.get_by_slug_setup)
+        cache.delete_memoized(ThreadService.get_by_slug_or_id_setup)
+
         cache.delete_memoized(ThreadService.get_count)

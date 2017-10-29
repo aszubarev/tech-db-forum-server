@@ -1,0 +1,11 @@
+CREATE OR REPLACE FUNCTION get_thread_by_id_ret_uid(p_thread_id INT)
+RETURNS TABLE(thread_id INT)
+AS
+$BODY$
+  BEGIN
+    RETURN QUERY SELECT th.thread_id
+    FROM threads th
+    WHERE th.thread_id = p_thread_id;
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
