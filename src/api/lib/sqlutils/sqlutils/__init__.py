@@ -1,6 +1,6 @@
 from .abstract_expand_set import AbstractExpandSet
 from .converter import Converter
-from .entity import Entity, create_one, create_many
+from .entity import Entity, create_one, create_many, return_one, return_many
 from .empty_expand_set import EmptyExpandSet
 from .expand_item import ExpandItem
 from .expand_set import ExpandSet

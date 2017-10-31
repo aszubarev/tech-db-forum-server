@@ -1,7 +1,7 @@
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 
 from injector import inject
-from sqlutils import DataContext, Repository, create_one, create_many
+from sqlutils import DataContext, Repository, create_one, create_many, return_one, return_many
 
 from forum.persistence.dto.user_dto import UserDTO
 
@@ -79,9 +79,15 @@ class UserRepository(Repository[UserDTO]):
     def clear(self):
         self._context.callproc('clear_users', [])
 
+    # TODO DEPRECATED
     def add(self, entity: UserDTO) -> Optional[UserDTO]:
         data = self._context.callproc('add_user', [entity.nickname, entity.email, entity.about, entity.fullname])
         return create_one(UserDTO, data)
+
+    def add_v2(self, insert: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        data = self._context.callproc('add_user', insert['nickname'],
+                                      insert['email'], insert['about'], insert['fullname'])
+        return return_one(data)
 
     def add_many(self, entities: List[UserDTO]):
         raise NotImplementedError

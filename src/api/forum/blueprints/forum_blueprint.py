@@ -1,5 +1,5 @@
 
-from flask import Blueprint, abort, request, Response, json
+from flask import Blueprint, request, Response, json
 from injector import inject, singleton
 
 from apiutils import BaseBlueprint
