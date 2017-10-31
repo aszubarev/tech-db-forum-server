@@ -32,7 +32,7 @@ class UserService(Service[User, UserDTO, UserRepository]):
         body.update({
             'nickname': kwargs['nickname']
         })
-        data = self.__repo.update_soft(body)
+        data = self.__repo.update(body)
         self._clear_cache()
         return data
 

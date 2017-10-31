@@ -89,39 +89,7 @@ class UserRepository(object):
                                params['email'], params['about'], params['fullname']])
         return params
 
-    # TODO DEPRECATED
-    def update(self, entity: UserDTO) -> Optional[UserDTO]:
-
-        params = [p for p in [entity.nickname, entity.email, entity.about, entity.fullname] if p is not None]
-        data = None
-
-        if entity.email is not None and entity.about is not None and entity.fullname is not None:
-            data = self._context.callproc('update_user', params)
-
-        elif entity.email is not None and entity.about is None and entity.fullname is None:
-            data = self._context.callproc('update_user_by_email', params)
-
-        elif entity.email is None and entity.about is not None and entity.fullname is None:
-            data = self._context.callproc('update_user_by_about', params)
-
-        elif entity.email is None and entity.about is None and entity.fullname is not None:
-            data = self._context.callproc('update_user_by_fullname', params)
-
-        elif entity.email is None and entity.about is not None and entity.fullname is not None:
-            data = self._context.callproc('update_user_by_about_fullname', params)
-
-        elif entity.email is not None and entity.about is None and entity.fullname is not None:
-            data = self._context.callproc('update_user_by_email_fullname', params)
-
-        elif entity.email is not None and entity.about is not None and entity.fullname is None:
-            data = self._context.callproc('update_user_by_email_about', params)
-
-        elif entity.email is None and entity.about is None and entity.fullname is None:
-            data = self._context.callproc('update_user_by_empty_data', params)
-
-        return create_one(UserDTO, data)
-
-    def update_soft(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def update(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
         data = None
         nickname = params['nickname']
