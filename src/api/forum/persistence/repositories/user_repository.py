@@ -89,9 +89,7 @@ class UserRepository(object):
                                params['email'], params['about'], params['fullname']])
         return params
 
-    def add_many(self, entities: List[UserDTO]):
-        raise NotImplementedError
-
+    # TODO DEPRECATED
     def update(self, entity: UserDTO) -> Optional[UserDTO]:
 
         params = [p for p in [entity.nickname, entity.email, entity.about, entity.fullname] if p is not None]
@@ -123,5 +121,36 @@ class UserRepository(object):
 
         return create_one(UserDTO, data)
 
-    def delete(self, uid: int) -> None:
-        raise NotImplementedError
+    def update_soft(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+
+        data = None
+        nickname = params['nickname']
+        email = params.get('email')
+        about = params.get('about')
+        fullname = params.get('fullname')
+
+        if email is not None and about is not None and fullname is not None:
+            data = self._context.callproc('update_user', [nickname, email, about, fullname])
+
+        elif email is not None and about is None and fullname is None:
+            data = self._context.callproc('update_user_by_email', [nickname, email])
+
+        elif email is None and about is not None and fullname is None:
+            data = self._context.callproc('update_user_by_about', [nickname, about])
+
+        elif email is None and about is None and fullname is not None:
+            data = self._context.callproc('update_user_by_fullname', [nickname, fullname])
+
+        elif email is None and about is not None and fullname is not None:
+            data = self._context.callproc('update_user_by_about_fullname', [nickname, about, fullname])
+
+        elif email is not None and about is None and fullname is not None:
+            data = self._context.callproc('update_user_by_email_fullname', [nickname, email, fullname])
+
+        elif email is not None and about is not None and fullname is None:
+            data = self._context.callproc('update_user_by_email_about', [nickname, email, about])
+
+        elif email is None and about is None and fullname is None:
+            data = self._context.callproc('update_user_by_empty_data', [nickname])
+
+        return return_one(data)

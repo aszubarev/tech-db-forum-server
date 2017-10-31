@@ -28,6 +28,14 @@ class UserService(Service[User, UserDTO, UserRepository]):
         self._clear_cache()
         return data
 
+    def update_soft(self, body: Dict[str, Any], **kwargs) -> Dict[str, Any]:
+        body.update({
+            'nickname': kwargs['nickname']
+        })
+        data = self.__repo.update_soft(body)
+        self._clear_cache()
+        return data
+
     @property
     def __repo(self) -> UserRepository:
         return self._repo
@@ -36,6 +44,7 @@ class UserService(Service[User, UserDTO, UserRepository]):
     def get_by_id(self, uid: int) -> Optional[User]:
         return super().get_by_id(uid)
 
+    # TODO DEPRECATED
     @cache.memoize(600)
     def get_by_nickname(self, nickname: str) -> Optional[User]:
         data = self.__repo.get_by_nickname(nickname)
