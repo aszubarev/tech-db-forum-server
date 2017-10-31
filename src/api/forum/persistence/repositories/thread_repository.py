@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, List
 
 from injector import inject
@@ -92,10 +93,9 @@ class ThreadRepository(Repository[ThreadDTO]):
 
     def vote(self, entity: VoteDTO) -> Optional[int]:
         data = self._context.callproc('add_vote', [entity.user_id, entity.thread_id, entity.vote_value])
-        if data is None or len(data) == 0:
-            return None
         result_dict = data[0]
-        return result_dict.get('votes')
+        votes = result_dict.get('votes')
+        return votes
 
     def add(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
         data = self._context.callproc('add_thread', [entity.slug, entity.forum_id, entity.user_id,

@@ -153,7 +153,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
                 entity = self._voteSerializer.load(data)
                 votes = self.__service.vote(entity)
-                if not votes:
+                if votes is None:
                     return self._return_error(f"[ThreadBlueprint._vote] "
                                               f"Can't get votes for thread by slug_or_id = {slug_or_id}", 500)
 
