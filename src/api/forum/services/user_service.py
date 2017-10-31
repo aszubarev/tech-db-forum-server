@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 
 from flask import request
 from injector import inject, singleton
@@ -19,6 +19,14 @@ class UserService(Service[User, UserDTO, UserRepository]):
     def __init__(self, repo: UserRepository) -> None:
         super().__init__(repo)
         self._converter = UserConverter()
+
+    def add_soft(self, body: Dict[str, Any], **kwargs) -> Dict[str, Any]:
+        body.update({
+            'nickname': kwargs['nickname']
+        })
+        data = self.__repo.add_soft(body)
+        self._clear_cache()
+        return data
 
     @property
     def __repo(self) -> UserRepository:

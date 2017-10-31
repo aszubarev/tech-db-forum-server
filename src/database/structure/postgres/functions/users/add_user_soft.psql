@@ -1,0 +1,15 @@
+CREATE OR REPLACE FUNCTION add_user_soft(
+  p_nickname CITEXT,
+  p_email CITEXT,
+  p_about TEXT,
+  p_fullname TEXT)
+
+RETURNS void
+AS
+$BODY$
+  BEGIN
+    INSERT INTO users (nickname, email, about, fullname)
+    VALUES (p_nickname, p_email, p_about, p_fullname);
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

@@ -84,10 +84,10 @@ class UserRepository(Repository[UserDTO]):
         data = self._context.callproc('add_user', [entity.nickname, entity.email, entity.about, entity.fullname])
         return create_one(UserDTO, data)
 
-    def add_v2(self, insert: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        data = self._context.callproc('add_user', insert['nickname'],
-                                      insert['email'], insert['about'], insert['fullname'])
-        return return_one(data)
+    def add_soft(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        self._context.callproc('add_user_soft', [params['nickname'],
+                               params['email'], params['about'], params['fullname']])
+        return params
 
     def add_many(self, entities: List[UserDTO]):
         raise NotImplementedError

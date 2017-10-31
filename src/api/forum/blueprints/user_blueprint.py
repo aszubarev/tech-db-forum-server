@@ -3,6 +3,7 @@ from flask import Blueprint, abort, request, Response, json
 from injector import inject, singleton
 
 from apiutils import BaseBlueprint
+from forum.serializers.soft.user_serializer_soft import UserSerializerSoft
 
 from forum.serializers.user_serializer import UserSerializer
 from forum.services.forum_service import ForumService
@@ -15,10 +16,11 @@ class UserBlueprint(BaseBlueprint[UserService]):
 
     @inject
     def __init__(self, service: UserService, serializer: UserSerializer,
-                 forum_service: ForumService) -> None:
+                 user_serializer_soft: UserSerializerSoft, forum_service: ForumService) -> None:
         super().__init__(service)
         self._forumService = forum_service
         self.__serializer = serializer
+        self._userSerializerSoft = user_serializer_soft
 
     @property
     def _name(self) -> str:
@@ -42,7 +44,10 @@ class UserBlueprint(BaseBlueprint[UserService]):
         @blueprint.route('user/<nickname>/create', methods=['POST'])
         def _add(nickname: str):
             try:
-                return self._add(nickname=nickname)
+
+                data = self.__service.add_soft(body=request.json, nickname=nickname)
+                response = self._userSerializerSoft.dump(data)
+                return Response(response=json.dumps(response), status=201, mimetype='application/json')
 
             except UniqueViolationError:
                 data = self.__service.get_by_nickname_or_email(nickname=nickname, email=request.json['email'])
