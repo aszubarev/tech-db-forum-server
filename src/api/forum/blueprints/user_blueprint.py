@@ -56,12 +56,12 @@ class UserBlueprint(BaseBlueprint[UserService]):
         @blueprint.route('user/<nickname>/profile', methods=['GET'])
         def profile(nickname: str):
             try:
-                user = self.__service.get_by_nickname(nickname=nickname)
-
-                if not user:
+                data = self.__service.get_by_nickname_soft(nickname=nickname)
+                if not data:
                     return self._return_error(f"Can't find user with nickname {nickname}", 404)
 
-                return self._return_one(user)
+                response = self._userSerializerSoft.dump(data)
+                return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
             except NoDataFoundError:
                 return self._return_error(f"Can't find user with nickname {nickname}", 404)
