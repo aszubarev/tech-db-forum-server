@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 
 from injector import inject
 
@@ -9,7 +9,7 @@ from sqlutils import DataContext, Repository, create_one, create_many
 from forum.persistence.dto.thread_dto import ThreadDTO
 
 
-class ThreadRepository(Repository[ThreadDTO]):
+class ThreadRepository(object):
 
     @inject
     def __init__(self, context: DataContext) -> None:
@@ -97,15 +97,35 @@ class ThreadRepository(Repository[ThreadDTO]):
         votes = result_dict.get('votes')
         return votes
 
-    def add(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
-        data = self._context.callproc('add_thread', [entity.slug, entity.forum_id, entity.user_id,
-                                                     entity.created, entity.message, entity.title])
-        new_entity = create_one(ThreadDTO, data)
-        new_entity.user_nickname = entity.user_nickname
-        new_entity.forum_slug = entity.forum_slug
-        new_entity.votes = 0
+    def add(self, params: Dict[str, Any]) -> Dict[str, Any]:
 
-        return new_entity
+        logging.error(f"[ThreadRepository.add] params = {params}")
+        data = self._context.callproc('add_thread', [params['slug'],     # must be init in blueprint
+                                                     params['forum_id'], params['forum_slug'],
+                                                     params['user_id'], params['user_nickname'],
+                                                     params['created'],  # must be init in blueprint
+                                                     params['message'], params['title']])
+        thread_id = data[0]['thread_id']
+        response = {
+            'id': thread_id,
+            'forum': params['forum_slug'],
+            'author': params['user_nickname'],
+            'message': params['message'],
+            'title': params['title'],
+            'votes': 0
+        }
+
+        if params['created'] is not None:
+            response.update({
+                'created': params['created'].astimezone().isoformat()
+            })
+
+        if params['slug'] is not None:
+            response.update({
+                'slug': params['slug']
+            })
+
+        return response
 
     def add_many(self, entities: List[ThreadDTO]):
         raise NotImplementedError

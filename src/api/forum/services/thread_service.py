@@ -22,17 +22,30 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
     def __init__(self, repo: ThreadRepository, forum_service: ForumService) -> None:
         super().__init__(repo)
         self._converter = ThreadConverter()
-        self._forum_service = forum_service
+        self._forumService = forum_service
 
     @property
     def __repo(self) -> ThreadRepository:
         return self._repo
 
     def add(self, entity: ThreadDTO) -> Optional[Thread]:
-        dto = self._repo.add(entity)
-        self._forum_service.increment_threads(entity.forum_id)
+        raise NotImplementedError
+
+    def add_soft(self, body: Dict[str, Any], **kwargs) -> Dict[str, Any]:
+        params = body
+        forum_id = kwargs['forum_id']
+        params.update({
+            'user_id': kwargs['user_id'],
+            'user_nickname': kwargs['user_nickname'],
+            'forum_id': forum_id,
+            'forum_slug': kwargs['forum_slug'],
+            'slug': None if body.get('slug') is None else body['slug'],
+            'created': None if body.get('created') is None else dateutil.parser.parse(body['created'])
+        })
+        response = self.__repo.add(params)
+        self._forumService.increment_threads(uid=forum_id)
         self._clear_cache()
-        return self._convert(dto)
+        return response
 
     def vote(self, entity: VoteDTO) -> Optional[int]:
         """
@@ -108,7 +121,7 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         return self._convert(data)
 
     def get_for_forum(self, slug: str) -> List[Thread]:
-        forum = self._forum_service.get_by_slug(slug)
+        forum = self._forumService.get_by_slug(slug)
         if forum is None:
             raise NoDataFoundError(f"Can't find forum by slug = {slug}")
 
