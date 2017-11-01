@@ -1,3 +1,4 @@
+import logging
 
 from flask import Blueprint, request, Response, json
 from injector import inject, singleton
@@ -47,7 +48,8 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
                 user = self._userService.get_by_nickname_soft(request.json['user'])
                 if not user:
                     return self._return_error(f"Can't find user with nickname {request.json['user']}", 404)
-                data = self._service.add_soft(body=request.json, nickname=user['nickname'])
+
+                data = self._service.add_soft(body=request.json, user_id=user['user_id'], nickname=user['nickname'])
                 return Response(response=json.dumps(data), status=201, mimetype='application/json')
 
             except UniqueViolationError:

@@ -71,7 +71,7 @@ class UserBlueprint(BaseBlueprint[UserService]):
                     return self._return_error(f"Can't update user with nickname {nickname}", 404)
 
                 # TODO update by uid, not not nickname
-                data = self.__service.update_soft(body=request.json, nickname=nickname)
+                data = self.__service.update_soft(body=request.json, nickname=user['nickname'])
                 return Response(response=json.dumps(data), status=200, mimetype='application/json')
 
             except NoDataFoundError as exp:

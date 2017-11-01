@@ -37,6 +37,7 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
 
     def add_soft(self, body: Dict[str, Any], **kwargs) -> Dict[str, Any]:
         body.update({
+            'user_id': kwargs['user_id'],
             'nickname': kwargs['nickname']
         })
         data = self.__repo.add(body)

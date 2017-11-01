@@ -51,10 +51,12 @@ class ForumRepository(Repository[ForumDTO]):
         self._context.callproc('add_forum', [params['slug'], params['user_id'], params['nickname'], params['title']])
         data = params
         data.update({
+            'user': params['nickname'],
             'threads': 0,
             'posts': 0
         })
         data.pop('user_id')
+        data.pop('nickname')
         return data
 
     def add_many(self, entities: List[ForumDTO]):

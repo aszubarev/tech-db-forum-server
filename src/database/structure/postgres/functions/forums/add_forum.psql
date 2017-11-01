@@ -7,10 +7,10 @@ CREATE OR REPLACE FUNCTION add_forum(
 RETURNS void
 AS
 $BODY$
-  BEGIN
-    RETURN QUERY
-        INSERT INTO forums (slug, user_id, nickname, title)
-        VALUES (p_slug, p_user_id, p_nickname, p_title);
+BEGIN
+
+    INSERT INTO forums (slug, user_id, nickname, title)
+    VALUES (p_slug, p_user_id, p_nickname, p_title);
 
 END;
 $BODY$
