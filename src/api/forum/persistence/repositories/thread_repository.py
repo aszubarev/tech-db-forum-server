@@ -4,7 +4,7 @@ from typing import Optional, List, Any, Dict
 from injector import inject
 
 from forum.persistence.dto.vote_dto import VoteDTO
-from sqlutils import DataContext, Repository, create_one, create_many
+from sqlutils import DataContext, Repository, create_one, create_many, return_one
 
 from forum.persistence.dto.thread_dto import ThreadDTO
 
@@ -15,13 +15,35 @@ class ThreadRepository(object):
     def __init__(self, context: DataContext) -> None:
         self._context = context
 
-    def get_by_id(self, uid: int) -> Optional[ThreadDTO]:
+    def get_by_id(self, uid: int) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_thread_by_id', [uid])
-        return create_one(ThreadDTO, data)
+        response = return_one(data)
+        if not response:
+            return None
 
-    def get_by_slug(self, slug: str) -> Optional[ThreadDTO]:
+        created = response.get('created')
+
+        if created:
+            response.update({
+                'created': created.astimezone().isoformat()
+            })
+
+        return response
+
+    def get_by_slug(self, slug) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_thread_by_slug', [slug])
-        return create_one(ThreadDTO, data)
+        response = return_one(data)
+        if not response:
+            return None
+
+        created = response.get('created')
+
+        if created:
+            response.update({
+                'created': created.astimezone().isoformat()
+            })
+
+        return response
 
     def get_by_id_setup(self, uid: int, load_forum: bool) -> Optional[ThreadDTO]:
 

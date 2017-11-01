@@ -58,16 +58,15 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         return votes
 
     @cache.memoize(600)
-    def get_by_id(self, uid: int) -> Optional[Thread]:
-        return super().get_by_id(uid)
+    def get_by_id(self, uid: int) -> Optional[Dict[str, Any]]:
+        return self._repo.get_by_id(uid)
 
     @cache.memoize(600)
-    def get_by_slug(self, slug: str) -> Optional[Thread]:
-        data = self._repo.get_by_slug(slug)
-        return self._convert(data)
+    def get_by_slug(self, slug: str) -> Optional[Dict[str, Any]]:
+        return self._repo.get_by_slug(slug)
 
     @cache.memoize(600)
-    def get_by_slug_or_id(self, slug_or_id: str) -> Optional[Thread]:
+    def get_by_slug_or_id(self, slug_or_id: str) -> Optional[Dict[str, Any]]:
 
         try:
             cast_thread_id = int(slug_or_id)

@@ -59,8 +59,8 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
             except UniqueViolationError:
                 thread_slug = request.json['slug']
-                model = self._service.get_by_slug(thread_slug)
-                return self._return_one(model, status=409)
+                response = self._service.get_by_slug(thread_slug)
+                return Response(response=json.dumps(response), status=409, mimetype='application/json')
 
         @blueprint.route('forum/<slug>/threads', methods=['GET'])
         def _get_threads_by_forum(slug: str):
@@ -73,14 +73,11 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
         @blueprint.route('thread/<slug_or_id>/details', methods=['GET'])
         def _details(slug_or_id: str):
-            try:
-                model = self.__service.get_by_slug_or_id(slug_or_id)
-                if not model:
-                    return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
-                return self._return_one(model, status=200)
 
-            except BadRequestError as exp:
-                return self._return_error(f"Bad request", 400)
+            thread = self.__service.get_by_slug_or_id(slug_or_id)
+            if not thread:
+                return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
+            return Response(response=json.dumps(thread), status=409, mimetype='application/json')
 
         @blueprint.route('thread/<slug_or_id>/details', methods=['POST'])
         def _update(slug_or_id: str):
@@ -93,7 +90,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                     thread = self.__service.get_by_slug_or_id(slug_or_id)
                     if not thread:
                         return self._return_error(f"Can't get thread by slug_or_id = {slug_or_id}", 404)
-                    return self._return_one(thread, status=200)
+                    return Response(response=json.dumps(thread), status=200, mimetype='application/json')
 
                 try:
 
@@ -141,13 +138,13 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 if not thread:
                     return self._return_error(f"Can't find thread by slug_or_id = {slug_or_id}", 404)
 
-                user = self._userService.get_by_nickname_setup(nickname, load_nickname=False)
+                user = self._userService.get_by_nickname(nickname)
                 if not user:
                     return self._return_error(f"Can't find user by nickname = {nickname}", 404)
 
                 data.update({
-                    'thread_id': thread.uid,
-                    'user_id': user.uid,
+                    'thread_id': thread['id'],
+                    'user_id': user['user_id'],
                 })
 
                 entity = self._voteSerializer.load(data)
@@ -156,8 +153,8 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                     return self._return_error(f"[ThreadBlueprint._vote] "
                                               f"Can't get votes for thread by slug_or_id = {slug_or_id}", 500)
 
-                thread.votes = votes
-                return self._return_one(thread, status=200)
+                thread['votes'] = votes
+                return Response(response=json.dumps(thread), status=200, mimetype='application/json')
 
             except NoDataFoundError as exp:
                 return self._return_error(f"Can't create thread by request = {request.json}", 404)

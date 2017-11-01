@@ -80,7 +80,6 @@ class UserService(Service[User, UserDTO, UserRepository]):
         # TODO don't remember update cache
         cache.delete_memoized(UserService.get_by_id)
         cache.delete_memoized(UserService.get_by_nickname)
-        cache.delete_memoized(UserService.get_by_nickname)
         cache.delete_memoized(UserService.get_by_nickname_setup)
         cache.delete_memoized(UserService.get_by_nickname_or_email)
         cache.delete_memoized(UserService.get_count)
