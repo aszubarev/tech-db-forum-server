@@ -43,7 +43,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
         def _add(slug: str):
             try:
                 body = request.json
-                author = self._userService.get_by_nickname_soft(body.get('author'))
+                author = self._userService.get_by_nickname(body.get('author'))
                 if not author:
                     return self._return_error(f"Can't find author for thread by nickname = {body.get('author')}", 404)
 

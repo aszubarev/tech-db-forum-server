@@ -16,12 +16,7 @@ class UserRepository(object):
         data = self._context.callproc('get_user_by_id', [uid])
         return create_one(UserDTO, data)
 
-    # TODO DEPRECATED
-    def get_by_nickname(self, nickname: str) -> Optional[UserDTO]:
-        data = self._context.callproc('get_user_by_nickname', [nickname])
-        return create_one(UserDTO, data)
-
-    def get_by_nickname_soft(self, nickname: str) -> Optional[Dict[str, Any]]:
+    def get_by_nickname(self, nickname: str) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_user_by_nickname', [nickname])
         return return_one(data)
 

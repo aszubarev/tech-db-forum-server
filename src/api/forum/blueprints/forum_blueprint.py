@@ -45,16 +45,16 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
         @blueprint.route('forum/create', methods=['POST'])
         def _add():
             try:
-                user = self._userService.get_by_nickname_soft(request.json['user'])
+                body = request.json
+                user = self._userService.get_by_nickname(body['user'])
                 if not user:
-                    return self._return_error(f"Can't find user with nickname {request.json['user']}", 404)
+                    return self._return_error(f"Can't find user with nickname {body['user']}", 404)
 
-                data = self._service.add_soft(body=request.json,
-                                              user_id=user['user_id'], user_nickname=user['nickname'])
+                data = self._service.add_soft(body=body, user_id=user['user_id'], user_nickname=user['nickname'])
                 return Response(response=json.dumps(data), status=201, mimetype='application/json')
 
             except UniqueViolationError:
-                data = self.__service.get_by_slug_soft(request.json['slug'])
+                data = self.__service.get_by_slug_soft(body['slug'])
                 return Response(response=json.dumps(data), status=409, mimetype='application/json')
 
         @blueprint.route('forum/<slug>/details', methods=['GET'])

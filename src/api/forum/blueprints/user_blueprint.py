@@ -52,7 +52,7 @@ class UserBlueprint(BaseBlueprint[UserService]):
         @blueprint.route('user/<nickname>/profile', methods=['GET'])
         def profile(nickname: str):
             try:
-                data = self.__service.get_by_nickname_soft(nickname=nickname)
+                data = self.__service.get_by_nickname(nickname=nickname)
                 if not data:
                     return self._return_error(f"Can't find user with nickname {nickname}", 404)
 
@@ -66,7 +66,7 @@ class UserBlueprint(BaseBlueprint[UserService]):
             try:
 
                 # TODO use light version
-                user = self.__service.get_by_nickname_soft(nickname=nickname)
+                user = self.__service.get_by_nickname(nickname=nickname)
                 if not user:
                     return self._return_error(f"Can't update user with nickname {nickname}", 404)
 
