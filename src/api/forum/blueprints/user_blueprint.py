@@ -60,8 +60,7 @@ class UserBlueprint(BaseBlueprint[UserService]):
                 if not data:
                     return self._return_error(f"Can't find user with nickname {nickname}", 404)
 
-                response = self._userSerializerSoft.dump(data)
-                return Response(response=json.dumps(response), status=200, mimetype='application/json')
+                return Response(response=json.dumps(data), status=200, mimetype='application/json')
 
             except NoDataFoundError:
                 return self._return_error(f"Can't find user with nickname {nickname}", 404)
@@ -77,8 +76,7 @@ class UserBlueprint(BaseBlueprint[UserService]):
 
                 # TODO update by uid, not not nickname
                 data = self.__service.update_soft(body=request.json, nickname=nickname)
-                response = self._userSerializerSoft.dump(data)
-                return Response(response=json.dumps(response), status=200, mimetype='application/json')
+                return Response(response=json.dumps(data), status=200, mimetype='application/json')
 
             except NoDataFoundError as exp:
                 return self._return_error(f"Can't update user with nickname {nickname}", 404)
