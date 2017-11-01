@@ -34,9 +34,9 @@ class UserRepository(object):
 
         return create_one(UserDTO, data)
 
-    def get_by_nickname_or_email(self, nickname: str, email: str) -> List[UserDTO]:
+    def get_by_nickname_or_email(self, nickname: str, email: str) -> List[Dict[str, Any]]:
         data = self._context.callproc('get_users_by_nickname_or_email', [nickname, email])
-        return create_many(UserDTO, data)
+        return return_many(data)
 
     def get_for_forum(self, forum_id: int, since: str, limit: str, desc: str) -> List[Dict[str, Any]]:
         data = None

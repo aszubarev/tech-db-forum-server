@@ -47,7 +47,7 @@ class UserBlueprint(BaseBlueprint[UserService]):
 
             except UniqueViolationError:
                 data = self.__service.get_by_nickname_or_email(nickname=nickname, email=request.json['email'])
-                return self._return_many(data, status=409)
+                return Response(response=json.dumps(data), status=409, mimetype='application/json')
 
         @blueprint.route('user/<nickname>/profile', methods=['GET'])
         def profile(nickname: str):

@@ -60,9 +60,8 @@ class UserService(Service[User, UserDTO, UserRepository]):
         return self._convert(data)
 
     @cache.memoize(600)
-    def get_by_nickname_or_email(self, nickname: str, email: str) -> List[User]:
-        data = self.__repo.get_by_nickname_or_email(nickname, email)
-        return self._convert_many(data)
+    def get_by_nickname_or_email(self, nickname: str, email: str) -> List[Dict[str, Any]]:
+        return self.__repo.get_by_nickname_or_email(nickname=nickname, email=email)
 
     @cache.memoize(600)
     def get_count(self) -> int:
