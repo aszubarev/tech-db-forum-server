@@ -5,8 +5,7 @@ CREATE OR REPLACE FUNCTION get_users_for_forum_since_limit_desc(
     p_desc_flag BOOLEAN
 )
 
-RETURNS TABLE(user_id INT,
-              nickname CITEXT,
+RETURNS TABLE(nickname CITEXT,
               email CITEXT,
               about TEXT,
               fullname TEXT)
@@ -31,7 +30,7 @@ BEGIN
 
 
   RETURN QUERY
-  SELECT tmp.user_id, tmp.nickname, tmp.email, tmp.about, tmp.fullname
+  SELECT tmp.nickname, tmp.email, tmp.about, tmp.fullname
   FROM tmp_users tmp
   OFFSET since_offset
   LIMIT p_limit;

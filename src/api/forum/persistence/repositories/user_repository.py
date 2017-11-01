@@ -38,12 +38,8 @@ class UserRepository(object):
         data = self._context.callproc('get_users_by_nickname_or_email', [nickname, email])
         return create_many(UserDTO, data)
 
-    def get_for_forum(self, forum_id: int, **kwargs) -> List[UserDTO]:
-
+    def get_for_forum(self, forum_id: int, since: str, limit: str, desc: str) -> List[Dict[str, Any]]:
         data = None
-        desc = kwargs.get('desc')
-        limit = kwargs.get('limit')
-        since = kwargs.get('since')
 
         if since is not None and limit is None and desc is None:
             data = self._context.callproc('get_users_for_forum_since', [forum_id, since])
@@ -69,7 +65,7 @@ class UserRepository(object):
         elif since is None and limit is None and desc is None:
             data = self._context.callproc('get_users_for_forum', [forum_id])
 
-        return create_many(UserDTO, data)
+        return return_many(data)
 
     def get_count(self) -> int:
         data = self._context.callproc('get_users_count', [])

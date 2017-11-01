@@ -68,14 +68,13 @@ class UserService(Service[User, UserDTO, UserRepository]):
     def get_count(self) -> int:
         return self.__repo.get_count()
 
-    def get_for_forum(self, forum_id: int) -> List[User]:
+    def get_for_forum(self, forum_id: int, args: Dict[str, Any]) -> List[Dict[str, Any]]:
 
-        desc = request.args.get('desc')
-        limit = request.args.get('limit')
-        since = request.args.get('since')
+        desc = args.get('desc')
+        limit = args.get('limit')
+        since = args.get('since')
 
-        data = self.__repo.get_for_forum(forum_id, since=since, limit=limit, desc=desc)
-        return self._convert_many(data)
+        return self.__repo.get_for_forum(forum_id=forum_id, since=since, limit=limit, desc=desc)
 
     def _convert(self, entity: UserDTO) -> Optional[User]:
         if not entity:

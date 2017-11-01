@@ -6,7 +6,7 @@ from psycopg2 import errorcodes
 from psycopg2 import IntegrityError
 from psycopg2 import InternalError
 import psycopg2.extras
-from psycopg2.extras import DictCursor
+from psycopg2.extras import RealDictCursor
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2.psycopg1 import connection
 
@@ -133,9 +133,9 @@ class PostgresDataContext(DataContext):
         query = f'UPDATE {collection} SET {update} WHERE {key}=$(key)s'
         self.execute(query, data)
 
-    def _create_connection(self) -> Tuple[connection, DictCursor]:
+    def _create_connection(self) -> Tuple[connection, RealDictCursor]:
         conn = psycopg2.connect(host=self._host, port=self._port, database=self._database,
                                 user=self._user, password=self._password)
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cursor = conn.cursor(cursor_factory=DictCursor)
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
         return conn, cursor
