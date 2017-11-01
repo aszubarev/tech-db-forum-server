@@ -1,21 +1,16 @@
 CREATE OR REPLACE FUNCTION add_forum(
   p_slug CITEXT,
   p_user_id INT,
+  p_nickname CITEXT,
   p_title TEXT)
 
-RETURNS TABLE(forum_id INT,
-              slug CITEXT,
-              user_id INT,
-              title TEXT,
-              threads INT,
-              posts INT)
+RETURNS void
 AS
 $BODY$
   BEGIN
     RETURN QUERY
-        INSERT INTO forums (slug, user_id, title)
-        VALUES (p_slug, p_user_id, p_title)
-        RETURNING forums.forum_id, forums.slug, forums.user_id, forums.title, forums.threads, forums.posts;
+        INSERT INTO forums (slug, user_id, nickname, title)
+        VALUES (p_slug, p_user_id, p_nickname, p_title);
 
 END;
 $BODY$

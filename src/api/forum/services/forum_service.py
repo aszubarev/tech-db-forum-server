@@ -1,5 +1,5 @@
 
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 
 from injector import inject, singleton
 from sqlutils import Service, NoDataFoundError
@@ -34,6 +34,14 @@ class ForumService(Service[Forum, ForumDTO, ForumRepository]):
     def increment_posts_by_number(self, uid: int, number: int):
         self.__repo.increment_posts_by_number(uid=uid, number=number)
         self._clear_cache()
+
+    def add_soft(self, body: Dict[str, Any], **kwargs) -> Dict[str, Any]:
+        body.update({
+            'nickname': kwargs['nickname']
+        })
+        data = self.__repo.add(body)
+        self._clear_cache()
+        return data
 
     @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Forum]:

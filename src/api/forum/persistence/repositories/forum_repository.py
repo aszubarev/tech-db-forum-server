@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 
 from injector import inject
 from sqlutils import DataContext, Repository, create_one
@@ -47,11 +47,15 @@ class ForumRepository(Repository[ForumDTO]):
     def get_all(self) -> List[ForumDTO]:
         raise NotImplementedError
 
-    def add(self, entity: ForumDTO) -> Optional[ForumDTO]:
-        data = self._context.callproc('add_forum', [entity.slug, entity.user_id, entity.title])
-        new_entity = create_one(ForumDTO, data)
-        new_entity.user_nickname = entity.user_nickname
-        return new_entity
+    def add(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        self._context.callproc('add_forum', [params['slug'], params['user_id'], params['nickname'], params['title']])
+        data = params
+        data.update({
+            'threads': 0,
+            'posts': 0
+        })
+        data.pop('user_id')
+        return data
 
     def add_many(self, entities: List[ForumDTO]):
         raise NotImplementedError

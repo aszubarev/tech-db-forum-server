@@ -7,6 +7,7 @@ from apiutils import BaseBlueprint
 from forum.serializers.forum_serializer import ForumSerializer
 from forum.serializers.thread_serializer import ThreadSerializer
 from forum.services.forum_service import ForumService
+from forum.services.user_service import UserService
 from sqlutils import NoDataFoundError, UniqueViolationError
 from forum.services.thread_service import ThreadService
 
@@ -15,13 +16,15 @@ from forum.services.thread_service import ThreadService
 class ForumBlueprint(BaseBlueprint[ForumService]):
 
     @inject
-    def __init__(self, service: ForumService, serializer: ForumSerializer,
+    def __init__(self, service: ForumService, serializer: ForumSerializer, user_service: UserService,
                  thread_service: ThreadService, thread_serializer: ThreadSerializer) -> None:
         super().__init__(service)
         self.__serializer = serializer
 
         self._thread_service = thread_service
         self._thread_serializer = thread_serializer
+
+        self._userService = user_service
 
     @property
     def _name(self) -> str:
@@ -38,14 +41,14 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
     def _create_blueprint(self) -> Blueprint:
         blueprint = Blueprint(self._name, __name__)
 
-        @blueprint.route('forum/<uid>', methods=['GET'])
-        def _get_by_id(uid: str):
-            return self._get_by_id(int(uid))
-
         @blueprint.route('forum/create', methods=['POST'])
         def _add():
             try:
-                return self._add()
+                user = self._userService.get_by_nickname_soft(request.json['user'])
+                if not user:
+                    return self._return_error(f"Can't find user with nickname {request.json['user']}", 404)
+                data = self._service.add_soft(body=request.json, nickname=user['nickname'])
+                return Response(response=json.dumps(data), status=201, mimetype='application/json')
 
             except UniqueViolationError:
                 forum = self.__service.get_by_slug(request.json['slug'])

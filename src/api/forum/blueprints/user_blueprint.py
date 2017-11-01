@@ -37,10 +37,6 @@ class UserBlueprint(BaseBlueprint[UserService]):
     def _create_blueprint(self) -> Blueprint:
         blueprint = Blueprint(self._name, __name__)
 
-        @blueprint.route('user/<uid>', methods=['GET'])
-        def _get_by_id(uid: str):
-            return self._get_by_id(int(uid))
-
         @blueprint.route('user/<nickname>/create', methods=['POST'])
         def _add(nickname: str):
             try:
