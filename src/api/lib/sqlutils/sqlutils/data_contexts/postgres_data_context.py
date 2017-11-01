@@ -1,4 +1,5 @@
 import logging
+from contextlib import contextmanager
 from typing import Any, Dict, Tuple, List
 
 import psycopg2
@@ -8,6 +9,7 @@ from psycopg2 import InternalError
 import psycopg2.extras
 from psycopg2.extras import RealDictCursor
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from psycopg2.pool import ThreadedConnectionPool
 from psycopg2.psycopg1 import connection
 
 from sqlutils.data_contexts.data_context import DataContext
@@ -29,6 +31,8 @@ class PostgresDataContext(DataContext):
         self._database = database
         self._user = user
         self._password = password
+        self._poolConnection = ThreadedConnectionPool(minconn=1, maxconn=90, host=host, port=port,
+                                                      database=database, user=user, password=password)
 
         psycopg2.extras.register_uuid()
 
@@ -51,7 +55,8 @@ class PostgresDataContext(DataContext):
             raise
         finally:
             cursor.close()
-            conn.close()
+            self._put_connection(conn=conn)
+            # conn.close()
         return data
 
     def add_many(self, table: str, values_str: str, args_str: str, params_list: List[List]):
@@ -82,7 +87,8 @@ class PostgresDataContext(DataContext):
             raise
         finally:
             cursor.close()
-            conn.close()
+            self._put_connection(conn=conn)
+            # conn.close()
 
     def callproc(self, cmd, params):
         conn, cursor = self._create_connection()
@@ -103,7 +109,8 @@ class PostgresDataContext(DataContext):
             raise
         finally:
             cursor.close()
-            conn.close()
+            self._put_connection(conn=conn)
+            # conn.close()
         return data
 
     def get_by_id(self, collection: str, key: str = None, value: Any = None) -> Dict[str, Any]:
@@ -133,9 +140,20 @@ class PostgresDataContext(DataContext):
         query = f'UPDATE {collection} SET {update} WHERE {key}=$(key)s'
         self.execute(query, data)
 
+    def _get_connection(self):
+        return self._poolConnection.getconn()
+
+    def _put_connection(self, conn):
+        self._poolConnection.putconn(conn=conn)
+
     def _create_connection(self) -> Tuple[connection, RealDictCursor]:
-        conn = psycopg2.connect(host=self._host, port=self._port, database=self._database,
-                                user=self._user, password=self._password)
+        # conn = psycopg2.connect(host=self._host, port=self._port, database=self._database,
+        #                         user=self._user, password=self._password)
+        # conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        # cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+        conn = self._get_connection()
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = conn.cursor(cursor_factory=RealDictCursor)
+
         return conn, cursor

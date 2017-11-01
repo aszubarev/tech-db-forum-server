@@ -77,7 +77,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
             thread = self.__service.get_by_slug_or_id(slug_or_id)
             if not thread:
                 return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
-            return Response(response=json.dumps(thread), status=409, mimetype='application/json')
+            return Response(response=json.dumps(thread), status=200, mimetype='application/json')
 
         @blueprint.route('thread/<slug_or_id>/details', methods=['POST'])
         def _update(slug_or_id: str):
