@@ -49,21 +49,20 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
                 if not user:
                     return self._return_error(f"Can't find user with nickname {request.json['user']}", 404)
 
-                data = self._service.add_soft(body=request.json, user_id=user['user_id'], nickname=user['nickname'])
+                data = self._service.add_soft(body=request.json,
+                                              user_id=user['user_id'], user_nickname=user['nickname'])
                 return Response(response=json.dumps(data), status=201, mimetype='application/json')
 
             except UniqueViolationError:
-                forum = self.__service.get_by_slug(request.json['slug'])
-                return self._return_one(forum, status=409)
-
-            except NoDataFoundError:
-                return self._return_error(f"Can't find user with nickname {request.json['user']}", 404)
+                data = self.__service.get_by_slug_soft(request.json['slug'])
+                return Response(response=json.dumps(data), status=409, mimetype='application/json')
 
         @blueprint.route('forum/<slug>/details', methods=['GET'])
         def _details(slug: str):
-            model = self._service.get_by_slug(slug)
-            if not model:
+            data = self.__service.get_by_slug_soft(slug)
+            if not data:
                 return self._return_error(f"Can't find forum details by slag = {slug}", 404)
-            return self._return_one(model, status=200)
+
+            return Response(response=json.dumps(data), status=200, mimetype='application/json')
 
         return blueprint

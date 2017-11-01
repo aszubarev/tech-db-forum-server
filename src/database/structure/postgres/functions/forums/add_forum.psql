@@ -9,7 +9,7 @@ AS
 $BODY$
 BEGIN
 
-    INSERT INTO forums (slug, user_id, nickname, title)
+    INSERT INTO forums (slug, user_id, user_nickname, title)
     VALUES (p_slug, p_user_id, p_nickname, p_title);
 
 END;

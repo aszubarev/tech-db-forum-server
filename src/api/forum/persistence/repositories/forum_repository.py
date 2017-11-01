@@ -1,7 +1,7 @@
 from typing import Optional, List, Any, Dict
 
 from injector import inject
-from sqlutils import DataContext, Repository, create_one
+from sqlutils import DataContext, Repository, create_one, return_one
 
 from forum.persistence.dto.forum_dto import ForumDTO
 
@@ -19,6 +19,10 @@ class ForumRepository(Repository[ForumDTO]):
     def get_by_slug(self, slug: str) -> Optional[ForumDTO]:
         data = self._context.callproc('get_forum_by_slug', [slug])
         return create_one(ForumDTO, data)
+
+    def get_by_slug_soft(self, slug: str) -> Optional[Dict[str, Any]]:
+        data = self._context.callproc('get_forum_by_slug', [slug])
+        return return_one(data)
 
     def get_by_slug_setup(self, slug: str) -> Optional[ForumDTO]:
 
@@ -48,15 +52,16 @@ class ForumRepository(Repository[ForumDTO]):
         raise NotImplementedError
 
     def add(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        self._context.callproc('add_forum', [params['slug'], params['user_id'], params['nickname'], params['title']])
+        self._context.callproc('add_forum', [params['slug'],
+                                             params['user_id'], params['user_nickname'], params['title']])
         data = params
         data.update({
-            'user': params['nickname'],
+            'user': params['user_nickname'],
             'threads': 0,
             'posts': 0
         })
         data.pop('user_id')
-        data.pop('nickname')
+        data.pop('user_nickname')
         return data
 
     def add_many(self, entities: List[ForumDTO]):

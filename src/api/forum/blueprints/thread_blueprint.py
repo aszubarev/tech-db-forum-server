@@ -42,17 +42,17 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
         @blueprint.route('forum/<slug>/create', methods=['POST'])
         def _add(slug: str):
             try:
-                data = request.json
-                author = self._userService.get_by_nickname(data.get('author'))
+                body = request.json
+                author = self._userService.get_by_nickname_soft(body.get('author'))
                 if not author:
-                    return self._return_error(f"Can't find author for thread by nickname = {data.get('author')}", 404)
+                    return self._return_error(f"Can't find author for thread by nickname = {body.get('author')}", 404)
 
-                forum = self._forumService.get_by_slug(slug)
+                forum = self._forumService.get_by_slug_soft(slug)
                 if not forum:
                     return self._return_error(f"Can't find forum for thread by slug = {slug}", 404)
 
-                return self._add(author_id=author.uid, forum_id=forum.uid,
-                                 author_nickname=author.nickname, forum_slug=forum.slug)
+                return self._add(author_id=author['user_id'], forum_id=forum['forum_id'],
+                                 author_nickname=author['nickname'], forum_slug=forum['slug'])
 
             except NoDataFoundError:
                 return self._return_error(f"Can't create thread by slag = {slug}", 404)
