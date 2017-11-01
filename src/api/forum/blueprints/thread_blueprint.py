@@ -57,9 +57,8 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
             except NoDataFoundError:
                 return self._return_error(f"Can't create thread by slag = {slug}", 404)
 
-            # TODO here possible id, not a slug
             except UniqueViolationError:
-                thread_slug = request.json['slug']  # here 'slug' is unique name of thread
+                thread_slug = request.json['slug']
                 model = self._service.get_by_slug(thread_slug)
                 return self._return_one(model, status=409)
 
