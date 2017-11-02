@@ -44,8 +44,8 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
 
         @blueprint.route('forum/create', methods=['POST'])
         def _add():
+            body = request.json
             try:
-                body = request.json
                 user = self._userService.get_by_nickname(body['user'])
                 if not user:
                     return self._return_error(f"Can't find user with nickname {body['user']}", 404)

@@ -59,7 +59,7 @@ class PostSerializerFull(Serializer):
                 if 'thread' in related:
                     thread = self._threadService.get_by_id(model.thread.uid)
                     data.update({
-                        'thread': self._threadSerializer.dump(thread)
+                        'thread': thread
                     })
 
                 if 'forum' in related:
