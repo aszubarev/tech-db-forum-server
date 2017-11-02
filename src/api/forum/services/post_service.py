@@ -27,13 +27,12 @@ class PostService(Service[Post, PostDTO, PostRepository]):
     def __repo(self) -> PostRepository:
         return self._repo
 
-    def add_many(self, entities: List[PostDTO]):
-        if not entities:
-            return []
-        data = self._repo.add_many(entities)
-        self._forum_service.increment_posts_by_number(entities[0].forum_id, len(entities))
+    def next_uid(self) -> int:
+        return self.__repo.next_uid()
+
+    def add_many(self, insert_values: str, insert_args: str) -> None:
+        self.__repo.add_many(insert_values=insert_values, insert_args=insert_args)
         self._clear_cache()
-        return self._convert_many(data)
 
     @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Post]:

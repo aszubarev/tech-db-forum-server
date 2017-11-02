@@ -121,7 +121,6 @@ class ThreadRepository(object):
 
     def add(self, params: Dict[str, Any]) -> Dict[str, Any]:
 
-        logging.error(f"[ThreadRepository.add] params = {params}")
         data = self._context.callproc('add_thread', [params['slug'],     # must be init in blueprint
                                                      params['forum_id'], params['forum_slug'],
                                                      params['user_id'], params['user_nickname'],

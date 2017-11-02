@@ -40,6 +40,7 @@ class PostgresDataContext(DataContext):
         conn, cursor = self._create_connection()
         try:
             cursor.execute(cmd, params)
+            conn.commit()
             data = cursor.fetchall()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
@@ -59,20 +60,19 @@ class PostgresDataContext(DataContext):
             # conn.close()
         return data
 
-    def add_many(self, table: str, values_str: str, args_str: str, params_list: List[List]):
+    def add_many(self, table: str, insert_values: str, insert_args: str) -> None:
         """
         :param table: table name
-        :param values_str: (id, data, ...)
-        :param args_str: "(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-        :param params_list: list of insert parameters
+        :param insert_values: (id, data, ...)
+        :param insert_args: "(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
         :return: data
         """
 
         conn, cursor = self._create_connection()
         try:
-            args_str = ','.join(cursor.mogrify(args_str, params).decode('utf-8') for params in params_list)
-            query = f"INSERT INTO {table} {values_str} VALUES {args_str};"
+            query = f"INSERT INTO {table} {insert_values} VALUES {insert_args};"
             cursor.execute(query)
+            conn.commit()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
                 raise UniqueViolationError

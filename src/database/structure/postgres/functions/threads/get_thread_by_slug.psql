@@ -1,7 +1,9 @@
 CREATE OR REPLACE FUNCTION get_thread_by_slug(p_slug CITEXT)
 RETURNS TABLE(id INT,
               slug CITEXT,
+              user_id INT,
               author CITEXT,
+              forum_id INT,
               forum CITEXT,
               created TIMESTAMP WITH TIME ZONE,
               message TEXT,
@@ -10,7 +12,7 @@ RETURNS TABLE(id INT,
 AS
 $BODY$
   BEGIN
-    RETURN QUERY SELECT th.thread_id, th.slug, th.user_nickname, th.forum_slug,
+    RETURN QUERY SELECT th.thread_id, th.slug, th.user_id, th.user_nickname, th.forum_id, th.forum_slug,
                         th.created, th.message, th.title, th.votes
     FROM threads th
     WHERE th.slug = p_slug;

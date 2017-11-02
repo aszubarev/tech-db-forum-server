@@ -31,7 +31,7 @@ class DataContext(metaclass=ABCMeta):
         return NotImplemented
 
     @abstractmethod
-    def add_many(self, table: str, values_str: str, args_str: str, params_list: List[List[Any]]) -> Any:
+    def add_many(self, table: str, insert_values: str, insert_args: str) -> Any:
         return NotImplemented
 
     @abstractmethod

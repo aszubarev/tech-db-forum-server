@@ -138,7 +138,7 @@ class PostRepository(Repository[PostDTO]):
 
     def add(self, entity: PostDTO) -> Optional[PostDTO]:
 
-        uid = self._next_val()
+        uid = self.next_uid()
         if entity.parent_id != 0:
             path = entity.parent_path
             path.append(uid)
@@ -153,38 +153,8 @@ class PostRepository(Repository[PostDTO]):
 
         return new_entity
 
-    def add_many(self, entities: List[PostDTO]) -> List[PostDTO]:
-
-        if not entities:
-            return []
-
-        params_list = []
-        for entity in entities:
-
-            uid = self._next_val()
-            if entity.parent_id != 0:
-                path = entity.parent_path
-                path.append(uid)
-            else:
-                path = [uid]
-
-            entity.uid = uid
-            entity.path = path
-            entity.is_edited = False
-
-            path_str = str(path).replace('[', '{').replace(']', '}')
-            params = [str(uid), str(entity.thread_id), str(entity.forum_id), str(entity.user_id), str(entity.parent_id),
-                      entity.message, entity.created.astimezone(tz=self._tz).isoformat(), str(False), path_str]
-
-            params_list.append(params)
-
-        self._context.add_many(table='posts',
-                               values_str="(post_id, thread_id, forum_id, user_id, "
-                                          "parent_id, message, created, is_edited, path)",
-                               args_str="(%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                               params_list=params_list)
-
-        return entities
+    def add_many(self, insert_values: str, insert_args: str) -> None:
+        self._context.add_many(table='posts', insert_values=insert_values, insert_args=insert_args)
 
     def update(self, entity: PostDTO) -> Optional[PostDTO]:
         data = None
@@ -198,7 +168,7 @@ class PostRepository(Repository[PostDTO]):
     def _update_path(self, uid: int, path: List[int]):
         self._context.callproc('update_post_path_by_id', [uid, path])
 
-    def _next_val(self) -> Optional[int]:
+    def next_uid(self) -> Optional[int]:
         data = self._context.execute("SELECT nextval('posts_post_id_seq');", {})
         if data is None or len(data) == 0:
             return None
