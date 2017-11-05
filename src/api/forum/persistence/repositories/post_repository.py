@@ -30,7 +30,7 @@ class PostRepository(Repository[PostDTO]):
 
         return create_one(PostDTO, data)
 
-    def get_posts_for_thread_soft(self, thread_id: int, **kwargs) -> List[Dict[str, Any]]:
+    def get_posts_for_thread(self, thread_id: int, **kwargs) -> List[Dict[str, Any]]:
         sort = kwargs.get('sort')
         limit = kwargs.get('limit')
         since = kwargs.get('since')
