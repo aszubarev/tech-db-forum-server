@@ -1,8 +1,5 @@
 import logging
 from datetime import datetime
-from typing import List
-
-import sys
 
 import pytz
 from flask import Blueprint, abort, request, Response, json
@@ -10,9 +7,6 @@ from injector import inject, singleton
 
 from apiutils import BaseBlueprint
 from apiutils.errors.bad_request_error import BadRequestError
-
-from forum.exceptions.post_invalid_parent import PostInvalidParentError
-from forum.persistence.dto.post_dto import PostDTO
 
 from forum.serializers.post_serializer import PostSerializer
 from forum.services.forum_service import ForumService
@@ -171,22 +165,3 @@ class PostBlueprint(BaseBlueprint[PostService]):
             return self._return_one(model, status=200)
 
         return blueprint
-
-    def _parse_many_posts(self, **kwargs) -> List[PostDTO]:
-        entities = []
-        load_data_list = request.json
-        if not load_data_list:
-            return entities
-
-        try:
-            prepared_load_data = self._serializer.prepare_load_data(**kwargs)
-            for load_data in load_data_list:
-                load_data.update(prepared_load_data)
-                entity = self._serializer.load(load_data)
-                entities.append(entity)
-
-        except NoDataFoundError as exp:
-            raise NoDataFoundError(f"Can't parse {self._name} entity") from exp
-        except BaseException:
-            abort(400)
-        return entities
