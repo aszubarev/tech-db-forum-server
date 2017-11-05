@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_posts_for_thread_flat_limit_fix(
+CREATE OR REPLACE FUNCTION get_posts_for_thread_flat_limit(
   p_thread_id INT,
   p_limit INT)
 

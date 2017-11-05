@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_posts_for_thread_tree_since_limit_desc_fix(
+CREATE OR REPLACE FUNCTION get_posts_for_thread_tree_since_limit_desc(
   p_thread_id INT,
   p_since INT,
   p_limit INT,

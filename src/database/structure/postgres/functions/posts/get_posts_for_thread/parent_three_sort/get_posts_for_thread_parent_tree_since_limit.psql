@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_posts_for_thread_parent_tree_since_limit_fix(
+CREATE OR REPLACE FUNCTION get_posts_for_thread_parent_tree_since_limit(
   p_thread_id INT,
   p_since INT,
   p_limit INT)
@@ -22,6 +22,7 @@ BEGIN
       WHERE pr.thread_id = p_thread_id
             AND pr.parent_id = 0
             AND pr.path > (SELECT p_sub.path FROM posts p_sub WHERE p_sub.post_id = p_since)
+      ORDER BY pr.post_id
       LIMIT p_limit
     )
     SELECT p.post_id, p.thread_id, p.forum_slug, p.user_nickname,

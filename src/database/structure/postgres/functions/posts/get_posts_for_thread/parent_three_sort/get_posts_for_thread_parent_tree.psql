@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_posts_for_thread_parent_tree_fix(
+CREATE OR REPLACE FUNCTION get_posts_for_thread_parent_tree(
   p_thread_id INT)
 
 RETURNS TABLE(id INT,

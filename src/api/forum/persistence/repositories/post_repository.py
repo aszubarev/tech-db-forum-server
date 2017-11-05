@@ -41,68 +41,68 @@ class PostRepository(Repository[PostDTO]):
         # FLAT SORT or EMPTY SORT
         if sort == 'flat' or sort is None:
             if limit is not None and since is None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_flat_limit_fix', [thread_id, limit])
+                data = self._context.callproc('get_posts_for_thread_flat_limit', [thread_id, limit])
 
             elif limit is not None and since is None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_flat_limit_desc_fix', [thread_id, limit, desc])
+                data = self._context.callproc('get_posts_for_thread_flat_limit_desc', [thread_id, limit, desc])
 
             elif limit is not None and since is not None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_flat_since_limit_fix', [thread_id, since, limit])
+                data = self._context.callproc('get_posts_for_thread_flat_since_limit', [thread_id, since, limit])
 
             elif limit is not None and since is not None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_flat_since_limit_desc_fix',
+                data = self._context.callproc('get_posts_for_thread_flat_since_limit_desc',
                                               [thread_id, since, limit, desc])
 
             elif limit is None and since is None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_flat_desc_fix', [thread_id, desc])
+                data = self._context.callproc('get_posts_for_thread_flat_desc', [thread_id, desc])
 
             elif limit is None and since is None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_flat_fix', [thread_id])
+                data = self._context.callproc('get_posts_for_thread_flat', [thread_id])
 
         # TREE SORT
         elif sort == 'tree':
             if limit is not None and since is None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_tree_limit_fix', [thread_id, limit])
+                data = self._context.callproc('get_posts_for_thread_tree_limit', [thread_id, limit])
 
             elif limit is not None and since is None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_tree_limit_desc_fix', [thread_id, limit, desc])
+                data = self._context.callproc('get_posts_for_thread_tree_limit_desc', [thread_id, limit, desc])
 
             elif limit is not None and since is not None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_tree_since_limit_fix', [thread_id, since, limit])
+                data = self._context.callproc('get_posts_for_thread_tree_since_limit', [thread_id, since, limit])
 
             elif limit is not None and since is not None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_tree_since_limit_desc_fix',
+                data = self._context.callproc('get_posts_for_thread_tree_since_limit_desc',
                                               [thread_id, since, limit, desc])
 
             elif limit is None and since is None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_tree_desc_fix', [thread_id, desc])
+                data = self._context.callproc('get_posts_for_thread_tree_desc', [thread_id, desc])
 
             elif limit is None and since is None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_tree_fix', [thread_id])
+                data = self._context.callproc('get_posts_for_thread_tree', [thread_id])
 
         # PARENT_TREE SORT
         # TODO CREATE INDEX for thread_id and parent_id
         elif sort == 'parent_tree':
             if limit is not None and since is None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_parent_tree_limit_fix', [thread_id, limit])
+                data = self._context.callproc('get_posts_for_thread_parent_tree_limit', [thread_id, limit])
 
             elif limit is not None and since is None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_parent_tree_limit_desc_fix',
+                data = self._context.callproc('get_posts_for_thread_parent_tree_limit_desc',
                                               [thread_id, limit, desc])
 
             elif limit is not None and since is not None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_parent_tree_since_limit_fix',
+                data = self._context.callproc('get_posts_for_thread_parent_tree_since_limit',
                                               [thread_id, since, limit])
 
             elif limit is not None and since is not None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_parent_tree_since_limit_desc_fix',
+                data = self._context.callproc('get_posts_for_thread_parent_tree_since_limit_desc',
                                               [thread_id, since, limit, desc])
 
             elif limit is None and since is None and desc is not None:
-                data = self._context.callproc('get_posts_for_thread_parent_tree_desc_fix', [thread_id, desc])
+                data = self._context.callproc('get_posts_for_thread_parent_tree_desc', [thread_id, desc])
 
             elif limit is None and since is None and desc is None:
-                data = self._context.callproc('get_posts_for_thread_parent_tree_fix', [thread_id])
+                data = self._context.callproc('get_posts_for_thread_parent_tree', [thread_id])
 
         if not data:
             return []
@@ -160,9 +160,6 @@ class PostRepository(Repository[PostDTO]):
 
     def delete(self, uid: int) -> None:
         raise NotImplementedError
-
-    def _update_path(self, uid: int, path: List[int]):
-        self._context.callproc('update_post_path_by_id', [uid, path])
 
     def next_uid(self) -> Optional[int]:
         data = self._context.execute("SELECT nextval('posts_post_id_seq');", {})

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_posts_for_thread_parent_tree_limit_fix(
+CREATE OR REPLACE FUNCTION get_posts_for_thread_parent_tree_limit(
   p_thread_id INT,
   p_limit INT)
 
@@ -19,6 +19,7 @@ BEGIN
       SELECT pr.path
       FROM posts pr
       WHERE pr.thread_id = p_thread_id AND pr.parent_id = 0
+      ORDER BY pr.post_id
       LIMIT p_limit
     )
     SELECT p.post_id, p.thread_id, p.forum_slug, p.user_nickname,
