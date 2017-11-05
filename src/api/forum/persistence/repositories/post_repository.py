@@ -108,7 +108,7 @@ class PostRepository(Repository[PostDTO]):
             return []
 
         for post in data:
-            post['created'] = post['created'].astimezone().isoformat()
+            post['created'] = post['created'].astimezone(self._tz).isoformat()
 
         return data
 
@@ -152,11 +152,22 @@ class PostRepository(Repository[PostDTO]):
     def add_many(self, insert_values: str, insert_args: str) -> None:
         self._context.add_many(table='posts', insert_values=insert_values, insert_args=insert_args)
 
+    # DEPRECATED
     def update(self, entity: PostDTO) -> Optional[PostDTO]:
         data = None
         if entity.message is not None:
             data = self._context.callproc('update_post', [entity.uid, entity.message])
         return create_one(PostDTO, data)
+
+    def update_soft(self, uid: int, message: str):
+        data = self._context.callproc('update_post_soft', [uid, message])
+        response = return_one(data)
+        if not response:
+            return None
+        response['created'] = response['created'].astimezone(self._tz).isoformat()
+        response['isEdited'] = response['isedited']     # WTF??? why should I do this?
+        del response['isedited']                        # WTF??? why should I do this?
+        return response
 
     def delete(self, uid: int) -> None:
         raise NotImplementedError

@@ -3,7 +3,6 @@ from typing import Optional, List, Dict, Any
 from flask import request
 from injector import inject, singleton
 
-from forum.models.thread import Thread
 from forum.services.forum_service import ForumService
 from sqlutils import Service
 
@@ -33,6 +32,11 @@ class PostService(Service[Post, PostDTO, PostRepository]):
     def add_many(self, insert_values: str, insert_args: str) -> None:
         self.__repo.add_many(insert_values=insert_values, insert_args=insert_args)
         self._clear_cache()
+
+    def update_soft(self, uid: int, message: str) -> Optional[Dict[str, Any]]:
+        response = self.__repo.update_soft(uid=uid, message=message)
+        self._clear_cache()
+        return response
 
     @cache.memoize(600)
     def get_by_id(self, uid: int) -> Optional[Post]:
