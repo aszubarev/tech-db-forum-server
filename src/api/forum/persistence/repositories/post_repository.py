@@ -148,13 +148,3 @@ class PostRepository(object):
             return None
         result_dict = data[0]
         return result_dict.get('nextval')
-
-    @staticmethod
-    def _create_many(data: List[Dict[str, Any]], thread: Thread) -> List[PostDTO]:
-        entities = []
-        for row in data:
-            entity = PostDTO.create(row)
-            entity.forum_slug = thread.forum.slug
-            entities.append(entity)
-        return entities
-
