@@ -4,7 +4,6 @@ from typing import Optional, List, Dict, Any
 import pytz
 from injector import inject
 
-from forum.models.thread import Thread
 from sqlutils import DataContext, create_one, return_one
 
 from forum.persistence.dto.post_dto import PostDTO
