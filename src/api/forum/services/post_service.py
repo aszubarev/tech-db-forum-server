@@ -34,7 +34,7 @@ class PostService(Service[Post, PostDTO, PostRepository]):
         self._clear_cache()
 
     def update_soft(self, uid: int, message: str) -> Optional[Dict[str, Any]]:
-        response = self.__repo.update_soft(uid=uid, message=message)
+        response = self.__repo.update(uid=uid, message=message)
         self._clear_cache()
         return response
 

@@ -1,16 +1,16 @@
 import logging
-from typing import Optional, List, Dict, Any, TypeVar, Type
+from typing import Optional, List, Dict, Any
 
 import pytz
 from injector import inject
 
 from forum.models.thread import Thread
-from sqlutils import DataContext, Repository, create_one, create_many, return_one, NoDataFoundError
+from sqlutils import DataContext, create_one, return_one
 
 from forum.persistence.dto.post_dto import PostDTO
 
 
-class PostRepository(Repository[PostDTO]):
+class PostRepository(object):
 
     @inject
     def __init__(self, context: DataContext) -> None:
@@ -126,40 +126,10 @@ class PostRepository(Repository[PostDTO]):
         result_dict = data[0]
         return result_dict.get('posts_count')
 
-    def get_all(self) -> List[PostDTO]:
-        raise NotImplementedError
-
-    def clear(self):
-        self._context.callproc('clear_posts', [])
-
-    def add(self, entity: PostDTO) -> Optional[PostDTO]:
-
-        uid = self.next_uid()
-        if entity.parent_id != 0:
-            path = entity.parent_path
-            path.append(uid)
-        else:
-            path = [uid]
-
-        data = self._context.callproc('add_post_new', [uid, entity.thread_id, entity.forum_id, entity.user_id,
-                                                       entity.parent_id, entity.message, entity.created.astimezone(tz=self._tz).isoformat(), path])
-        new_entity = create_one(PostDTO, data)
-        new_entity.user_nickname = entity.user_nickname
-        new_entity.forum_slug = entity.forum_slug
-
-        return new_entity
-
     def add_many(self, insert_values: str, insert_args: str) -> None:
         self._context.add_many(table='posts', insert_values=insert_values, insert_args=insert_args)
 
-    # DEPRECATED
-    def update(self, entity: PostDTO) -> Optional[PostDTO]:
-        data = None
-        if entity.message is not None:
-            data = self._context.callproc('update_post', [entity.uid, entity.message])
-        return create_one(PostDTO, data)
-
-    def update_soft(self, uid: int, message: str):
+    def update(self, uid: int, message: str):
         data = self._context.callproc('update_post_soft', [uid, message])
         response = return_one(data)
         if not response:
@@ -169,8 +139,8 @@ class PostRepository(Repository[PostDTO]):
         del response['isedited']                        # WTF??? why should I do this?
         return response
 
-    def delete(self, uid: int) -> None:
-        raise NotImplementedError
+    def clear(self):
+        self._context.callproc('clear_posts', [])
 
     def next_uid(self) -> Optional[int]:
         data = self._context.execute("SELECT nextval('posts_post_id_seq');", {})
