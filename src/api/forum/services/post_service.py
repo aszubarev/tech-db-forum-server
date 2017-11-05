@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 from flask import request
 from injector import inject, singleton
@@ -62,6 +62,15 @@ class PostService(Service[Post, PostDTO, PostRepository]):
 
         entities = self.__repo.get_posts_for_thread(thread=thread, desc=desc, limit=limit, since=since, sort=sort)
         return self._convert_many(entities)
+
+    def get_posts_for_thread_soft(self, thread_id: int) -> List[Dict[str, Any]]:
+        desc = request.args.get('desc')
+        limit = request.args.get('limit')
+        since = request.args.get('since')
+        sort = request.args.get('sort')
+
+        return self.__repo.get_posts_for_thread_soft(thread_id=thread_id, desc=desc,
+                                                     limit=limit, since=since, sort=sort)
 
     def _convert(self, entity: PostDTO) -> Optional[Post]:
         if not entity:

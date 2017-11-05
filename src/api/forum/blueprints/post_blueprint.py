@@ -129,8 +129,8 @@ class PostBlueprint(BaseBlueprint[PostService]):
                 if not thread:
                     return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
 
-                models = self.__service.get_posts_for_thread(thread)
-                return self._return_many(models, status=200)
+                response = self.__service.get_posts_for_thread_soft(thread.uid)
+                return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
             except NoDataFoundError as exp:
                 return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)

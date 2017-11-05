@@ -1,0 +1,28 @@
+CREATE OR REPLACE FUNCTION get_posts_for_thread_flat_since_limit_fix(
+  p_thread_id INT,
+  p_since INT,
+  p_limit INT)
+
+RETURNS TABLE(id INT,
+              thread INT,
+              forum CITEXT,
+              author CITEXT,
+              parent INT,
+              message TEXT,
+              created TIMESTAMP WITH TIME ZONE,
+              isEdited BOOLEAN)
+AS
+$BODY$
+BEGIN
+
+    RETURN QUERY
+    SELECT p.post_id, p.thread_id, p.forum_slug, p.user_nickname,
+           p.parent_id, p.message, p.created, p.is_edited
+    FROM posts p
+    WHERE p.thread_id = p_thread_id AND p.post_id > p_since
+    ORDER BY p.post_id
+    LIMIT p_limit;
+
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

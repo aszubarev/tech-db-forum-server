@@ -1,0 +1,34 @@
+CREATE OR REPLACE FUNCTION get_posts_for_thread_tree_desc_fix(
+  p_thread_id INT,
+  p_desc_flag BOOLEAN)
+
+RETURNS TABLE(id INT,
+              thread INT,
+              forum CITEXT,
+              author CITEXT,
+              parent INT,
+              message TEXT,
+              created TIMESTAMP WITH TIME ZONE,
+              isEdited BOOLEAN)
+AS
+$BODY$
+BEGIN
+
+    RETURN QUERY
+    SELECT p.post_id, p.thread_id, p.forum_slug, p.user_nickname,
+           p.parent_id, p.message, p.created, p.is_edited
+    FROM posts p
+    WHERE p.thread_id = p_thread_id
+    ORDER BY CASE p_desc_flag
+                WHEN false THEN p.path
+                ELSE NULL
+             END ASC,
+
+             CASE p_desc_flag
+                WHEN true  THEN p.path
+                ELSE NULL
+             END DESC;
+
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
