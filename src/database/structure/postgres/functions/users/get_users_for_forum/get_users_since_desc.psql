@@ -13,25 +13,40 @@ $BODY$
 DECLARE since_offset INT;
 BEGIN
 
-  DROP TABLE IF EXISTS tmp_users;
-  CREATE TEMP TABLE tmp_users
-  AS
-  SELECT *
-  FROM get_users_for_forum_desc(p_forum_id, p_desc_flag);
-
-  SELECT rn INTO since_offset, nickname
-  FROM (
-    SELECT ROW_NUMBER() OVER () as rn, tmp_users.nickname as nickname
-    FROM tmp_users
-  ) tmp
-  WHERE tmp.nickname = p_since COLLATE "ucs_basic"
-  LIMIT 1;
-
-
   RETURN QUERY
-  SELECT tmp.nickname, tmp.email, tmp.about, tmp.fullname
-  FROM tmp_users tmp
-  OFFSET since_offset;
+
+  SELECT res.nickname, res.email, res.about, res.fullname
+  FROM (
+
+        ( SELECT users.nickname, users.email, users.about, users.fullname
+          FROM posts
+          JOIN users on posts.user_id = users.user_id
+          WHERE posts.forum_id = p_forum_id AND CASE p_desc_flag
+                                                    WHEN true THEN  posts.user_nickname < p_since COLLATE "ucs_basic"
+                                                    ELSE posts.user_nickname > p_since COLLATE "ucs_basic"
+                                                END
+        )
+
+        UNION
+
+        ( SELECT users.nickname, users.email, users.about, users.fullname
+          FROM threads
+          JOIN users on threads.user_id = users.user_id
+          WHERE threads.forum_id = p_forum_id AND CASE p_desc_flag
+                                                    WHEN true THEN  threads.user_nickname < p_since COLLATE "ucs_basic"
+                                                    ELSE threads.user_nickname > p_since COLLATE "ucs_basic"
+                                                  END
+        )
+  ) res
+  ORDER BY CASE p_desc_flag
+              WHEN false THEN res.nickname
+              ELSE NULL
+           END COLLATE "ucs_basic" ASC,
+
+           CASE p_desc_flag
+              WHEN true THEN res.nickname
+              ELSE NULL
+           END COLLATE "ucs_basic" DESC;
 
   END;
 $BODY$
