@@ -4,35 +4,34 @@ CREATE OR REPLACE FUNCTION get_users_for_forum_since_limit(
     p_limit INT
 )
 
-RETURNS TABLE(user_id INT,
-              nickname CITEXT,
+RETURNS TABLE(nickname CITEXT,
               email CITEXT,
               about TEXT,
               fullname TEXT)
 AS
 $BODY$
-DECLARE since_offset INT;
 BEGIN
 
-  DROP TABLE IF EXISTS tmp_users;
-  CREATE TEMP TABLE tmp_users
-  AS
-  SELECT *
-  FROM get_users_for_forum_desc(p_forum_id, FALSE);
-
-  SELECT rn INTO since_offset, nickname
-  FROM (
-    SELECT ROW_NUMBER() OVER () as rn, tmp_users.nickname as nickname
-    FROM tmp_users
-  ) tmp
-  WHERE tmp.nickname = p_since COLLATE "ucs_basic"
-  LIMIT 1;
-
-
   RETURN QUERY
-  SELECT tmp.user_id, tmp.nickname, tmp.email, tmp.about, tmp.fullname
-  FROM tmp_users tmp
-  OFFSET since_offset
+
+  SELECT res.nickname, res.email, res.about, res.fullname
+  FROM (
+
+        ( SELECT users.nickname, users.email, users.about, users.fullname
+          FROM posts
+          JOIN users on posts.user_id = users.user_id
+          WHERE posts.forum_id = p_forum_id AND posts.user_nickname > p_since COLLATE "ucs_basic"
+        )
+
+        UNION
+
+        ( SELECT users.nickname, users.email, users.about, users.fullname
+          FROM threads
+          JOIN users on threads.user_id = users.user_id
+          WHERE threads.forum_id = p_forum_id AND threads.user_nickname > p_since COLLATE "ucs_basic"
+        )
+  ) res
+  ORDER BY res.nickname COLLATE "ucs_basic"
   LIMIT p_limit;
 
   END;

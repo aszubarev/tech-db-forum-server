@@ -2,8 +2,7 @@ CREATE OR REPLACE FUNCTION update_user_by_about(
   p_nickname CITEXT,
   p_about TEXT)
 
-RETURNS TABLE(user_id INT,
-              nickname CITEXT,
+RETURNS TABLE(nickname CITEXT,
               email CITEXT,
               about TEXT,
               fullname TEXT)
@@ -14,7 +13,7 @@ $BODY$
         UPDATE users
         SET about = p_about
         WHERE users.nickname = p_nickname
-        RETURNING users.user_id, users.nickname, users.email, users.about, users.fullname;
+        RETURNING users.nickname, users.email, users.about, users.fullname;
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;

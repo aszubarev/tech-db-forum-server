@@ -1,18 +1,19 @@
 CREATE OR REPLACE FUNCTION get_post_by_id(p_post_id INT)
-RETURNS TABLE(post_id INT,
-              thread_id INT,
+RETURNS TABLE(id INT,
+              thread INT,
               forum_id INT,
+              forum CITEXT,
               user_id INT,
+              author CITEXT,
               parent_id INT,
               message TEXT,
               created TIMESTAMP WITH TIME ZONE,
-              is_edited BOOLEAN,
-              path INTEGER[])
+              isEdited BOOLEAN)
 AS
 $BODY$
   BEGIN
-    RETURN QUERY SELECT pst.post_id, pst.thread_id, pst.forum_id, pst.user_id,
-                        pst.parent_id, pst.message, pst.created, pst.is_edited, pst.path
+    RETURN QUERY SELECT pst.post_id, pst.thread_id, pst.forum_id, pst.forum_slug, pst.user_id, pst.user_nickname,
+                        pst.parent_id, pst.message, pst.created, pst.is_edited
     FROM posts pst
     WHERE pst.post_id = p_post_id;
   END;

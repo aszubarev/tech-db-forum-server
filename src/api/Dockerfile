@@ -36,4 +36,4 @@ ENV SERVER_NAME forum_server
 ENV DB_HOST postgres
 ENV WEB_PORT 80
 
-CMD /usr/local/bin/gunicorn -w 1 -b :$WEB_PORT main:app
+CMD /usr/local/bin/gunicorn -w 4 -b :$WEB_PORT main:app

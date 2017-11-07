@@ -1,7 +1,7 @@
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 
 from injector import inject
-from sqlutils import DataContext, Repository, create_one
+from sqlutils import DataContext, Repository, create_one, return_one
 
 from forum.persistence.dto.forum_dto import ForumDTO
 
@@ -12,18 +12,13 @@ class ForumRepository(Repository[ForumDTO]):
     def __init__(self, context: DataContext) -> None:
         self._context = context
 
-    def get_by_id(self, uid: int) -> Optional[ForumDTO]:
+    def get_by_id(self, uid: int) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_forum_by_id', [uid])
-        return create_one(ForumDTO, data)
+        return return_one(data)
 
-    def get_by_slug(self, slug: str) -> Optional[ForumDTO]:
+    def get_by_slug(self, slug: str) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_forum_by_slug', [slug])
-        return create_one(ForumDTO, data)
-
-    def get_by_slug_setup(self, slug: str) -> Optional[ForumDTO]:
-
-        data = self._context.callproc('get_forum_by_slug_ret_uid', [slug])
-        return create_one(ForumDTO, data)
+        return return_one(data)
 
     def increment_threads(self, uid: int) -> None:
         self._context.callproc('forum_increment_threads', [uid])
@@ -44,14 +39,17 @@ class ForumRepository(Repository[ForumDTO]):
     def clear(self):
         self._context.callproc('clear_forums', [])
 
-    def get_all(self) -> List[ForumDTO]:
+    def get_all(self):
         raise NotImplementedError
 
-    def add(self, entity: ForumDTO) -> Optional[ForumDTO]:
-        data = self._context.callproc('add_forum', [entity.slug, entity.user_id, entity.title])
-        new_entity = create_one(ForumDTO, data)
-        new_entity.user_nickname = entity.user_nickname
-        return new_entity
+    def add(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        self._context.callproc('add_forum', [params['slug'],  params['user_id'], params['user'], params['title']])
+        data = params
+        data.update({
+            'threads': 0,
+            'posts': 0
+        })
+        return data
 
     def add_many(self, entities: List[ForumDTO]):
         raise NotImplementedError

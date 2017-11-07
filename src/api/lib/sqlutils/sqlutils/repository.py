@@ -21,10 +21,6 @@ class Repository(Generic[T]):
         raise NotImplementedError
 
     @abstractmethod
-    def add_many(self, entities: List[T]) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
     def update(self, entity: T) -> None:
         raise NotImplementedError
 

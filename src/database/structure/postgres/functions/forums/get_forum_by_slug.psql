@@ -1,17 +1,15 @@
 CREATE OR REPLACE FUNCTION get_forum_by_slug(p_slug CITEXT)
   RETURNS TABLE(forum_id INT,
                 slug CITEXT,
-                user_id INT,
+                "user" CITEXT,
                 title TEXT,
                 threads INT,
-                posts INT,
-                user_nickname CITEXT)
+                posts INT)
 AS
 $BODY$
   BEGIN
-    RETURN QUERY SELECT f.forum_id, f.slug, f.user_id, f.title, f.threads, f.posts, u.nickname
+    RETURN QUERY SELECT f.forum_id, f.slug, f.user_nickname, f.title, f.threads, f.posts
     FROM forums f
-    JOIN users u on f.user_id = u.user_id
     WHERE f.slug = p_slug;
   END;
 $BODY$
