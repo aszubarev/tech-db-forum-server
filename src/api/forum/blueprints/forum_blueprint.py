@@ -46,7 +46,7 @@ class ForumBlueprint(BaseBlueprint[ForumRepository]):
                 return Response(response=json.dumps(data), status=201, mimetype='application/json')
 
             except UniqueViolationError:
-                data = self.__service.get_by_slug(body['slug'])
+                data = self.__repo.get_by_slug(body['slug'])
                 return Response(response=json.dumps(data), status=409, mimetype='application/json')
 
         @blueprint.route('forum/<slug>/details', methods=['GET'])

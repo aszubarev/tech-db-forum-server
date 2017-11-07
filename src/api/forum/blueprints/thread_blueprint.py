@@ -103,7 +103,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadRepository]):
             if not thread:
                 return self._return_error(f"Can't update thread by slug_or_id = {slug_or_id}", 404)
 
-            return self._return_one(thread, status=200)
+            return Response(response=json.dumps(thread), status=200, mimetype='application/json')
 
         @blueprint.route('thread/<slug_or_id>/vote', methods=['POST'])
         def _vote(slug_or_id: str):

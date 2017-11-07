@@ -13,9 +13,9 @@ from apiutils import BaseBlueprint
 class UserBlueprint(BaseBlueprint[UserRepository]):
 
     @inject
-    def __init__(self, repo: UserRepository, forum_repository: ForumRepository) -> None:
+    def __init__(self, repo: UserRepository, forum_repo: ForumRepository) -> None:
         super().__init__(repo)
-        self._forumRepository = forum_repository
+        self._forumRepo = forum_repo
 
     @property
     def _name(self) -> str:
@@ -57,7 +57,7 @@ class UserBlueprint(BaseBlueprint[UserRepository]):
             try:
 
                 # TODO use light version
-                user = self.__service.get_by_nickname(nickname=nickname)
+                user = self.__repo.get_by_nickname(nickname=nickname)
                 if not user:
                     return self._return_error(f"Can't update user with nickname {nickname}", 404)
 
@@ -66,7 +66,7 @@ class UserBlueprint(BaseBlueprint[UserRepository]):
                 params.update({
                     'nickname': user['nickname']
                 })
-                data = self._repository.update(params)
+                data = self.__repo.update(params)
                 return Response(response=json.dumps(data), status=200, mimetype='application/json')
 
             except UniqueViolationError:
@@ -75,7 +75,7 @@ class UserBlueprint(BaseBlueprint[UserRepository]):
         @blueprint.route('forum/<forum_slug>/users', methods=['GET'])
         def _get_users_for_forum(forum_slug: str):
 
-            forum = self._forumRepository.get_by_slug(forum_slug)
+            forum = self._forumRepo.get_by_slug(forum_slug)
             if not forum:
                 return self._return_error(f"Can't find forum: forum_slug =  {forum_slug}", 404)
 

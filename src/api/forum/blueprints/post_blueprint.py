@@ -70,7 +70,7 @@ class PostBlueprint(BaseBlueprint[PostRepository]):
                     parent_id = 0
                     path = "{" + str(uid) + "}"
                 else:
-                    parent = self._postRepo.get_parent(parent_id)
+                    parent = self.__repo.get_parent(parent_id)
                     if not parent:
                         return self._return_error(f"Can't get parent for post", 409)
 
@@ -115,7 +115,13 @@ class PostBlueprint(BaseBlueprint[PostRepository]):
                 if not thread:
                     return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
 
-                response = self.__repo.get_posts_for_thread(thread['id'])
+                sort = request.args.get('sort')
+                since = request.args.get('since')
+                limit = request.args.get('limit')
+                desc = request.args.get('desc')
+
+                response = self.__repo.get_posts_for_thread(thread['id'],
+                                                            sort=sort, since=since, limit=limit, desc=desc)
                 return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
             except NoDataFoundError:
