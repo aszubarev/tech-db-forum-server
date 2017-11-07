@@ -39,8 +39,8 @@ class PostService(Service[Post, PostDTO, PostRepository]):
         return response
 
     @cache.memoize(600)
-    def get_by_id(self, uid: int) -> Optional[Post]:
-        return super().get_by_id(uid)
+    def get_by_id(self, uid: int) -> Optional[Dict[str, Any]]:
+        return self.__repo.get_by_id(uid)
 
     @cache.memoize(600)
     def get_by_id_setup(self, uid: int, load_path: bool = False, load_thread: bool = False) -> Optional[Post]:

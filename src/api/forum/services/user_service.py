@@ -40,6 +40,9 @@ class UserService(Service[User, UserDTO, UserRepository]):
     def __repo(self) -> UserRepository:
         return self._repo
 
+    def get_by_id(self, uid: int) -> Optional[Dict[str, Any]]:
+        return self.__repo.get_by_id(uid)
+
     @cache.memoize(600)
     def get_by_nickname(self, nickname: str) -> Optional[Dict[str, Any]]:
         return self.__repo.get_by_nickname(nickname)
@@ -78,7 +81,6 @@ class UserService(Service[User, UserDTO, UserRepository]):
     @staticmethod
     def _clear_cache() -> None:
         # TODO don't remember update cache
-        cache.delete_memoized(UserService.get_by_id)
         cache.delete_memoized(UserService.get_by_nickname)
         cache.delete_memoized(UserService.get_by_nickname_setup)
         cache.delete_memoized(UserService.get_by_nickname_or_email)

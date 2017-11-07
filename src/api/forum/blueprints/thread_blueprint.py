@@ -1,3 +1,4 @@
+import dateutil.parser
 from flask import Blueprint, abort, request, Response, json
 from injector import inject, singleton
 
@@ -47,7 +48,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 if not author:
                     return self._return_error(f"Can't find author for thread by nickname = {body.get('author')}", 404)
 
-                forum = self._forumService.get_by_slug_soft(slug)
+                forum = self._forumService.get_by_slug(slug)
                 if not forum:
                     return self._return_error(f"Can't find forum for thread by slug = {slug}", 404)
 
@@ -64,12 +65,19 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
         @blueprint.route('forum/<slug>/threads', methods=['GET'])
         def _get_threads_by_forum(slug: str):
-            try:
-                models = self.__service.get_for_forum(slug)
-                return self._return_many(models, status=200)
 
-            except NoDataFoundError:
+            forum = self._forumService.get_by_slug(slug)
+            if forum is None:
                 return self._return_error(f"Can't get threads by forum slag = {slug}", 404)
+
+            desc = request.args.get('desc')
+            limit = request.args.get('limit')
+            since = request.args.get('since')
+            if since is not None:
+                since = dateutil.parser.parse(since)
+
+            threads = self.__service.get_for_forum(forum['forum_id'], since=since, limit=limit, desc=desc)
+            return Response(response=json.dumps(threads), status=200, mimetype='application/json')
 
         @blueprint.route('thread/<slug_or_id>/details', methods=['GET'])
         def _details(slug_or_id: str):

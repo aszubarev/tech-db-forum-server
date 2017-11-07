@@ -12,9 +12,9 @@ class UserRepository(object):
     def __init__(self, context: DataContext) -> None:
         self._context = context
 
-    def get_by_id(self, uid: int) -> Optional[UserDTO]:
+    def get_by_id(self, uid: int) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_user_by_id', [uid])
-        return create_one(UserDTO, data)
+        return return_one(data)
 
     def get_by_nickname(self, nickname: str) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_user_by_nickname', [nickname])

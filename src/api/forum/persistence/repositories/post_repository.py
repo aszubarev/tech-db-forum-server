@@ -16,9 +16,23 @@ class PostRepository(object):
         self._context = context
         self._tz = pytz.timezone('Europe/Moscow')
 
-    def get_by_id(self, uid: int) -> Optional[PostDTO]:
+    def get_by_id(self, uid: int) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_post_by_id', [uid])
-        return create_one(PostDTO, data)
+        if not data:
+            return None
+        response = return_one(data)
+        if not response:
+            return None
+
+        response['created'] = response['created'].astimezone(self._tz).isoformat()
+        response['isEdited'] = response['isedited']
+        del response['isedited']
+
+        return response
+
+    def get_parent(self, uid: int) -> Optional[Dict[str, Any]]:
+        data = self._context.callproc('get_parent_post_by_id', [uid])
+        return return_one(data)
 
     def get_by_id_setup(self, uid: int, load_path: bool, load_thread: bool) -> Optional[PostDTO]:
 

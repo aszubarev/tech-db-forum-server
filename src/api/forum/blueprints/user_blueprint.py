@@ -83,11 +83,11 @@ class UserBlueprint(BaseBlueprint[UserService]):
         @blueprint.route('forum/<forum_slug>/users', methods=['GET'])
         def _get_users_for_forum(forum_slug: str):
 
-            forum = self._forumService.get_by_slug_setup(forum_slug)
+            forum = self._forumService.get_by_slug(forum_slug)
             if not forum:
                 return self._return_error(f"Can't find forum: forum_slug =  {forum_slug}", 404)
 
-            data = self._service.get_for_forum(forum_id=forum.uid, args=request.args)
+            data = self._service.get_for_forum(forum_id=forum['forum_id'], args=request.args)
             return Response(response=json.dumps(data), status=200, mimetype='application/json')
 
         return blueprint

@@ -7,6 +7,7 @@ from injector import inject, singleton
 
 from apiutils import BaseBlueprint
 from apiutils.errors.bad_request_error import BadRequestError
+from forum.persistence.repositories.post_repository import PostRepository
 
 from forum.serializers.post_serializer import PostSerializer
 from forum.services.forum_service import ForumService
@@ -23,13 +24,15 @@ class PostBlueprint(BaseBlueprint[PostService]):
     @inject
     def __init__(self, service: PostService, serializer: PostSerializer,
                  post_serializer_full: PostSerializerFull,
-                 thread_service: ThreadService, user_service: UserService, forum_service: ForumService) -> None:
+                 thread_service: ThreadService, user_service: UserService, forum_service: ForumService,
+                 post_repo: PostRepository) -> None:
         super().__init__(service)
         self._threadService = thread_service
         self.__serializer = serializer
         self._postSerializerFull = post_serializer_full
         self._userService = user_service
         self._forumService = forum_service
+        self._postRepo = post_repo
 
         self._tz = pytz.timezone('Europe/Moscow')
 
@@ -74,18 +77,19 @@ class PostBlueprint(BaseBlueprint[PostService]):
 
                 uid = self.__service.next_uid()
                 parent_id = post.get('parent')
+
                 if not parent_id:
                     parent_id = 0
                     path = "{" + str(uid) + "}"
                 else:
-                    parent = self.__service.get_by_id(parent_id)
+                    parent = self._postRepo.get_parent(parent_id)
                     if not parent:
                         return self._return_error(f"Can't get parent for post", 409)
 
-                    if parent.thread.uid != thread['id']:
+                    if parent['thread'] != thread['id']:
                         return self._return_error(f"The parent belongs to another thread: parent_id = {parent_id}", 409)
 
-                    path = parent.path
+                    path = parent['path']
                     path.append(uid)
                     path = str(path).replace('[', '{').replace(']', '}')
 
@@ -134,13 +138,35 @@ class PostBlueprint(BaseBlueprint[PostService]):
 
         @blueprint.route('post/<uid>/details', methods=['GET'])
         def _details(uid: int):
-            model = self.__service.get_by_id(uid)
+            post = self.__service.get_by_id(uid)
 
-            if not model:
+            if not post:
                 return self._return_error(f"Can't find post by id = {uid}", 404)
 
+            author = None
+            forum = None
+            thread = None
+
             related = request.args.get('related')
-            response = self._postSerializerFull.dump(model, related=related)
+
+            if related is not None:
+
+                if 'user' in related:
+                    author = self._userService.get_by_id(post['user_id'])
+
+                if 'thread' in related:
+                    thread = self._threadService.get_by_id(post['thread'])
+
+                if 'forum' in related:
+                    forum = self._forumService.get_by_id(post['forum_id'])
+
+            response = {
+                'author': author,
+                'thread': thread,
+                'forum': forum,
+                'post': post
+            }
+
             return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
         @blueprint.route('post/<uid>/details', methods=['POST'])
@@ -153,7 +179,7 @@ class PostBlueprint(BaseBlueprint[PostService]):
                 post = self.__service.get_by_id(uid)
                 if not post:
                     return self._return_error(f"Can't get post by uid = {uid}", 404)
-                return self._return_one(post, status=200)
+                return Response(response=json.dumps(post), status=200, mimetype='application/json')
 
             message = data['message']
             response = self.__service.update_soft(uid=uid, message=message)

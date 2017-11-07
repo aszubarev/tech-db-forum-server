@@ -12,22 +12,13 @@ class ForumRepository(Repository[ForumDTO]):
     def __init__(self, context: DataContext) -> None:
         self._context = context
 
-    def get_by_id(self, uid: int) -> Optional[ForumDTO]:
+    def get_by_id(self, uid: int) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_forum_by_id', [uid])
-        return create_one(ForumDTO, data)
-
-    def get_by_slug(self, slug: str) -> Optional[ForumDTO]:
-        data = self._context.callproc('get_forum_by_slug', [slug])
-        return create_one(ForumDTO, data)
-
-    def get_by_slug_soft(self, slug: str) -> Optional[Dict[str, Any]]:
-        data = self._context.callproc('get_forum_by_slug', [slug])
         return return_one(data)
 
-    def get_by_slug_setup(self, slug: str) -> Optional[ForumDTO]:
-
-        data = self._context.callproc('get_forum_by_slug_ret_uid', [slug])
-        return create_one(ForumDTO, data)
+    def get_by_slug(self, slug: str) -> Optional[Dict[str, Any]]:
+        data = self._context.callproc('get_forum_by_slug', [slug])
+        return return_one(data)
 
     def increment_threads(self, uid: int) -> None:
         self._context.callproc('forum_increment_threads', [uid])
@@ -48,7 +39,7 @@ class ForumRepository(Repository[ForumDTO]):
     def clear(self):
         self._context.callproc('clear_forums', [])
 
-    def get_all(self) -> List[ForumDTO]:
+    def get_all(self):
         raise NotImplementedError
 
     def add(self, params: Dict[str, Any]) -> Dict[str, Any]:

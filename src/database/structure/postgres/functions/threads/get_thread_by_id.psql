@@ -12,8 +12,9 @@ RETURNS TABLE(id INT,
 AS
 $BODY$
   BEGIN
-    RETURN QUERY SELECT th.thread_id, th.slug, th.user_id, th.user_nickname, th.forum_id, th.forum_slug,
-                        th.created, th.message, th.title, th.votes
+    RETURN QUERY
+    SELECT th.thread_id, th.slug, th.user_id, th.user_nickname, th.forum_id, th.forum_slug,
+           th.created, th.message, th.title, th.votes
     FROM threads th
     WHERE th.thread_id = p_thread_id;
   END;

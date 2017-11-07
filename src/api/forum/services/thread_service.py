@@ -119,20 +119,8 @@ class ThreadService(Service[Thread, ThreadDTO, ThreadRepository]):
         self._clear_cache()
         return self._convert(data)
 
-    def get_for_forum(self, slug: str) -> List[Thread]:
-        forum = self._forumService.get_by_slug(slug)
-        if forum is None:
-            raise NoDataFoundError(f"Can't find forum by slug = {slug}")
-
-        desc = request.args.get('desc')
-        limit = request.args.get('limit')
-        since = request.args.get('since')
-
-        if since is not None:
-            since = dateutil.parser.parse(since)
-
-        data = self._repo.get_for_forum(forum.uid, desc=desc, limit=limit, since=since)
-        return self._convert_many(data)
+    def get_for_forum(self, forum_id: int, **kwargs) -> List[Dict[str, Any]]:
+        return self._repo.get_for_forum(forum_id, **kwargs)
 
     def _convert(self, entity: ThreadDTO) -> Optional[Thread]:
         if not entity:

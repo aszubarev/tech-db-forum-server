@@ -54,12 +54,12 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
                 return Response(response=json.dumps(data), status=201, mimetype='application/json')
 
             except UniqueViolationError:
-                data = self.__service.get_by_slug_soft(body['slug'])
+                data = self.__service.get_by_slug(body['slug'])
                 return Response(response=json.dumps(data), status=409, mimetype='application/json')
 
         @blueprint.route('forum/<slug>/details', methods=['GET'])
         def _details(slug: str):
-            data = self.__service.get_by_slug_soft(slug)
+            data = self.__service.get_by_slug(slug)
             if not data:
                 return self._return_error(f"Can't find forum details by slag = {slug}", 404)
 

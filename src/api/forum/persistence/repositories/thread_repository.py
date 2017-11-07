@@ -4,7 +4,7 @@ from typing import Optional, List, Any, Dict
 from injector import inject
 
 from forum.persistence.dto.vote_dto import VoteDTO
-from sqlutils import DataContext, Repository, create_one, create_many, return_one
+from sqlutils import DataContext, Repository, create_one, create_many, return_one, return_many
 
 from forum.persistence.dto.thread_dto import ThreadDTO
 
@@ -65,7 +65,7 @@ class ThreadRepository(object):
 
         return create_one(ThreadDTO, data)
 
-    def get_for_forum(self, forum_id: int, **kwargs) -> List[ThreadDTO]:
+    def get_for_forum(self, forum_id: int, **kwargs) -> List[Dict[str, Any]]:
 
         data = None
         desc = kwargs.get('desc')
@@ -91,7 +91,13 @@ class ThreadRepository(object):
         elif desc is None and limit is None and since is None:
             data = self._context.callproc('get_threads_for_forum', params)
 
-        return create_many(ThreadDTO, data)
+        if not data:
+            return []
+
+        for thread in data:
+            thread['created'] = thread['created'].astimezone().isoformat()
+
+        return data
 
     def get_number_threads_for_forum(self, forum_id: int) -> int:
         data = self._context.callproc('get_number_threads_for_forum', [forum_id])
