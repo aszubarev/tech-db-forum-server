@@ -1,5 +1,5 @@
 CREATE INDEX users_nickname_idx
-  ON users (nickname);
+  ON users (nickname COLLATE "ucs_basic");
 
 CREATE INDEX users_email_idx
   ON users (email);
