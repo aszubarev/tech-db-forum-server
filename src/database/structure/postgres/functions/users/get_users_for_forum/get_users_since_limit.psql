@@ -10,7 +10,6 @@ RETURNS TABLE(nickname CITEXT,
               fullname TEXT)
 AS
 $BODY$
-DECLARE since_offset INT;
 BEGIN
 
   RETURN QUERY
