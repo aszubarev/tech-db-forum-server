@@ -6,7 +6,7 @@ from apiutils import Serializer
 
 from forum.models.forum import Forum
 from forum.persistence.dto.forum_dto import ForumDTO
-from forum.services.post_service import PostService
+from forum.services.post_service import PostRepository
 from forum.services.user_service import UserService
 from sqlutils import NoDataFoundError
 
@@ -15,7 +15,7 @@ from sqlutils import NoDataFoundError
 class ForumSerializer(Serializer):
 
     @inject
-    def __init__(self, user_service: UserService, post_service: PostService):
+    def __init__(self, user_service: UserService, post_service: PostRepository):
         self._userService = user_service
         self._postService = post_service
 

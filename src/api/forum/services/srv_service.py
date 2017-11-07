@@ -6,7 +6,7 @@ from forum.models.service import Srv
 from forum.persistence.dto.service_dto import SrvDTO
 from forum.persistence.repositories.service_repository import SrvRepository
 from forum.services.forum_service import ForumService
-from forum.services.post_service import PostService
+from forum.services.post_service import PostRepository
 from forum.services.thread_service import ThreadService
 from forum.services.user_service import UserService
 from forum.services.vote_service import VoteService
@@ -19,7 +19,7 @@ class SrvService(Service[Srv, SrvDTO, SrvRepository]):
     def __init__(self, repo: SrvRepository,
                  forum_service: ForumService,
                  thread_service: ThreadService,
-                 post_service: PostService,
+                 post_service: PostRepository,
                  user_service: UserService,
                  vote_service: VoteService) -> None:
         super().__init__(repo)

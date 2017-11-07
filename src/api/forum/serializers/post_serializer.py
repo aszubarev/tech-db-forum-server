@@ -17,7 +17,7 @@ from forum.serializers.forum_serializer import ForumSerializer
 from forum.serializers.thread_serializer import ThreadSerializer
 from forum.serializers.user_serializer import UserSerializer
 from forum.services.forum_service import ForumService
-from forum.services.post_service import PostService
+from forum.services.post_service import PostRepository
 from forum.services.thread_service import ThreadService
 from forum.services.user_service import UserService
 from sqlutils import NoDataFoundError
@@ -27,7 +27,7 @@ from sqlutils import NoDataFoundError
 class PostSerializer(Serializer):
 
     @inject
-    def __init__(self, post_service: PostService,
+    def __init__(self, post_service: PostRepository,
                  user_service: UserService, user_serializer: UserSerializer,
                  forum_service: ForumService, forum_serializer: ForumSerializer,
                  thread_service: ThreadService, thread_serializer: ThreadSerializer) -> None:
