@@ -4,6 +4,7 @@ from injector import inject, singleton
 
 from apiutils import BaseBlueprint
 from apiutils.errors.bad_request_error import BadRequestError
+from forum.persistence.repositories.thread_repository import ThreadRepository
 
 from forum.serializers.thread_serializer import ThreadSerializer
 from forum.serializers.vote_serializer import VoteSerializer
@@ -14,12 +15,12 @@ from forum.services.user_service import UserService
 
 
 @singleton
-class ThreadBlueprint(BaseBlueprint[ThreadService]):
+class ThreadBlueprint(BaseBlueprint[ThreadRepository]):
 
     @inject
-    def __init__(self, service: ThreadService, serializer: ThreadSerializer, vote_serializer: VoteSerializer,
+    def __init__(self, repo: ThreadRepository, serializer: ThreadSerializer, vote_serializer: VoteSerializer,
                  user_service: UserService, forum_service: ForumService) -> None:
-        super().__init__(service)
+        super().__init__(repo)
         self.__serializer = serializer
         self._userService = user_service
         self._forumService = forum_service
@@ -35,7 +36,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
     @property
     def __service(self) -> ThreadService:
-        return self._service
+        return self._repository
 
     def _create_blueprint(self) -> Blueprint:
         blueprint = Blueprint(self._name, __name__)
@@ -60,7 +61,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
 
             except UniqueViolationError:
                 thread_slug = request.json['slug']
-                response = self._service.get_by_slug(thread_slug)
+                response = self._repository.get_by_slug(thread_slug)
                 return Response(response=json.dumps(response), status=409, mimetype='application/json')
 
         @blueprint.route('forum/<slug>/threads', methods=['GET'])
@@ -142,7 +143,7 @@ class ThreadBlueprint(BaseBlueprint[ThreadService]):
                 if not nickname or not voice:
                     return self._return_error(f"[ThreadBlueprint._vote] Bad request", 400)
 
-                thread = self._service.get_by_slug_or_id(slug_or_id)
+                thread = self._repository.get_by_slug_or_id(slug_or_id)
                 if not thread:
                     return self._return_error(f"Can't find thread by slug_or_id = {slug_or_id}", 404)
 

@@ -21,7 +21,7 @@ class SrvBlueprint(BaseBlueprint[SrvService]):
 
     @property
     def __service(self) -> SrvService:
-        return self._service
+        return self._repository
 
     @property
     def _serializer(self) -> SrvSerializer:

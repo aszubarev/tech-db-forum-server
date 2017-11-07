@@ -4,40 +4,27 @@ from flask import Blueprint, request, Response, json
 from injector import inject, singleton
 
 from apiutils import BaseBlueprint
+from forum.persistence.repositories.forum_repository import ForumRepository
+from forum.persistence.repositories.user_repository import UserRepository
 
-from forum.serializers.forum_serializer import ForumSerializer
-from forum.serializers.thread_serializer import ThreadSerializer
-from forum.services.forum_service import ForumService
-from forum.services.user_service import UserService
-from sqlutils import NoDataFoundError, UniqueViolationError
-from forum.services.thread_service import ThreadService
+from sqlutils import UniqueViolationError
 
 
 @singleton
-class ForumBlueprint(BaseBlueprint[ForumService]):
+class ForumBlueprint(BaseBlueprint[ForumRepository]):
 
     @inject
-    def __init__(self, service: ForumService, serializer: ForumSerializer, user_service: UserService,
-                 thread_service: ThreadService, thread_serializer: ThreadSerializer) -> None:
-        super().__init__(service)
-        self.__serializer = serializer
-
-        self._thread_service = thread_service
-        self._thread_serializer = thread_serializer
-
-        self._userService = user_service
+    def __init__(self, repo: ForumRepository, user_repo: UserRepository) -> None:
+        super().__init__(repo)
+        self._userRepo = user_repo
 
     @property
     def _name(self) -> str:
         return 'forums'
 
     @property
-    def _serializer(self) -> ForumSerializer:
-        return self.__serializer
-
-    @property
-    def __service(self) -> ForumService:
-        return self._service
+    def __repo(self) -> ForumRepository:
+        return self._repo
 
     def _create_blueprint(self) -> Blueprint:
         blueprint = Blueprint(self._name, __name__)
@@ -46,11 +33,16 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
         def _add():
             body = request.json
             try:
-                user = self._userService.get_by_nickname(body['user'])
+                user = self._userRepo.get_by_nickname(body['user'])
                 if not user:
                     return self._return_error(f"Can't find user with nickname {body['user']}", 404)
 
-                data = self._service.add_soft(body=body, user_id=user['user_id'], user_nickname=user['nickname'])
+                params = body
+                params.update({
+                    'user_id': user['user_id'],
+                    'user': user['nickname']
+                })
+                data = self.__repo.add(params)
                 return Response(response=json.dumps(data), status=201, mimetype='application/json')
 
             except UniqueViolationError:
@@ -59,7 +51,7 @@ class ForumBlueprint(BaseBlueprint[ForumService]):
 
         @blueprint.route('forum/<slug>/details', methods=['GET'])
         def _details(slug: str):
-            data = self.__service.get_by_slug(slug)
+            data = self.__repo.get_by_slug(slug)
             if not data:
                 return self._return_error(f"Can't find forum details by slag = {slug}", 404)
 

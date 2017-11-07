@@ -46,7 +46,7 @@ class PostBlueprint(BaseBlueprint[PostService]):
 
     @property
     def __service(self) -> PostService:
-        return self._service
+        return self._repository
 
     def _create_blueprint(self) -> Blueprint:
         blueprint = Blueprint(self._name, __name__)

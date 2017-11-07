@@ -20,18 +20,9 @@ class UserRepository(object):
         data = self._context.callproc('get_user_by_nickname', [nickname])
         return return_one(data)
 
-    def get_by_nickname_setup(self, nickname: str, load_nickname: bool) -> Optional[UserDTO]:
-
-        if load_nickname is True:
-            data = self._context.callproc('get_by_nickname_ret_uid_nickname', [nickname])
-        else:
-            data = self._context.callproc('get_by_nickname_ret_uid', [nickname])
-
-        return create_one(UserDTO, data)
-
     def get_by_nickname_or_email(self, nickname: str, email: str) -> List[Dict[str, Any]]:
         data = self._context.callproc('get_users_by_nickname_or_email', [nickname, email])
-        return return_many(data)
+        return data
 
     def get_for_forum(self, forum_id: int, since: str, limit: str, desc: str) -> List[Dict[str, Any]]:
         data = None
@@ -60,7 +51,7 @@ class UserRepository(object):
         elif since is None and limit is None and desc is None:
             data = self._context.callproc('get_users_for_forum', [forum_id])
 
-        return return_many(data)
+        return data
 
     def get_count(self) -> int:
         data = self._context.callproc('get_users_count', [])
@@ -69,15 +60,11 @@ class UserRepository(object):
         result_dict = data[0]
         return result_dict.get('users_count')
 
-    def get_all(self) -> List[UserDTO]:
-        raise NotImplementedError
-
     def clear(self):
         self._context.callproc('clear_users', [])
 
     def add(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        self._context.callproc('add_user_soft', [params['nickname'],
-                               params['email'], params['about'], params['fullname']])
+        self._context.callproc('add_user', [params['nickname'], params['email'], params['about'], params['fullname']])
         return params
 
     def update(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:

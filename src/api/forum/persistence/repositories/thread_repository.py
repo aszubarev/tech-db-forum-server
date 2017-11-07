@@ -21,12 +21,9 @@ class ThreadRepository(object):
         if not response:
             return None
 
-        created = response.get('created')
-
-        if created:
-            response.update({
-                'created': created.astimezone().isoformat()
-            })
+        response.update({
+            'created': response['created'].astimezone().isoformat()
+        })
 
         return response
 
@@ -36,34 +33,11 @@ class ThreadRepository(object):
         if not response:
             return None
 
-        created = response.get('created')
-
-        if created:
-            response.update({
-                'created': created.astimezone().isoformat()
-            })
+        response.update({
+            'created': response['created'].astimezone().isoformat()
+        })
 
         return response
-
-    def get_by_id_setup(self, uid: int, load_forum: bool) -> Optional[ThreadDTO]:
-
-        if load_forum is True:
-            data = self._context.callproc('get_thread_by_id_ret_uid_forum', [uid])
-
-        else:
-            data = self._context.callproc('get_thread_by_id_ret_uid', [uid])
-
-        return create_one(ThreadDTO, data)
-
-    def get_by_slug_setup(self, slug: str, load_forum: bool) -> Optional[ThreadDTO]:
-
-        if load_forum is True:
-            data = self._context.callproc('get_thread_by_slug_ret_uid_forum', [slug])
-
-        else:
-            data = self._context.callproc('get_thread_by_slug_ret_uid', [slug])
-
-        return create_one(ThreadDTO, data)
 
     def get_for_forum(self, forum_id: int, **kwargs) -> List[Dict[str, Any]]:
 
@@ -99,13 +73,6 @@ class ThreadRepository(object):
 
         return data
 
-    def get_number_threads_for_forum(self, forum_id: int) -> int:
-        data = self._context.callproc('get_number_threads_for_forum', [forum_id])
-        if data is None or len(data) == 0:
-            return 0
-        result_dict = data[0]
-        return result_dict.get('number_threads')
-
     def get_count(self) -> int:
         data = self._context.callproc('get_threads_count', [])
         if data is None or len(data) == 0:
@@ -115,9 +82,6 @@ class ThreadRepository(object):
 
     def clear(self):
         self._context.callproc('clear_threads', [])
-
-    def get_all(self) -> List[ThreadDTO]:
-        raise NotImplementedError
 
     def vote(self, entity: VoteDTO) -> Optional[int]:
         data = self._context.callproc('add_vote', [entity.user_id, entity.thread_id, entity.vote_value])
@@ -154,9 +118,6 @@ class ThreadRepository(object):
 
         return response
 
-    def add_many(self, entities: List[ThreadDTO]):
-        raise NotImplementedError
-
     def update_by_slug(self, entity: ThreadDTO) -> Optional[ThreadDTO]:
         msg = entity.message
         title = entity.title
@@ -189,9 +150,3 @@ class ThreadRepository(object):
             data = self._context.callproc('update_thread_by_uid_by_title', [entity.uid, title])
 
         return create_one(ThreadDTO, data)
-
-    def update(self, entity: ThreadDTO):
-        raise NotImplementedError
-
-    def delete(self, uid: int) -> None:
-        raise NotImplementedError

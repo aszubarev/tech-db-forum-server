@@ -4,9 +4,7 @@ from typing import Optional, List, Dict, Any
 import pytz
 from injector import inject
 
-from sqlutils import DataContext, create_one, return_one
-
-from forum.persistence.dto.post_dto import PostDTO
+from sqlutils import DataContext, return_one
 
 
 class PostRepository(object):
@@ -33,15 +31,6 @@ class PostRepository(object):
     def get_parent(self, uid: int) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_parent_post_by_id', [uid])
         return return_one(data)
-
-    def get_by_id_setup(self, uid: int, load_path: bool, load_thread: bool) -> Optional[PostDTO]:
-
-        if load_path is True and load_thread is True:
-            data = self._context.callproc('get_post_by_id_ret_uid_thread_path', [uid])
-        else:
-            data = self._context.callproc('get_post_by_id_ret_uid', [uid])
-
-        return create_one(PostDTO, data)
 
     def get_posts_for_thread(self, thread_id: int, **kwargs) -> List[Dict[str, Any]]:
         sort = kwargs.get('sort')
@@ -122,15 +111,10 @@ class PostRepository(object):
 
         for post in data:
             post['created'] = post['created'].astimezone(self._tz).isoformat()
+            post['isEdited'] = post['isedited']
+            del post['isedited']
 
         return data
-
-    def get_number_posts_for_forum(self, forum_id: int) -> int:
-        data = self._context.callproc('get_number_posts_for_forum', [forum_id])
-        if data is None or len(data) == 0:
-            return 0
-        result_dict = data[0]
-        return result_dict.get('number_posts')
 
     def get_count(self) -> int:
         data = self._context.callproc('get_posts_count', [])

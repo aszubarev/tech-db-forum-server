@@ -43,16 +43,12 @@ class ForumRepository(Repository[ForumDTO]):
         raise NotImplementedError
 
     def add(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        self._context.callproc('add_forum', [params['slug'],
-                                             params['user_id'], params['user_nickname'], params['title']])
+        self._context.callproc('add_forum', [params['slug'],  params['user_id'], params['user'], params['title']])
         data = params
         data.update({
-            'user': params['user_nickname'],
             'threads': 0,
             'posts': 0
         })
-        data.pop('user_id')
-        data.pop('user_nickname')
         return data
 
     def add_many(self, entities: List[ForumDTO]):
