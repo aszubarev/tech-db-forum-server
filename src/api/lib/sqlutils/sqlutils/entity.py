@@ -1,12 +1,22 @@
 from abc import abstractmethod
-from typing import Any, Dict, Type, List, TypeVar
+from typing import Any, Dict, Type, List, TypeVar, Optional
 
 import copy
 
 T = TypeVar('T', bound="Entity")
 
 
-def create_one(cls: Type[T], data: List[Dict[str, Any]]) -> T:
+def return_one(data: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    if data is None or len(data) == 0:
+        return None
+    return data[0]
+
+
+def return_many(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return data
+
+
+def create_one(cls: Type[T], data: List[Dict[str, Any]]) -> Optional[T]:
     if data is None or len(data) == 0:
         return None
     return cls.create(data[0])

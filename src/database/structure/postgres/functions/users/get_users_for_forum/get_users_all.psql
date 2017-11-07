@@ -2,8 +2,7 @@ CREATE OR REPLACE FUNCTION get_users_for_forum(
     p_forum_id INT
 )
 
-RETURNS TABLE(user_id INT,
-              nickname CITEXT,
+RETURNS TABLE(nickname CITEXT,
               email CITEXT,
               about TEXT,
               fullname TEXT)
@@ -13,10 +12,10 @@ BEGIN
 
   RETURN QUERY
 
-  SELECT res.user_id, res.nickname, res.email, res.about, res.fullname
+  SELECT res.nickname, res.email, res.about, res.fullname
   FROM (
 
-        ( SELECT users.user_id, users.nickname, users.email, users.about, users.fullname
+        ( SELECT users.nickname, users.email, users.about, users.fullname
           FROM posts
           JOIN users on posts.user_id = users.user_id
           WHERE posts.forum_id = p_forum_id
@@ -24,7 +23,7 @@ BEGIN
 
         UNION
 
-        ( SELECT users.user_id, users.nickname, users.email, users.about, users.fullname
+        ( SELECT users.nickname, users.email, users.about, users.fullname
           FROM threads
           JOIN users on threads.user_id = users.user_id
           WHERE threads.forum_id = p_forum_id
