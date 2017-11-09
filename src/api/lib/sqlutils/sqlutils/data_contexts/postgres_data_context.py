@@ -35,10 +35,12 @@ class PostgresDataContext(DataContext):
         self._password = password
         self._poolConnection = ThreadedConnectionPool(minconn=1, maxconn=10, host=host, port=port,
                                                       database=database, user=user, password=password)
+        self._pid = os.getpid()
 
     def execute(self, cmd: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         conn, cursor = self._create_connection()
         try:
+            # logging.info(f"[PostgresDataContext.execute] run  with pid = {self._pid}")
             cursor.execute(cmd, params)
             data = cursor.fetchall()
         except IntegrityError as ex:
@@ -54,6 +56,7 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
+            # logging.info(f"[PostgresDataContext.execute] stop with pid = {self._pid}")
             conn.commit()
             cursor.close()
             self._put_connection(conn=conn)
@@ -69,6 +72,7 @@ class PostgresDataContext(DataContext):
 
         conn, cursor = self._create_connection()
         try:
+            # logging.info(f"[PostgresDataContext.add_many] run  with pid = {self._pid}")
             query = f"INSERT INTO {table} {insert_values} VALUES {insert_args};"
             cursor.execute(query)
         except IntegrityError as ex:
@@ -84,6 +88,7 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
+            # logging.info(f"[PostgresDataContext.add_many] stop with pid = {self._pid}")
             conn.commit()
             cursor.close()
             self._put_connection(conn=conn)
@@ -91,6 +96,7 @@ class PostgresDataContext(DataContext):
     def callproc(self, cmd, params):
         conn, cursor = self._create_connection()
         try:
+            # logging.info(f"[PostgresDataContext.callproc] run  with pid = {self._pid}")
             cursor.callproc(cmd, params)
             data = cursor.fetchall()
         except IntegrityError as ex:
@@ -106,6 +112,7 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
+            # logging.info(f"[PostgresDataContext.callproc] stop with pid = {self._pid}")
             conn.commit()
             cursor.close()
             self._put_connection(conn=conn)
@@ -119,7 +126,7 @@ class PostgresDataContext(DataContext):
 
     def _create_connection(self) -> Tuple[connection, RealDictCursor]:
         conn = self._get_connection()
-        conn.set_isolation_level(ISOLATION_LEVEL_READ_UNCOMMITTED)
+        conn.set_isolation_level(ISOLATION_LEVEL_READ_COMMITTED)
         cursor = conn.cursor(cursor_factory=RealDictCursor)
 
         return conn, cursor
