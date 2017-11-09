@@ -18,6 +18,7 @@ from sqlutils.errors.unique_violation_error import UniqueViolationError
 from sqlutils.errors.no_data_found_error import NoDataFoundError
 from sqlutils.errors.foreign_key_violation_error import ForeignKeyViolationError
 from sqlutils.errors.restrict_violation_error import RestrictViolationError
+import os
 
 
 class PostgresDataContext(DataContext):
@@ -32,7 +33,7 @@ class PostgresDataContext(DataContext):
         self._database = database
         self._user = user
         self._password = password
-        self._poolConnection = ThreadedConnectionPool(minconn=1, maxconn=8, host=host, port=port,
+        self._poolConnection = ThreadedConnectionPool(minconn=1, maxconn=10, host=host, port=port,
                                                       database=database, user=user, password=password)
 
     def execute(self, cmd: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -40,7 +41,6 @@ class PostgresDataContext(DataContext):
         try:
             cursor.execute(cmd, params)
             data = cursor.fetchall()
-            conn.commit()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
                 raise UniqueViolationError
@@ -54,6 +54,7 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
+            conn.commit()
             cursor.close()
             self._put_connection(conn=conn)
         return data
@@ -70,7 +71,6 @@ class PostgresDataContext(DataContext):
         try:
             query = f"INSERT INTO {table} {insert_values} VALUES {insert_args};"
             cursor.execute(query)
-            conn.commit()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
                 raise UniqueViolationError
@@ -84,6 +84,7 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
+            conn.commit()
             cursor.close()
             self._put_connection(conn=conn)
 
@@ -92,7 +93,6 @@ class PostgresDataContext(DataContext):
         try:
             cursor.callproc(cmd, params)
             data = cursor.fetchall()
-            conn.commit()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
                 raise UniqueViolationError
@@ -106,36 +106,10 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
+            conn.commit()
             cursor.close()
             self._put_connection(conn=conn)
         return data
-
-    def get_by_id(self, collection: str, key: str = None, value: Any = None) -> Dict[str, Any]:
-        query = f'SELECT * FROM {collection}'
-        if not key:
-            query += f' WHERE {key}=%(key)s'
-        data = self.execute(query, {key: value})
-        if len(data) == 0:
-            raise NoDataFoundError
-        return data[0]
-
-    def get_all(self, collection: str) -> List[Dict[str, Any]]:
-        return self.execute(f'SELECT * FROM {collection}', {})
-
-    def add(self, collection: str, data: Dict[str, Any]) -> Any:
-        columns = ', '.join(data.keys())
-        values = ', '.join(f'%({k})s' for k in data.keys())
-        query = f'INSERT INTO {collection} ({columns}) VALUES ({values})'
-        self.execute(query, data)
-
-    def delete(self, collection: str, key: str, uid: Any) -> None:
-        query = f'DELETE FROM {collection} WHERE {key}=$(key)s'
-        self.execute(query, {key: uid})
-
-    def update(self, collection: str, key: str, data: Dict[str, Any]) -> None:
-        update = ', '.join(f'{k}=$({k})s' for k in data.keys() if k != key)
-        query = f'UPDATE {collection} SET {update} WHERE {key}=$(key)s'
-        self.execute(query, data)
 
     def _get_connection(self):
         return self._poolConnection.getconn()
@@ -149,3 +123,18 @@ class PostgresDataContext(DataContext):
         cursor = conn.cursor(cursor_factory=RealDictCursor)
 
         return conn, cursor
+
+    def get_by_id(self, collection: str, key: str = None, value: Any = None) -> Dict[str, Any]:
+        return NotImplemented
+
+    def get_all(self, collection: str) -> List[Dict[str, Any]]:
+        return NotImplemented
+
+    def add(self, collection: str, data: Dict[str, Any]) -> Any:
+        return NotImplemented
+
+    def delete(self, collection: str, key: str, uid: Any) -> None:
+        return NotImplemented
+
+    def update(self, collection: str, key: str, data: Dict[str, Any]) -> None:
+        return NotImplemented

@@ -1,11 +1,9 @@
-import logging
 from typing import Optional, List, Any, Dict
-
-from injector import inject
-
-from sqlutils import DataContext,return_one
+from injector import inject, singleton
+from sqlutils import DataContext, return_one
 
 
+@singleton
 class ThreadRepository(object):
 
     @inject

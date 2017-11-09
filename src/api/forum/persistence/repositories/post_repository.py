@@ -1,12 +1,12 @@
-import logging
 from typing import Optional, List, Dict, Any
 
 import pytz
-from injector import inject
+from injector import inject, singleton
 
 from sqlutils import DataContext, return_one
 
 
+@singleton
 class PostRepository(object):
 
     @inject

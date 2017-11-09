@@ -1,11 +1,10 @@
 from typing import Optional, List, Any, Dict
 
-from injector import inject
-from sqlutils import DataContext, create_one, create_many, return_one, return_many
-
-from forum.persistence.dto.user_dto import UserDTO
+from injector import inject, singleton
+from sqlutils import DataContext, return_one
 
 
+@singleton
 class UserRepository(object):
 
     @inject
