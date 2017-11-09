@@ -8,7 +8,8 @@ from psycopg2 import IntegrityError
 from psycopg2 import InternalError
 import psycopg2.extras
 from psycopg2.extras import RealDictCursor
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT, ISOLATION_LEVEL_READ_COMMITTED, \
+    ISOLATION_LEVEL_READ_UNCOMMITTED
 from psycopg2.pool import ThreadedConnectionPool
 from psycopg2.psycopg1 import connection
 
@@ -33,17 +34,13 @@ class PostgresDataContext(DataContext):
         self._password = password
         self._poolConnection = ThreadedConnectionPool(minconn=1, maxconn=8, host=host, port=port,
                                                       database=database, user=user, password=password)
-        self._conn, self._cursor = self._create_connection()
-
-        psycopg2.extras.register_uuid()
 
     def execute(self, cmd: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
-        # conn, cursor = self._create_connection()
-        # conn = self._conn
-        cursor = self._cursor
+        conn, cursor = self._create_connection()
         try:
             cursor.execute(cmd, params)
             data = cursor.fetchall()
+            conn.commit()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
                 raise UniqueViolationError
@@ -57,10 +54,8 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
-            pass
-            # cursor.close()
-            # self._put_connection(conn=conn)
-            # conn.close()
+            cursor.close()
+            self._put_connection(conn=conn)
         return data
 
     def add_many(self, table: str, insert_values: str, insert_args: str) -> None:
@@ -71,11 +66,11 @@ class PostgresDataContext(DataContext):
         :return: data
         """
 
-        # conn, cursor = self._create_connection()
-        cursor = self._cursor
+        conn, cursor = self._create_connection()
         try:
             query = f"INSERT INTO {table} {insert_values} VALUES {insert_args};"
             cursor.execute(query)
+            conn.commit()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
                 raise UniqueViolationError
@@ -89,17 +84,15 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
-            pass
-            # cursor.close()
-            # self._put_connection(conn=conn)
-            # conn.close()
+            cursor.close()
+            self._put_connection(conn=conn)
 
     def callproc(self, cmd, params):
-        # conn, cursor = self._create_connection()
-        cursor = self._cursor
+        conn, cursor = self._create_connection()
         try:
             cursor.callproc(cmd, params)
             data = cursor.fetchall()
+            conn.commit()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
                 raise UniqueViolationError
@@ -113,10 +106,8 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
-            pass
-            # cursor.close()
-            # self._put_connection(conn=conn)
-            # conn.close()
+            cursor.close()
+            self._put_connection(conn=conn)
         return data
 
     def get_by_id(self, collection: str, key: str = None, value: Any = None) -> Dict[str, Any]:
@@ -153,13 +144,8 @@ class PostgresDataContext(DataContext):
         self._poolConnection.putconn(conn=conn)
 
     def _create_connection(self) -> Tuple[connection, RealDictCursor]:
-        # conn = psycopg2.connect(host=self._host, port=self._port, database=self._database,
-        #                         user=self._user, password=self._password)
-        # conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        # cursor = conn.cursor(cursor_factory=RealDictCursor)
-
         conn = self._get_connection()
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        conn.set_isolation_level(ISOLATION_LEVEL_READ_UNCOMMITTED)
         cursor = conn.cursor(cursor_factory=RealDictCursor)
 
         return conn, cursor
