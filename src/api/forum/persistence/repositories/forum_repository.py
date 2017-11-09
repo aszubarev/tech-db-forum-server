@@ -1,12 +1,11 @@
-from typing import Optional, List, Any, Dict
+from typing import Optional, Any, Dict
 
-from injector import inject
-from sqlutils import DataContext, Repository, create_one, return_one
-
-from forum.persistence.dto.forum_dto import ForumDTO
+from injector import inject, singleton
+from sqlutils import DataContext, return_one
 
 
-class ForumRepository(Repository[ForumDTO]):
+@singleton
+class ForumRepository(object):
 
     @inject
     def __init__(self, context: DataContext) -> None:
@@ -36,12 +35,6 @@ class ForumRepository(Repository[ForumDTO]):
         result_dict = data[0]
         return result_dict.get('forums_count')
 
-    def clear(self):
-        self._context.callproc('clear_forums', [])
-
-    def get_all(self):
-        raise NotImplementedError
-
     def add(self, params: Dict[str, Any]) -> Dict[str, Any]:
         self._context.callproc('add_forum', [params['slug'],  params['user_id'], params['user'], params['title']])
         data = params
@@ -51,11 +44,5 @@ class ForumRepository(Repository[ForumDTO]):
         })
         return data
 
-    def add_many(self, entities: List[ForumDTO]):
-        raise NotImplementedError
-
-    def update(self, entity: ForumDTO):
-        raise NotImplementedError
-
-    def delete(self, uid: int) -> None:
-        raise NotImplementedError
+    def clear(self):
+        self._context.callproc('clear_forums', [])

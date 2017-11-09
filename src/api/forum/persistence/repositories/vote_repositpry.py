@@ -1,7 +1,8 @@
-from injector import inject
+from injector import inject, singleton
 from sqlutils import DataContext
 
 
+@singleton
 class VoteRepository(object):
 
     @inject
