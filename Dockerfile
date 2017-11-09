@@ -53,7 +53,6 @@ WORKDIR /loader
 ########################################################################################################################
 
 COPY ./src/api/requirements.txt /requirements.txt
-
 RUN pip install -r /requirements.txt
 
 COPY ./src/api/lib/sqlutils /prereqs/sqlutils
@@ -71,11 +70,6 @@ WORKDIR /api
 RUN python setup.py install
 RUN rm -rf /api
 
-RUN pip freeze | grep apiutils
-RUN pip freeze | grep sqlutils
-RUN pip freeze | grep forum
-
-#COPY ./src/api/main.py /usr/local/forum/main.py
 WORKDIR /tmp/api/forum
 ENV PYTHONPATH /tmp/api/
 
