@@ -31,16 +31,18 @@ class PostgresDataContext(DataContext):
         self._database = database
         self._user = user
         self._password = password
-        self._poolConnection = ThreadedConnectionPool(minconn=1, maxconn=90, host=host, port=port,
+        self._poolConnection = ThreadedConnectionPool(minconn=1, maxconn=8, host=host, port=port,
                                                       database=database, user=user, password=password)
+        self._conn, self._cursor = self._create_connection()
 
         psycopg2.extras.register_uuid()
 
     def execute(self, cmd: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
-        conn, cursor = self._create_connection()
+        # conn, cursor = self._create_connection()
+        # conn = self._conn
+        cursor = self._cursor
         try:
             cursor.execute(cmd, params)
-            conn.commit()
             data = cursor.fetchall()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
@@ -55,8 +57,9 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
-            cursor.close()
-            self._put_connection(conn=conn)
+            pass
+            # cursor.close()
+            # self._put_connection(conn=conn)
             # conn.close()
         return data
 
@@ -68,11 +71,11 @@ class PostgresDataContext(DataContext):
         :return: data
         """
 
-        conn, cursor = self._create_connection()
+        # conn, cursor = self._create_connection()
+        cursor = self._cursor
         try:
             query = f"INSERT INTO {table} {insert_values} VALUES {insert_args};"
             cursor.execute(query)
-            conn.commit()
         except IntegrityError as ex:
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
                 raise UniqueViolationError
@@ -86,12 +89,14 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
-            cursor.close()
-            self._put_connection(conn=conn)
+            pass
+            # cursor.close()
+            # self._put_connection(conn=conn)
             # conn.close()
 
     def callproc(self, cmd, params):
-        conn, cursor = self._create_connection()
+        # conn, cursor = self._create_connection()
+        cursor = self._cursor
         try:
             cursor.callproc(cmd, params)
             data = cursor.fetchall()
@@ -108,8 +113,9 @@ class PostgresDataContext(DataContext):
                 raise NoDataFoundError
             raise
         finally:
-            cursor.close()
-            self._put_connection(conn=conn)
+            pass
+            # cursor.close()
+            # self._put_connection(conn=conn)
             # conn.close()
         return data
 
