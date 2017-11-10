@@ -1,0 +1,29 @@
+CREATE OR REPLACE FUNCTION update_votes_for_thread_procedure()
+RETURNS TRIGGER
+AS
+$BODY$
+BEGIN
+
+  IF (TG_OP = 'UPDATE')
+      THEN
+        IF NEW.vote_value != OLD.vote_value
+            THEN UPDATE threads
+                 SET votes = votes + (2 * NEW.vote_value)
+                 WHERE threads.id = NEW.thread_id;
+                 RETURN NEW;
+        ELSE
+            RETURN NEW;
+        END IF;
+
+  ELSE -- handle INSERT
+
+    UPDATE threads
+    SET votes = votes + NEW.vote_value
+    WHERE threads.id = NEW.thread_id;
+    RETURN NEW;
+
+  END IF;
+
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
