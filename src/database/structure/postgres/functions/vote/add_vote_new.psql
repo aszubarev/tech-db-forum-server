@@ -1,0 +1,67 @@
+CREATE OR REPLACE FUNCTION add_vote_new(
+  p_nickname CITEXT,
+  p_thread_id INT,
+  p_vote_value INT)
+
+RETURNS TABLE(thread_id INT)
+AS
+$BODY$
+BEGIN
+
+    INSERT INTO vote (user_id, thread_id, vote_value)
+    VALUES ((
+                SELECT u.user_id
+                FROM users u
+                WHERE u.nickname = p_nickname
+            ) AS user_id,
+            (
+                SELECT th.thread_id
+                FROM threads th
+                WHERE th.thread_id = p_thread_id
+            ) AS thread_id,
+            p_vote_value
+           )
+    ON CONFLICT (user_id, thread_id)
+    DO UPDATE SET vote_value = EXCLUDED.vote_value
+    RETURNING thread_id;
+
+END;
+
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+
+------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION add_vote_new(
+  p_nickname CITEXT,
+  p_thread_slug CITEXT,
+  p_vote_value INT)
+
+RETURNS TABLE(thread_id INT)
+AS
+$BODY$
+BEGIN
+
+    INSERT INTO vote (user_id, thread_id, vote_value)
+    VALUES ((
+                SELECT u.user_id
+                FROM users u
+                WHERE u.nickname = p_nickname
+            ) AS user_id,
+            (
+                SELECT th.thread_id
+                FROM threads th
+                WHERE th.slug = p_thread_slug
+            ) AS thread_id,
+            p_vote_value
+           )
+    ON CONFLICT (user_id, thread_id)
+    DO UPDATE SET vote_value = EXCLUDED.vote_value
+    RETURNING thread_id;
+
+END;
+
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+
+------------------------------------------------------------------------------------------------------------------------
