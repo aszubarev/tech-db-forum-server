@@ -74,13 +74,24 @@ function load_database_constraints {
     done
 }
 
+function load_database_triggers {
+    echo "load database triggers"
+    for dirname in ${db_dir}/*;
+    do
+        if [ -d "$dirname" ]; then
+            execute_folder_recursively "$dirname"/postgres/procedures
+            execute_folder_recursively "$dirname"/postgres/triggers
+        fi
+    done
+}
+
 function wait_postgres {
     echo "Waiting postgres to run on ${db_host} ${db_port}..."
 
 #    while ! psql -h ${db_host} -U "postgres" -c "SELECT datname FROM pg_database LIMIT 1" >&/dev/null;
     while ! psql -h ${db_host} -U "postgres" -p ${db_port} -c "SELECT datname FROM pg_database LIMIT 1";
     do
-      sleep 5
+      sleep 2
     done
 
     echo "Postgres launched"
@@ -97,4 +108,5 @@ wait_postgres
 re_create_database "${db_name}" "${db_user}" "${db_password}"
 load_database_structure
 load_database_constraints
+load_database_triggers
 
