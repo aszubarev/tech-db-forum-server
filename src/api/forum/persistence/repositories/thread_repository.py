@@ -87,6 +87,10 @@ class ThreadRepository(object):
         votes = result_dict.get('votes')
         return votes
 
+    def vote_new(self, user_nickname: str, thread_slug_or_id: str, vote_value) -> Optional[Dict[str, Any]]:
+        data = self._context.callproc('add_vote_new', [user_nickname, thread_slug_or_id, vote_value])
+        return return_one(data)
+
     def add(self, params: Dict[str, Any]) -> Dict[str, Any]:
 
         data = self._context.callproc('add_thread', [params['slug'],     # must be init in blueprint
