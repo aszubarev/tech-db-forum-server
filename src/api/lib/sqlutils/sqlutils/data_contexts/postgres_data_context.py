@@ -14,6 +14,7 @@ from psycopg2.pool import ThreadedConnectionPool
 from psycopg2.psycopg1 import connection
 
 from sqlutils.data_contexts.data_context import DataContext
+from sqlutils.errors.not_null_violation import NotNUllViolation
 from sqlutils.errors.unique_violation_error import UniqueViolationError
 from sqlutils.errors.no_data_found_error import NoDataFoundError
 from sqlutils.errors.foreign_key_violation_error import ForeignKeyViolationError
@@ -50,6 +51,8 @@ class PostgresDataContext(DataContext):
                 raise ForeignKeyViolationError
             elif ex.pgcode == errorcodes.RESTRICT_VIOLATION:
                 raise RestrictViolationError
+            elif ex.pgcode == errorcodes.NOT_NULL_VIOLATION:
+                raise NotNUllViolation
             raise
         except InternalError as ex:
             if ex.pgcode == errorcodes.NO_DATA_FOUND:
@@ -82,6 +85,8 @@ class PostgresDataContext(DataContext):
                 raise ForeignKeyViolationError
             elif ex.pgcode == errorcodes.RESTRICT_VIOLATION:
                 raise RestrictViolationError
+            elif ex.pgcode == errorcodes.NOT_NULL_VIOLATION:
+                raise NotNUllViolation
             raise
         except InternalError as ex:
             if ex.pgcode == errorcodes.NO_DATA_FOUND:
@@ -100,12 +105,15 @@ class PostgresDataContext(DataContext):
             cursor.callproc(cmd, params)
             data = cursor.fetchall()
         except IntegrityError as ex:
+            # logging.error(f"[PostgresDataContext.callproc] error code = {ex.pgcode}")
             if ex.pgcode == errorcodes.UNIQUE_VIOLATION:
                 raise UniqueViolationError
             elif ex.pgcode == errorcodes.FOREIGN_KEY_VIOLATION:
                 raise ForeignKeyViolationError
             elif ex.pgcode == errorcodes.RESTRICT_VIOLATION:
                 raise RestrictViolationError
+            elif ex.pgcode == errorcodes.NOT_NULL_VIOLATION:
+                raise NotNUllViolation
             raise
         except InternalError as ex:
             if ex.pgcode == errorcodes.NO_DATA_FOUND:

@@ -88,7 +88,15 @@ class ThreadRepository(object):
         return votes
 
     def vote_new(self, user_nickname: str, thread_slug_or_id: str, vote_value) -> Optional[Dict[str, Any]]:
-        data = self._context.callproc('add_vote_new', [user_nickname, thread_slug_or_id, vote_value])
+
+        try:
+            cast_thread_id = int(thread_slug_or_id)
+            data = self._context.callproc('add_vote_new_by_thread_id', [user_nickname, cast_thread_id, vote_value])
+
+        except ValueError:
+            thread_slug = thread_slug_or_id
+            data = self._context.callproc('add_vote_new_by_thread_slug', [user_nickname, thread_slug, vote_value])
+
         return return_one(data)
 
     def add(self, params: Dict[str, Any]) -> Dict[str, Any]:

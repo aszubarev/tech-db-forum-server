@@ -6,6 +6,6 @@ ALTER TABLE vote
     ADD CONSTRAINT vote_fk_threads
     FOREIGN KEY(thread_id) REFERENCES threads(thread_id);
 
---ALTER TABLE vote
---    ADD CONSTRAINT unic_user_thread
---    UNIQUE(user_id, thread_id);
+ALTER TABLE vote
+    ADD CONSTRAINT unic_user_thread
+    UNIQUE(user_id, thread_id);

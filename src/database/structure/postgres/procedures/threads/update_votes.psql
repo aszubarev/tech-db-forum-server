@@ -9,7 +9,7 @@ BEGIN
         IF NEW.vote_value != OLD.vote_value
             THEN UPDATE threads
                  SET votes = votes + (2 * NEW.vote_value)
-                 WHERE threads.id = NEW.thread_id;
+                 WHERE threads.thread_id = NEW.thread_id;
                  RETURN NEW;
         ELSE
             RETURN NEW;
@@ -19,7 +19,7 @@ BEGIN
 
     UPDATE threads
     SET votes = votes + NEW.vote_value
-    WHERE threads.id = NEW.thread_id;
+    WHERE threads.thread_id = NEW.thread_id;
     RETURN NEW;
 
   END IF;

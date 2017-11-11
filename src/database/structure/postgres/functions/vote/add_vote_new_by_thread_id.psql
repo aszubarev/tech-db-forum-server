@@ -1,0 +1,33 @@
+CREATE OR REPLACE FUNCTION add_vote_new_by_thread_id(
+  p_nickname CITEXT,
+  p_thread_id INT,
+  p_vote_value INT)
+
+RETURNS TABLE(thread_id INT)
+AS
+$BODY$
+BEGIN
+
+    RETURN QUERY
+    INSERT INTO vote (user_id, thread_id, vote_value)
+    VALUES (
+                (
+                    SELECT u.user_id
+                    FROM users u
+                    WHERE u.nickname = p_nickname
+                ),
+                (
+                    SELECT th.thread_id
+                    FROM threads th
+                    WHERE th.thread_id = p_thread_id
+                ),
+                p_vote_value
+            )
+    ON CONFLICT ON CONSTRAINT unic_user_thread
+    DO UPDATE SET vote_value = EXCLUDED.vote_value
+    RETURNING vote.thread_id;
+
+END;
+
+$BODY$
+LANGUAGE plpgsql VOLATILE;

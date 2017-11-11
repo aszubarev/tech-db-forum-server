@@ -1,5 +1,5 @@
 CREATE TRIGGER update_votes_for_thread_trigger
   AFTER INSERT OR UPDATE
-  ON votes
+  ON vote
   FOR EACH ROW
 EXECUTE PROCEDURE update_votes_for_thread_procedure();
