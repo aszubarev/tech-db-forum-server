@@ -20,35 +20,36 @@ BEGIN
     SELECT p.post_id, p.thread_id, p.forum_slug, p.user_nickname,
            p.parent_id, p.message, p.created, p.is_edited
     FROM posts p
-    WHERE p.thread_id = p_thread_id AND p.path IN (
-                                                    SELECT pr.path
-                                                    FROM posts pr
-                                                    WHERE pr.thread_id = p_thread_id
-                                                          AND pr.parent_id = 0
-                                                          AND CASE p_desc_flag
-                                                                  WHEN false THEN pr.path > (
-                                                                                             SELECT p_sub.path
-                                                                                             FROM posts p_sub
-                                                                                             WHERE p_sub.post_id = p_since
-                                                                                            )
-                                                                  WHEN true  THEN pr.path < (
-                                                                                             SELECT p_sub.path
-                                                                                             FROM posts p_sub
-                                                                                             WHERE p_sub.post_id = p_since
-                                                                                            )
-                                                          END
+    WHERE p.thread_id = p_thread_id
+      AND p.path IN (
+                        SELECT pr.path
+                        FROM posts pr
+                        WHERE pr.thread_id = p_thread_id
+                              AND pr.parent_id = 0
+                              AND CASE p_desc_flag
+                                      WHEN false THEN pr.path > (
+                                                                 SELECT p_sub.path
+                                                                 FROM posts p_sub
+                                                                 WHERE p_sub.post_id = p_since
+                                                                )
+                                      WHEN true  THEN pr.path < (
+                                                                 SELECT p_sub.path
+                                                                 FROM posts p_sub
+                                                                 WHERE p_sub.post_id = p_since
+                                                                )
+                              END
 
-                                                    ORDER BY CASE p_desc_flag
-                                                                WHEN false THEN pr.post_id
-                                                                ELSE NULL
-                                                             END ASC,
+                        ORDER BY CASE p_desc_flag
+                                    WHEN false THEN pr.post_id
+                                    ELSE NULL
+                                 END ASC,
 
-                                                             CASE p_desc_flag
-                                                                WHEN true THEN  pr.post_id
-                                                                ELSE NULL
-                                                             END DESC
-                                                    LIMIT p_limit
-                                                  )
+                                 CASE p_desc_flag
+                                    WHEN true THEN  pr.post_id
+                                    ELSE NULL
+                                 END DESC
+                        LIMIT p_limit
+                    )
     ORDER BY CASE p_desc_flag
                 WHEN false THEN p.path
                 ELSE NULL

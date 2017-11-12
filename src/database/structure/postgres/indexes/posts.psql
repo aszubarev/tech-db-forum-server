@@ -10,17 +10,23 @@ CREATE INDEX posts_users_idx
 CREATE INDEX posts_parent_idx
   ON posts (parent_id);
 
-CREATE INDEX posts_threads_parent_idx
-  ON posts (thread_id, parent_id);
+------------------------------------------------------------------------------------------------------------------------
+CREATE INDEX IF NOT EXISTS posts_uid_thread_idx
+  ON posts (post_id, thread_id);
 
--- get necessary post
-CREATE index posts_uid_path_idx
-  on posts (post_id, path);
+CREATE INDEX IF NOT EXISTS posts_thread_uid_idx
+  ON posts (thread_id, post_id);
 
--- for get root posts
-CREATE INDEX posts_thread_parent_path_idx
-  ON posts (thread_id, parent_id, path);
-
--- for get posts (parent_tree)
-CREATE INDEX posts_thread_path_idx
+CREATE INDEX IF NOT EXISTS posts_thread_path_idx
   ON posts (thread_id, path);
+
+CREATE index posts_uid_path_idx
+  ON posts (post_id, path);
+
+CREATE INDEX posts_thread_parent_path_uid_idx
+  ON posts (thread_id, parent_id, path, post_id);
+
+CREATE INDEX posts_uid_thread_parent_idx
+  ON posts (post_id, thread_id, parent_id);
+
+------------------------------------------------------------------------------------------------------------------------
