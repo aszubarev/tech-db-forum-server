@@ -5,7 +5,7 @@ RETURNS TABLE(id INT,
               forum CITEXT,
               user_id INT,
               author CITEXT,
-              parent_id INT,
+              parent INT,
               message TEXT,
               created TIMESTAMP WITH TIME ZONE,
               isEdited BOOLEAN)
