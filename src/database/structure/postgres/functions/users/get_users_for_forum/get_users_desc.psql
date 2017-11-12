@@ -12,33 +12,27 @@ $BODY$
 BEGIN
 
   RETURN QUERY
+   SELECT u.nickname, u.email, u.about, u.fullname
+   FROM users u
+   WHERE u.user_id in (
+                         select t.user_id
+                         from threads t
+                         WHERE t.forum_id = p_forum_id
 
-  SELECT res.nickname, res.email, res.about, res.fullname
-  FROM (
+                         UNION
 
-        ( SELECT users.nickname, users.email, users.about, users.fullname
-          FROM posts
-          JOIN users on posts.user_id = users.user_id
-          WHERE posts.forum_id = p_forum_id
-        )
-
-        UNION
-
-        ( SELECT users.nickname, users.email, users.about, users.fullname
-          FROM threads
-          JOIN users on threads.user_id = users.user_id
-          WHERE threads.forum_id = p_forum_id
-        )
-  ) res
-  ORDER BY CASE p_desc_flag
-              WHEN false THEN res.nickname
-              ELSE NULL
-           END COLLATE "ucs_basic" ASC,
-
-           CASE p_desc_flag
-              WHEN true THEN res.nickname
-              ELSE NULL
-           END COLLATE "ucs_basic" DESC;
+                         select p.user_id
+                         from posts p
+                         WHERE p.forum_id = p_forum_id
+                       )
+   ORDER BY CASE p_desc_flag
+               WHEN false THEN u.nickname
+               ELSE NULL
+            END COLLATE "ucs_basic" ASC,
+            CASE true
+               WHEN true THEN u.nickname
+               ELSE NULL
+            END COLLATE "ucs_basic" DESC;
 
   END;
 $BODY$
