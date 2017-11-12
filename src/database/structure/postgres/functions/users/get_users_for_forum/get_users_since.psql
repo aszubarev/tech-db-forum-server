@@ -12,26 +12,22 @@ $BODY$
 BEGIN
 
   RETURN QUERY
+  SELECT u.nickname, u.email, u.about, u.fullname
+  FROM users u
+  WHERE u.user_id in (
+                        select t.user_id
+                        from threads t
+                        WHERE t.forum_id = p_forum_id AND t.user_nickname > p_since COLLATE "ucs_basic"
 
-  SELECT res.nickname, res.email, res.about, res.fullname
-  FROM (
+                        UNION
 
-        ( SELECT users.nickname, users.email, users.about, users.fullname
-          FROM posts
-          JOIN users on posts.user_id = users.user_id
-          WHERE posts.forum_id = p_forum_id AND posts.user_nickname > p_since COLLATE "ucs_basic"
-        )
+                        select p.user_id
+                        from posts p
+                        WHERE p.forum_id = p_forum_id AND p.user_nickname > p_since COLLATE "ucs_basic"
+                      )
 
-        UNION
+  ORDER BY u.nickname COLLATE "ucs_basic";
 
-        ( SELECT users.nickname, users.email, users.about, users.fullname
-          FROM threads
-          JOIN users on threads.user_id = users.user_id
-          WHERE threads.forum_id = p_forum_id AND threads.user_nickname > p_since COLLATE "ucs_basic"
-        )
-  ) res
-  ORDER BY res.nickname COLLATE "ucs_basic";
-
-  END;
+END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;

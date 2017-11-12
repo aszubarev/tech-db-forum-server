@@ -132,13 +132,13 @@ class PostBlueprint(BaseBlueprint[PostRepository]):
 
         @blueprint.route('post/<uid>/details', methods=['GET'])
         def _details(uid: int):
-            logging.error(f"[PostBlueprint._details] uid = {uid}")
+            # logging.error(f"[PostBlueprint._details] uid = {uid}")
             post = self.__repo.get_by_id(uid)
 
             if not post:
                 return self._return_error(f"Can't find post by id = {uid}", 404)
 
-            logging.error(f"[PostBlueprint._details] post = {post}")
+            # logging.error(f"[PostBlueprint._details] post = {post}")
 
             author = None
             forum = None

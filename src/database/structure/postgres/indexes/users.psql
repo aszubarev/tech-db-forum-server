@@ -1,5 +1,9 @@
 CREATE INDEX users_nickname_idx
-  ON users (nickname COLLATE "ucs_basic");
+  ON users (nickname);
 
 CREATE INDEX users_email_idx
   ON users (email);
+
+CREATE INDEX users_uid_nickname_forum_idx
+  on users (user_id, nickname COLLATE "ucs_basic");
+
