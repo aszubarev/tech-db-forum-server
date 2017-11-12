@@ -16,19 +16,23 @@ $BODY$
 BEGIN
 
     RETURN QUERY
-    WITH roots AS (
-      SELECT pr.path
-      FROM posts pr
-      WHERE pr.thread_id = p_thread_id
-            AND pr.parent_id = 0
-            AND pr.path > (SELECT p_sub.path FROM posts p_sub WHERE p_sub.post_id = p_since)
-      ORDER BY pr.post_id
-      LIMIT p_limit
-    )
     SELECT p.post_id, p.thread_id, p.forum_slug, p.user_nickname,
            p.parent_id, p.message, p.created, p.is_edited
     FROM posts p
-    JOIN roots r ON p.path @> r.path
+    WHERE p.thread_id = p_thread_id AND p.path IN (
+                                                    SELECT pr.path
+                                                    FROM posts pr
+                                                    WHERE pr.thread_id = p_thread_id
+                                                          AND pr.parent_id = 0
+                                                          AND pr.path > (
+                                                                            SELECT p_sub.path
+                                                                            FROM posts p_sub
+                                                                            WHERE p_sub.post_id = p_since
+                                                                        )
+
+                                                    ORDER BY pr.post_id
+                                                    LIMIT p_limit
+                                                  )
     ORDER BY p.path;
 
 END;
