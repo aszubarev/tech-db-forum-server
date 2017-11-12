@@ -9,6 +9,7 @@
 *.pyo
 
 ./test/report.html
+./test/tech-db-forum.dat.gz
 
 # User-specific stuff:
 .idea/**/workspace.xml
