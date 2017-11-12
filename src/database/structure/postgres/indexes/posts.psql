@@ -31,8 +31,5 @@ CREATE INDEX posts_uid_thread_parent_idx
 
 ------------------------------------------------------------------------------------------------------------------------
 
-CREATE INDEX posts_forum_user_nickname_idx
-  on posts(forum_id, user_nickname COLLATE "ucs_basic");
-
 CREATE INDEX posts_forum_user_nickname_user_id_idx
   on posts(forum_id, user_nickname COLLATE "ucs_basic", user_id);
