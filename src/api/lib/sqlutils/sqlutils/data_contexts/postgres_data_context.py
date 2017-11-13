@@ -34,7 +34,7 @@ class PostgresDataContext(DataContext):
         self._database = database
         self._user = user
         self._password = password
-        self._poolConnection = ThreadedConnectionPool(minconn=1, maxconn=10, host=host, port=port,
+        self._poolConnection = ThreadedConnectionPool(minconn=1, maxconn=12, host=host, port=port,
                                                       database=database, user=user, password=password)
         self._pid = os.getpid()
 

@@ -1,6 +1,6 @@
-from gevent import monkey
-monkey.patch_all()
-from gevent.pywsgi import WSGIServer
+# from gevent import monkey
+# monkey.patch_all()
+# from gevent.pywsgi import WSGIServer
 
 import logging
 
@@ -24,9 +24,10 @@ def simple(env, resp):
 
 app.wsgi_app = DispatcherMiddleware(simple, {'/api': app.wsgi_app})
 
-http_server = WSGIServer(('', 5000), app.wsgi_app)
+# http_server = WSGIServer(('', 5000), app.wsgi_app)
 
 
 if __name__ == '__main__':
-    http_server.serve_forever()
+    app.run()
+    # http_server.serve_forever()
 
