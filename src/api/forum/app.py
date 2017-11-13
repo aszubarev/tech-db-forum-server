@@ -1,20 +1,18 @@
+from gevent import monkey
+monkey.patch_all()
+from gevent.pywsgi import WSGIServer
+
 import logging
-import os
 
 from flask import Flask
 from werkzeug.wsgi import DispatcherMiddleware
 
 from forum.application import Application
-from forum.cache import cache
+
 
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
-app.config['APPLICATION_ROOT'] = '/api'
-app.config['CACHE_TYPE'] = os.environ['CACHE_TYPE']
-app.config['CACHE_THRESHOLD'] = 500000
-cache.init_app(app)
-
 application = Application()
 application.register(app)
 
@@ -26,6 +24,9 @@ def simple(env, resp):
 
 app.wsgi_app = DispatcherMiddleware(simple, {'/api': app.wsgi_app})
 
+http_server = WSGIServer(('', 5000), app.wsgi_app)
+
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    http_server.serve_forever()
+
