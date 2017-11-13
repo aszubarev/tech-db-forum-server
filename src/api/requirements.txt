@@ -16,3 +16,4 @@ injector
 python-dateutil
 pytz
 tzlocal
+gevent
