@@ -1,4 +1,4 @@
-CREATE TRIGGER update_votes_for_thread_trigger
+CREATE TRIGGER update_votes_for_thread_tgr
   AFTER INSERT OR UPDATE
   ON vote
   FOR EACH ROW
