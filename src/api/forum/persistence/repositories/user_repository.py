@@ -40,7 +40,7 @@ class UserRepository(object):
 
         elif since is None and limit is not None and desc is not None:
             if desc == 'true':
-                data = self._context.callproc('get_users_for_forum_limit_desc', [forum_id, limit, desc])
+                data = self._context.callproc('get_users_for_forum_limit_desc', [forum_id, limit])
             else:
                 data = self._context.callproc('get_users_for_forum_limit', [forum_id, limit])
 
@@ -49,13 +49,13 @@ class UserRepository(object):
 
         elif since is not None and limit is None and desc is not None:
             if desc == 'true':
-                data = self._context.callproc('get_users_for_forum_since_desc', [forum_id, since, desc])
+                data = self._context.callproc('get_users_for_forum_since_desc', [forum_id, since])
             else:
                 data = self._context.callproc('get_users_for_forum_since', [forum_id, since])
 
         elif since is not None and limit is not None and desc is not None:
             if desc == 'true':
-                data = self._context.callproc('get_users_for_forum_since_limit_desc', [forum_id, since, limit, desc])
+                data = self._context.callproc('get_users_for_forum_since_limit_desc', [forum_id, since, limit])
             else:
                 data = self._context.callproc('get_users_for_forum_since_limit', [forum_id, since, limit])
 

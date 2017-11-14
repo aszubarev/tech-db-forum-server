@@ -13,13 +13,10 @@ $BODY$
 BEGIN
 
   RETURN QUERY
-  SELECT DISTINCT ON (u.nickname COLLATE "ucs_basic") u.nickname, u.email, u.fullname,  u.about
-  FROM users u
-  JOIN threads t ON (u.user_id = t.user_id AND t.forum_id = p_forum_id)
-  JOIN posts p ON (u.user_id = p.user_id AND p.forum_id = p_forum_id)
-  WHERE t.user_nickname < p_since COLLATE "ucs_basic"
-    AND p.user_nickname < p_since COLLATE "ucs_basic"
-  ORDER BY u.nickname COLLATE "ucs_basic" DESC
+  SELECT uf.user_nickname, uf.user_email, uf.user_about, uf.user_fullname
+  FROM users_for_forum uf
+  WHERE uf.forum_id = p_forum_id AND uf.user_nickname < p_since COLLATE "ucs_basic"
+  ORDER BY uf.user_nickname COLLATE "ucs_basic" DESC
   LIMIT p_limit;
 
   END;

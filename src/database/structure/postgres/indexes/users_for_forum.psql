@@ -1,0 +1,2 @@
+CREATE INDEX users_for_forum_full_idx
+  on users_for_forum (forum_id, user_nickname COLLATE "ucs_basic", user_email, user_about, user_fullname);
