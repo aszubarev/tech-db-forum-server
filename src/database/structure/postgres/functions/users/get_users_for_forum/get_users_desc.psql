@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION get_users_for_forum_desc(
-    p_forum_id INT,
-    p_desc_flag BOOLEAN
+    p_forum_id INT
 )
+
 
 RETURNS TABLE(nickname CITEXT,
               email CITEXT,
@@ -12,27 +12,11 @@ $BODY$
 BEGIN
 
   RETURN QUERY
-   SELECT u.nickname, u.email, u.about, u.fullname
-   FROM users u
-   WHERE u.user_id in (
-                         select t.user_id
-                         from threads t
-                         WHERE t.forum_id = p_forum_id
-
-                         UNION
-
-                         select p.user_id
-                         from posts p
-                         WHERE p.forum_id = p_forum_id
-                       )
-   ORDER BY CASE p_desc_flag
-               WHEN false THEN u.nickname
-               ELSE NULL
-            END COLLATE "ucs_basic" ASC,
-            CASE true
-               WHEN true THEN u.nickname
-               ELSE NULL
-            END COLLATE "ucs_basic" DESC;
+  SELECT DISTINCT ON (u.nickname COLLATE "ucs_basic") u.nickname, u.email, u.fullname,  u.about
+  FROM users u
+  JOIN threads t ON (u.user_id = t.user_id AND t.forum_id = p_forum_id)
+  JOIN posts p ON (u.user_id = p.user_id AND p.forum_id = p_forum_id)
+  ORDER BY u.nickname COLLATE "ucs_basic" DESC;
 
   END;
 $BODY$

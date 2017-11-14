@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION get_users_for_forum(
     p_forum_id INT
 )
 
+
 RETURNS TABLE(nickname CITEXT,
               email CITEXT,
               about TEXT,
@@ -10,21 +11,12 @@ AS
 $BODY$
 BEGIN
 
-    RETURN QUERY
-    SELECT u.nickname, u.email, u.about, u.fullname
-    FROM users u
-    WHERE u.user_id in (
-                         select t.user_id
-                         from threads t
-                         WHERE t.forum_id = p_forum_id
-
-                         UNION
-
-                         select p.user_id
-                         from posts p
-                         WHERE p.forum_id = p_forum_id
-                       )
-    ORDER BY u.nickname COLLATE "ucs_basic";
+  RETURN QUERY
+  SELECT DISTINCT ON (u.nickname COLLATE "ucs_basic") u.nickname, u.email, u.fullname,  u.about
+  FROM users u
+  JOIN threads t ON (u.user_id = t.user_id AND t.forum_id = p_forum_id)
+  JOIN posts p ON (u.user_id = p.user_id AND p.forum_id = p_forum_id)
+  ORDER BY u.nickname COLLATE "ucs_basic";
 
   END;
 $BODY$

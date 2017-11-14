@@ -33,19 +33,31 @@ class UserRepository(object):
             data = self._context.callproc('get_users_for_forum_limit', [forum_id, limit])
 
         elif since is None and limit is None and desc is not None:
-            data = self._context.callproc('get_users_for_forum_desc', [forum_id, desc])
+            if desc == 'true':
+                data = self._context.callproc('get_users_for_forum_desc', [forum_id])
+            else:
+                data = self._context.callproc('get_users_for_forum', [forum_id])
 
         elif since is None and limit is not None and desc is not None:
-            data = self._context.callproc('get_users_for_forum_limit_desc', [forum_id, limit, desc])
+            if desc == 'true':
+                data = self._context.callproc('get_users_for_forum_limit_desc', [forum_id, limit, desc])
+            else:
+                data = self._context.callproc('get_users_for_forum_limit', [forum_id, limit])
 
         elif since is not None and limit is not None and desc is None:
             data = self._context.callproc('get_users_for_forum_since_limit', [forum_id, since, limit])
 
         elif since is not None and limit is None and desc is not None:
-            data = self._context.callproc('get_users_for_forum_since_desc', [forum_id, since, desc])
+            if desc == 'true':
+                data = self._context.callproc('get_users_for_forum_since_desc', [forum_id, since, desc])
+            else:
+                data = self._context.callproc('get_users_for_forum_since', [forum_id, since])
 
         elif since is not None and limit is not None and desc is not None:
-            data = self._context.callproc('get_users_for_forum_since_limit_desc', [forum_id, since, limit, desc])
+            if desc == 'true':
+                data = self._context.callproc('get_users_for_forum_since_limit_desc', [forum_id, since, limit, desc])
+            else:
+                data = self._context.callproc('get_users_for_forum_since_limit', [forum_id, since, limit])
 
         elif since is None and limit is None and desc is None:
             data = self._context.callproc('get_users_for_forum', [forum_id])
