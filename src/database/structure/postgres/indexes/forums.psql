@@ -3,3 +3,6 @@ CREATE INDEX forums_slug_idx
 
 CREATE INDEX forums_users_idx
   ON forums (user_id);
+
+CREATE INDEX forums_slug_uid_udx
+  ON forums (slug, forum_id);

@@ -1,0 +1,15 @@
+CREATE OR REPLACE FUNCTION is_exists_by_slug(p_forum_slug CITEXT)
+RETURNS TABLE(forum_id INT,
+              slug CITEXT)
+AS
+$BODY$
+BEGIN
+
+    RETURN QUERY
+    select f.forum_id, f.slug
+    FROM forums f
+    WHERE f.slug = p_forum_slug;
+
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
