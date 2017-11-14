@@ -7,6 +7,9 @@ CREATE INDEX threads_forums_idx
 CREATE INDEX threads_users_idx
   ON threads (user_id);
 
-CREATE INDEX threads_forum_user_nickname_user_id_idx
-  on threads(forum_id, user_nickname COLLATE "ucs_basic", user_id);
+create index threads_forum_id_created_idx
+  on threads (forum_id, created);
+
+CREATE INDEX IF NOT EXISTS threads_forum_id_user_id_user_nickname_collate_idx
+  ON threads (forum_id, user_id, user_nickname COLLATE "ucs_basic");
 
