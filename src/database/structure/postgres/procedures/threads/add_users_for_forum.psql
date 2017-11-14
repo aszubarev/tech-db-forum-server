@@ -1,0 +1,20 @@
+CREATE OR REPLACE FUNCTION add_users_for_forum_on_thread_procedure()
+RETURNS TRIGGER
+AS
+$BODY$
+BEGIN
+
+  LOCK TABLE users_for_forum;
+  INSERT INTO users_for_forum (forum_id, user_nickname, user_email, user_fullname, user_about)
+  (
+    SELECT NEW.forum_id, NEW.user_nickname, u.email, u.fullname, u.about
+    FROM users u
+    WHERE u.user_id = new.user_id
+    FOR NO KEY UPDATE
+  )
+  ON CONFLICT DO NOTHING;
+  RETURN NEW;
+
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

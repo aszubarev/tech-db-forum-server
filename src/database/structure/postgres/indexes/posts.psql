@@ -30,6 +30,6 @@ CREATE INDEX posts_uid_thread_parent_idx
   ON posts (post_id, thread_id, parent_id);
 
 ------------------------------------------------------------------------------------------------------------------------
-
-CREATE INDEX posts_forum_user_nickname_user_id_idx
-  on posts(forum_id, user_nickname COLLATE "ucs_basic", user_id);
+--
+--CREATE INDEX IF NOT EXISTS posts_forum_id_user_id_user_nickname_collate_idx
+--  ON posts (forum_id, user_id, user_nickname COLLATE "ucs_basic");

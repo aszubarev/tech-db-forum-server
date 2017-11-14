@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION get_users_for_forum_since_desc(
     p_forum_id INT,
-    p_since CITEXT,
-    p_desc_flag BOOLEAN
+    p_since CITEXT
 )
+
 
 RETURNS TABLE(nickname CITEXT,
               email CITEXT,
@@ -12,32 +12,12 @@ AS
 $BODY$
 BEGIN
 
-   RETURN QUERY
-   SELECT u.nickname, u.email, u.about, u.fullname
-   FROM users u
-   WHERE u.user_id in (
-                         select t.user_id
-                         from threads t
-                         WHERE t.forum_id = p_forum_id AND CASE p_desc_flag
-                                                           WHEN true THEN  t.user_nickname < p_since COLLATE "ucs_basic"
-                                                           ELSE t.user_nickname > p_since COLLATE "ucs_basic"
-                                                       END
-                         UNION
-                         select p.user_id
-                         from posts p
-                         WHERE p.forum_id = p_forum_id AND CASE p_desc_flag
-                                                           WHEN true THEN  p.user_nickname < p_since COLLATE "ucs_basic"
-                                                           ELSE p.user_nickname > p_since COLLATE "ucs_basic"
-                                                       END
-                       )
-   ORDER BY CASE p_desc_flag
-               WHEN false THEN u.nickname
-               ELSE NULL
-            END COLLATE "ucs_basic" ASC,
-            CASE true
-               WHEN true THEN u.nickname
-               ELSE NULL
-            END COLLATE "ucs_basic" DESC;
+  RETURN QUERY
+  SELECT uf.user_nickname, uf.user_email, uf.user_about, uf.user_fullname
+  FROM users_for_forum uf
+  WHERE uf.forum_id = p_forum_id AND uf.user_nickname < p_since COLLATE "ucs_basic"
+  ORDER BY uf.user_nickname COLLATE "ucs_basic" DESC;
+
 
   END;
 $BODY$

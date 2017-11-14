@@ -11,6 +11,10 @@ class ForumRepository(object):
     def __init__(self, context: DataContext) -> None:
         self._context = context
 
+    def is_exists_by_slug(self, slug: str) -> Optional[Dict[str, Any]]:
+        data = self._context.callproc('is_exists_by_slug', [slug])
+        return return_one(data)
+
     def get_by_id(self, uid: int) -> Optional[Dict[str, Any]]:
         data = self._context.callproc('get_forum_by_id', [uid])
         return return_one(data)

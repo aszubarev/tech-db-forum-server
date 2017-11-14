@@ -1,0 +1,10 @@
+@startuml
+
+users_for_forum: uid [INT]
+users_for_forum: forum_slug [CITEXT]
+users_for_forum: user_nickname [CITEXT]
+users_for_forum: user_email [CITEXT]
+users_for_forum: user_about [TEXT]
+users_for_forum: user_fullname [TEXT]
+
+@enduml

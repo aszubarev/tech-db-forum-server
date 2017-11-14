@@ -106,31 +106,6 @@ class ThreadBlueprint(BaseBlueprint[ThreadRepository]):
 
             return Response(response=json.dumps(thread), status=200, mimetype='application/json')
 
-        # @blueprint.route('thread/<slug_or_id>/vote', methods=['POST'])
-        # def _vote(slug_or_id: str):
-        #
-        #     data = request.json
-        #     nickname = data.get('nickname')
-        #     voice = data.get('voice')
-        #     if not nickname or not voice:
-        #         return self._return_error(f"[ThreadBlueprint._vote] Bad request", 400)
-        #
-        #     thread = self.__repo.get_by_slug_or_id(slug_or_id)
-        #     if not thread:
-        #         return self._return_error(f"Can't find thread by slug_or_id = {slug_or_id}", 404)
-        #
-        #     user = self._userRepo.get_by_nickname(nickname)
-        #     if not user:
-        #         return self._return_error(f"Can't find user by nickname = {nickname}", 404)
-        #
-        #     votes = self.__repo.vote(user_id=user['user_id'], thread_id=thread['id'], voice=voice)
-        #     if votes is None:
-        #         return self._return_error(f"[ThreadBlueprint._vote] "
-        #                                   f"Can't get votes for thread by slug_or_id = {slug_or_id}", 500)
-        #
-        #     thread['votes'] = votes
-        #     return Response(response=json.dumps(thread), status=200, mimetype='application/json')
-
         @blueprint.route('thread/<slug_or_id>/vote', methods=['POST'])
         def _vote(slug_or_id: str):
             body = request.json

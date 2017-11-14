@@ -75,7 +75,7 @@ class UserBlueprint(BaseBlueprint[UserRepository]):
         @blueprint.route('forum/<forum_slug>/users', methods=['GET'])
         def _get_users_for_forum(forum_slug: str):
 
-            forum = self._forumRepo.get_by_slug(forum_slug)
+            forum = self._forumRepo.is_exists_by_slug(forum_slug)
             if not forum:
                 return self._return_error(f"Can't find forum: forum_slug =  {forum_slug}", 404)
 

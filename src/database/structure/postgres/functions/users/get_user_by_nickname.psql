@@ -9,7 +9,7 @@ $BODY$
   BEGIN
     RETURN QUERY SELECT u.user_id, u.nickname, u.email, u.about, u.fullname
     FROM users u
-    WHERE u.nickname = p_nickname;
+    WHERE u.nickname = p_nickname COLLATE "ucs_basic";
   END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;

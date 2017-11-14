@@ -3,6 +3,7 @@ CREATE OR REPLACE FUNCTION get_users_for_forum_limit(
     p_limit INT
 )
 
+
 RETURNS TABLE(nickname CITEXT,
               email CITEXT,
               about TEXT,
@@ -12,22 +13,11 @@ $BODY$
 BEGIN
 
   RETURN QUERY
-
-  SELECT u.nickname, u.email, u.about, u.fullname
-   FROM users u
-   WHERE u.user_id in (
-                         select t.user_id
-                         from threads t
-                         WHERE t.forum_id = p_forum_id
-
-                         UNION
-
-                         select p.user_id
-                         from posts p
-                         WHERE p.forum_id = p_forum_id
-                       )
-   ORDER BY u.nickname COLLATE "ucs_basic"
-   LIMIT p_limit;
+  SELECT uf.user_nickname, uf.user_email, uf.user_about, uf.user_fullname
+  FROM users_for_forum uf
+  WHERE uf.forum_id = p_forum_id
+  ORDER BY uf.user_nickname COLLATE "ucs_basic"
+  LIMIT p_limit;
 
   END;
 $BODY$

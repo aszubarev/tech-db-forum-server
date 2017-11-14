@@ -44,6 +44,15 @@ RUN echo "listen_addresses='*'" >> /var/lib/postgresql/$PGVER/main/postgresql.co
 RUN echo "synchronous_commit = off" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
 RUN echo "fsync = off" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
 
+RUN echo "log_statement = none" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
+RUN echo "log_duration = off " >> /var/lib/postgresql/$PGVER/main/postgresql.conf
+RUN echo "log_lock_waits = on" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
+RUN echo "log_min_duration_statement = 50" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
+RUN echo "log_filename = 'query.log'" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
+RUN echo "log_directory = '/var/log/postgresql'" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
+RUN echo "log_destination = 'csvlog'" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
+RUN echo "logging_collector = on" >> /var/lib/postgresql/$PGVER/main/postgresql.conf
+
 USER root
 ########################################################################################################################
 COPY ./src/database $DATABASE

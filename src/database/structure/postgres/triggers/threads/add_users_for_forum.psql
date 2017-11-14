@@ -1,0 +1,5 @@
+CREATE TRIGGER add_users_for_forum_on_threads_tgr
+  AFTER INSERT
+  ON threads
+  FOR EACH ROW
+EXECUTE PROCEDURE add_users_for_forum_on_thread_procedure();

@@ -1,0 +1,3 @@
+ALTER TABLE users_for_forum
+    ADD CONSTRAINT unic_forum_slug_user_nickname
+    UNIQUE(forum_id, user_nickname);
