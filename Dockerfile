@@ -16,8 +16,8 @@ ENV DB_SERVICE postgres
 ENV SERVER_NAME forum_server
 ENV WEB_PORT 5000
 
-ENV http_proxy http://10.100.122.141:3128/
-ENV https_proxy https://10.100.122.141:3128/
+#ENV http_proxy http://10.100.122.141:3128/
+#ENV https_proxy https://10.100.122.141:3128/
 
 
 ########################################################################################################################
