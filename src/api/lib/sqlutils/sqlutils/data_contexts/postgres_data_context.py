@@ -1,4 +1,5 @@
 import logging
+import gevent_psycopg2; gevent_psycopg2.monkey_patch()
 from contextlib import contextmanager
 from typing import Any, Dict, Tuple, List
 
