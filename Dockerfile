@@ -16,8 +16,8 @@ ENV DB_SERVICE postgres
 ENV SERVER_NAME forum_server
 ENV WEB_PORT 5000
 
-#ENV http_proxy http://10.100.122.141:3128/
-#ENV https_proxy https://10.100.122.141:3128/
+ENV http_proxy http://10.100.122.141:3128/
+ENV https_proxy https://10.100.122.141:3128/
 
 
 ########################################################################################################################
@@ -72,6 +72,10 @@ COPY ./src/api/lib/apiutils /prereqs/apiutils
 WORKDIR /prereqs/apiutils
 RUN python setup.py install
 
+COPY ./src/api/lib/gevent-psycopg2 /prereqs/gevent-psycopg2
+WORKDIR /prereqs/gevent-psycopg2
+RUN python setup.py install
+
 RUN rm -rf /prereqs
 
 COPY ./src/api /api
@@ -88,4 +92,4 @@ EXPOSE 5000
 
 CMD /usr/lib/postgresql/$PGVER/bin/pg_ctl -o "-p ${DB_PORT}" -D /var/lib/postgresql/$PGVER/main start &&\
     bash /loader/create_db.sh $DB_HOST $DB_PORT $DB_NAME $DB_USER $DB_PASS $DATABASE &&\
-    /usr/local/bin/gunicorn -w 8 -k sync --worker-connections 12 -t 240 -b 0.0.0.0:$WEB_PORT app:app
+    /usr/local/bin/gunicorn -w 8 -k gevent --worker-connections 12 -t 240 -b 0.0.0.0:$WEB_PORT app:app
