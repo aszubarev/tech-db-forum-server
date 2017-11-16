@@ -5,9 +5,7 @@ CREATE OR REPLACE FUNCTION get_threads_for_forum_sort_limit(p_forum_id INT,
                                                             p_limit int)
 RETURNS TABLE(id INT,
               slug CITEXT,
-              user_id INT,
               author CITEXT,
-              forum_id INT,
               forum CITEXT,
               created TIMESTAMP WITH TIME ZONE,
               message TEXT,
@@ -19,7 +17,7 @@ BEGIN
 
     RETURN QUERY
 
-    SELECT th.thread_id, th.slug, th.user_id, th.user_nickname, th.forum_id, th.forum_slug,
+    SELECT th.thread_id, th.slug, th.user_nickname, th.forum_slug,
            th.created, th.message, th.title, th.votes
     FROM threads th
     WHERE th.forum_id = p_forum_id
