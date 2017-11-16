@@ -88,4 +88,4 @@ EXPOSE 5000
 
 CMD /usr/lib/postgresql/$PGVER/bin/pg_ctl -o "-p ${DB_PORT}" -D /var/lib/postgresql/$PGVER/main start &&\
     bash /loader/create_db.sh $DB_HOST $DB_PORT $DB_NAME $DB_USER $DB_PASS $DATABASE &&\
-    /usr/local/bin/gunicorn -w 7 -k sync --worker-connections 12 -t 240 -b 0.0.0.0:$WEB_PORT app:app
+    /usr/local/bin/gunicorn -w 6 -k sync --worker-connections 12 -t 240 -b 0.0.0.0:$WEB_PORT app:app
