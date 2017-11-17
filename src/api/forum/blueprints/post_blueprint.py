@@ -13,6 +13,7 @@ from forum.persistence.repositories.thread_repository import ThreadRepository
 from forum.persistence.repositories.user_repository import UserRepository
 
 from sqlutils import NoDataFoundError
+import ujson
 
 
 @singleton
@@ -46,11 +47,12 @@ class PostBlueprint(BaseBlueprint[PostRepository]):
             if not thread:
                 return self._return_error(f"Can't find thread by slag = {slug_or_id}", 404)
 
-            body = request.json
+            body = ujson.loads(request.data)
+            # body = request.json
             response = []
 
             if not body:
-                return Response(response=json.dumps(response), status=201, mimetype='application/json')
+                return Response(response=ujson.dumps(response), status=201, mimetype='application/json')
 
             created = datetime.now(tz=self._tz).astimezone(tz=self._tz).isoformat()
             insert_values = "(post_id, thread_id, forum_id, forum_slug, user_id, user_nickname, " \
@@ -105,7 +107,7 @@ class PostBlueprint(BaseBlueprint[PostRepository]):
 
             self.__repo.add_many(insert_values=insert_values, insert_args=insert_args)
             self._forumRepo.increment_posts_by_number(thread['forum_id'], len(response))
-            return Response(response=json.dumps(response), status=201, mimetype='application/json')
+            return Response(response=ujson.dumps(response), status=201, mimetype='application/json')
 
         @blueprint.route('thread/<slug_or_id>/posts', methods=['GET'])
         def _posts(slug_or_id: str):
@@ -115,14 +117,15 @@ class PostBlueprint(BaseBlueprint[PostRepository]):
                 if not thread:
                     return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
 
-                sort = request.args.get('sort')
-                since = request.args.get('since')
-                limit = request.args.get('limit')
-                desc = request.args.get('desc')
+                args = request.args
+                sort = args.get('sort')
+                since = args.get('since')
+                limit = args.get('limit')
+                desc = args.get('desc')
 
                 response = self.__repo.get_posts_for_thread(thread['id'],
                                                             sort=sort, since=since, limit=limit, desc=desc)
-                return Response(response=json.dumps(response), status=200, mimetype='application/json')
+                return Response(response=ujson.dumps(response), status=200, mimetype='application/json')
 
             except NoDataFoundError:
                 return self._return_error(f"Can't get thread by forum slug_or_id = {slug_or_id}", 404)
@@ -132,13 +135,10 @@ class PostBlueprint(BaseBlueprint[PostRepository]):
 
         @blueprint.route('post/<uid>/details', methods=['GET'])
         def _details(uid: int):
-            # logging.error(f"[PostBlueprint._details] uid = {uid}")
             post = self.__repo.get_by_id(uid)
 
             if not post:
                 return self._return_error(f"Can't find post by id = {uid}", 404)
-
-            # logging.error(f"[PostBlueprint._details] post = {post}")
 
             author = None
             forum = None
@@ -164,26 +164,27 @@ class PostBlueprint(BaseBlueprint[PostRepository]):
                     'post': post
                 }
 
-            return Response(response=json.dumps(response), status=200, mimetype='application/json')
+            return Response(response=ujson.dumps(response), status=200, mimetype='application/json')
 
         @blueprint.route('post/<uid>/details', methods=['POST'])
         def _update(uid: int):
 
-            data = request.json
+            body = ujson.loads(request.data)
+            # body = request.json
 
             # empty request
-            if not data:
+            if not body:
                 post = self.__repo.get_by_id(uid)
                 if not post:
                     return self._return_error(f"Can't get post by uid = {uid}", 404)
-                return Response(response=json.dumps(post), status=200, mimetype='application/json')
+                return Response(response=ujson.dumps(post), status=200, mimetype='application/json')
 
-            message = data['message']
+            message = body['message']
             response = self.__repo.update(uid=uid, message=message)
 
             if not response:
                 return self._return_error(f"Can't find post by uid = {uid}", 404)
 
-            return Response(response=json.dumps(response), status=200, mimetype='application/json')
+            return Response(response=ujson.dumps(response), status=200, mimetype='application/json')
 
         return blueprint

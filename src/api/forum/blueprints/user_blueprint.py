@@ -7,6 +7,7 @@ from forum.persistence.repositories.user_repository import UserRepository
 from sqlutils import UniqueViolationError
 
 from apiutils import BaseBlueprint
+import ujson
 
 
 @singleton
@@ -33,16 +34,17 @@ class UserBlueprint(BaseBlueprint[UserRepository]):
         def _add(nickname: str):
             try:
 
-                params = request.json
+                # params = request.json
+                params = ujson.loads(request.data)
                 params.update({
                     'nickname': nickname
                 })
                 response = self.__repo.add(params)
-                return Response(response=json.dumps(response), status=201, mimetype='application/json')
+                return Response(response=ujson.dumps(response), status=201, mimetype='application/json')
 
             except UniqueViolationError:
                 response = self.__repo.get_by_nickname_or_email(nickname=nickname, email=request.json['email'])
-                return Response(response=json.dumps(response), status=409, mimetype='application/json')
+                return Response(response=ujson.dumps(response), status=409, mimetype='application/json')
 
         @blueprint.route('user/<nickname>/profile', methods=['GET'])
         def profile(nickname: str):
@@ -50,7 +52,7 @@ class UserBlueprint(BaseBlueprint[UserRepository]):
             if not data:
                 return self._return_error(f"Can't find user with nickname {nickname}", 404)
 
-            return Response(response=json.dumps(data), status=200, mimetype='application/json')
+            return Response(response=ujson.dumps(data), status=200, mimetype='application/json')
 
         @blueprint.route('user/<nickname>/profile', methods=['POST'])
         def _update(nickname: str):
@@ -67,7 +69,7 @@ class UserBlueprint(BaseBlueprint[UserRepository]):
                     'nickname': user['nickname']
                 })
                 data = self.__repo.update(params)
-                return Response(response=json.dumps(data), status=200, mimetype='application/json')
+                return Response(response=ujson.dumps(data), status=200, mimetype='application/json')
 
             except UniqueViolationError:
                 return self._return_error(f"Can't update user with nickname {nickname};", 409)
@@ -79,11 +81,12 @@ class UserBlueprint(BaseBlueprint[UserRepository]):
             if not forum:
                 return self._return_error(f"Can't find forum: forum_slug =  {forum_slug}", 404)
 
-            desc = request.args.get('desc')
-            limit = request.args.get('limit')
-            since = request.args.get('since')
+            args = request.args
+            desc = args.get('desc')
+            limit = args.get('limit')
+            since = args.get('since')
 
             data = self.__repo.get_for_forum(forum_id=forum['forum_id'], since=since, limit=limit, desc=desc)
-            return Response(response=json.dumps(data), status=200, mimetype='application/json')
+            return Response(response=ujson.dumps(data), status=200, mimetype='application/json')
 
         return blueprint

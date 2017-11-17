@@ -9,6 +9,7 @@ from forum.persistence.repositories.service_repository import SrvRepository
 from forum.persistence.repositories.thread_repository import ThreadRepository
 from forum.persistence.repositories.user_repository import UserRepository
 from forum.persistence.repositories.vote_repositpry import VoteRepository
+import ujson
 
 
 @singleton
@@ -46,7 +47,7 @@ class SrvBlueprint(BaseBlueprint[SrvRepository]):
                 'user': self._userRepo.get_count()
             }
 
-            return Response(response=json.dumps(response), status=200, mimetype='application/json')
+            return Response(response=ujson.dumps(response), status=200, mimetype='application/json')
 
         @blueprint.route('service/clear', methods=['POST'])
         def _clear():
