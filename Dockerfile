@@ -61,7 +61,8 @@ COPY ./lib/loader/database_loader /loader
 WORKDIR /loader
 ########################################################################################################################
 
-RUN apt-get -y install build-essential gcc
+RUN apt-get -y install build-essential gcc libpcre3 libpcre3-dev nginx
+COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
 COPY ./src/api/requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
@@ -84,10 +85,14 @@ RUN rm -rf /api
 WORKDIR /tmp/api/forum
 ENV PYTHONPATH /tmp/api/
 
-USER postgres
+#USER postgres
+USER root
 EXPOSE 54545
 EXPOSE 5000
+EXPOSE 80
 
-CMD /usr/lib/postgresql/$PGVER/bin/pg_ctl -o "-p ${DB_PORT}" -D /var/lib/postgresql/$PGVER/main start &&\
+CMD service nginx start && \
+    runuser -l postgres -c "/usr/lib/postgresql/10/bin/pg_ctl -o \"-p ${DB_PORT}\" -D /var/lib/postgresql/10/main start" &&\
     bash /loader/create_db.sh $DB_HOST $DB_PORT $DB_NAME $DB_USER $DB_PASS $DATABASE &&\
+#    /usr/local/bin/uwsgi --master --enable-threads --http-socket :$WEB_PORT -p 7 -w wsgi -z 30 --manage-script-name --mount /=app:app
     /usr/local/bin/gunicorn -w 5 -k sync --worker-connections 12 -t 240 -b 0.0.0.0:$WEB_PORT app:app
