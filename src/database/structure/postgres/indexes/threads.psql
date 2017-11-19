@@ -7,11 +7,11 @@ CREATE INDEX threads_forums_idx
 CREATE INDEX threads_users_idx
   ON threads (user_id);
 
---create index threads_forum_id_created_idx
---  on threads (forum_id, created);
+create index threads_forum_id_created_idx
+  on threads (forum_id, created);
 
-create index thread_forum_id_created_all_idx
-  on threads(forum_id, created, thread_id, slug, user_nickname, forum_slug,
-             message, title, votes);
+--create index thread_forum_id_created_all_idx
+--  on threads(forum_id, created, thread_id, slug, user_nickname, forum_slug,
+--             message, title, votes);
 
 
